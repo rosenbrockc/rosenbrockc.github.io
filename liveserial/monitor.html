@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Serial Port Monitoring &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="next" title="Data Logging" href="logging.html" />
+    <link rel="prev" title="Plotting and Logging Overview" href="overview.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Data Logging"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Plotting and Logging Overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="serial-port-monitoring">
+<h1>Serial Port Monitoring<a class="headerlink" href="#serial-port-monitoring" title="Permalink to this headline">¶</a></h1>
+<p>The monitoring module provides a class structure for interacting with a single
+serial port. Multiple class instances can be made for interacting with multiple
+ports at the same time and aggregating their data on a single
+plot. Synchronization is handled through <a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">Queue</span></code></a> instances that
+allow multi-thread access to putting and getting data.</p>
+<dl class="class">
+<dt id="liveserial.monitor.ComMonitorThread">
+<em class="property">class </em><code class="descclassname">liveserial.monitor.</code><code class="descname">ComMonitorThread</code><span class="sig-paren">(</span><em>data_q</em>, <em>error_q</em>, <em>port</em>, <em>port_baud</em>, <em>port_stopbits=1</em>, <em>port_parity='N'</em>, <em>port_timeout=0.01</em>, <em>listener=False</em>, <em>virtual=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>A thread for monitoring a COM port. The COM port is</dt>
+<dd>opened when the thread is started.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_q</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; Queue for received data. Items in the queue are
+(data, timestamp) pairs, where data is a binary
+string representing the received data, and timestamp
+is the time elapsed from the thread&#8217;s start (in
+seconds).</li>
+<li><strong>error_q</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; Queue for error messages. In particular, if the
+serial port fails to open for some reason, an error
+is placed into this queue.</li>
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The COM port to open. Must be recognized by the
+system.</li>
+<li><strong>port_baud</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Rate at which information is transferred in a communication channel
+(in bits/second).</li>
+<li><strong>stopbits</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Serial communication parameter; one of (1, 1.5, 2).</li>
+<li><strong>parity</strong> &#8211; (str): Serial communication parameter; one of [&#8216;N&#8217;, &#8216;E&#8217;, &#8216;O&#8217;, &#8216;M&#8217;, &#8216;S&#8217;].</li>
+<li><strong>port_timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The timeout used for reading the COM port. If this
+value is low, the thread will return data in finer
+grained chunks, with more accurate timestamps, but
+it will also consume more CPU.</li>
+<li><strong>listener</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; specifies that this COMThread is a listener, which prints
+out the raw stream in real-time, but doesn&#8217;t analyze it.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="ComMonitorThread.alive">
+<code class="descname">alive</code><a class="headerlink" href="#ComMonitorThread.alive" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.Event</em> &#8211; event for asynchronously handling the reads from
+the serial port.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ComMonitorThread.serial_arg">
+<code class="descname">serial_arg</code><a class="headerlink" href="#ComMonitorThread.serial_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; arguments used to contstruct the <a class="reference external" href="https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial" title="(in pySerial v3.0)"><code class="xref py py-class docutils literal"><span class="pre">serial.Serial</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ComMonitorThread.serial_port">
+<code class="descname">serial_port</code><a class="headerlink" href="#ComMonitorThread.serial_port" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>serial.Serial</em> &#8211; serial instance for communication.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.monitor.ComMonitorThread.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>terminate=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells the thread monitoring the COM port to clean up and return.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; number of seconds (or fractions of seconds) to wait
+until returning. If <cite>None</cite>, then the operation will
+block until the thread terminates. See also
+<a class="reference external" href="https://docs.python.org/2/library/threading.html#threading.Thread.join" title="(in Python v2.7)"><code class="xref py py-meth docutils literal"><span class="pre">threading.Thread.join()</span></code></a>.</li>
+<li><strong>terminate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the data collection is told to stop before
+trying to join the underlying thread; otherwise, the thread will
+keep processing data until join is called with terminate=True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.monitor.ComMonitorThread.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the COM monitoring thread. If an existing serial connection is
+open, it will be closed and a new one will be created. The monitoring
+will continue indefinitely until <code class="xref py py-meth docutils literal"><span class="pre">join()</span></code> is called.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="live-feed-for-data-aggregation">
+<h1>Live Feed for Data Aggregation<a class="headerlink" href="#live-feed-for-data-aggregation" title="Permalink to this headline">¶</a></h1>
+<p>Serial port data is read off by the <a class="reference internal" href="#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><code class="xref py py-class docutils literal"><span class="pre">ComMonitorThread</span></code></a>
+instances. However, the amount of data generated on the serial stream exceeds
+what we need to generate a useful plot, and sometimes even exceeds our needs for
+logging. The <code class="xref py py-class docutils literal"><span class="pre">Logger</span></code> class instance monitors the data
+queues and periodically aggregates that data to form a single value,
+representative of the interval between checks (see <a class="reference internal" href="logging.html"><span class="doc">Data Logging</span></a>). These single point
+values are stored in <a class="reference internal" href="#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><code class="xref py py-class docutils literal"><span class="pre">LiveDataFeed</span></code></a>.</p>
+<dl class="class">
+<dt id="liveserial.monitor.LiveDataFeed">
+<em class="property">class </em><code class="descclassname">liveserial.monitor.</code><code class="descname">LiveDataFeed</code><a class="reference internal" href="_modules/liveserial/monitor.html#LiveDataFeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.LiveDataFeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple &#8220;live data feed&#8221; abstraction that allows a reader to read the most
+recent data and find out whether it was updated since the last read.</p>
+<dl class="attribute">
+<dt id="LiveDataFeed.has_new_data">
+<code class="descname">has_new_data</code><a class="headerlink" href="#LiveDataFeed.has_new_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; A boolean attribute telling the reader whether the
+data was updated since the last read; keyed by sensor identifier.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LiveDataFeed.cur_data">
+<code class="descname">cur_data</code><a class="headerlink" href="#LiveDataFeed.cur_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; most recent data point placed on the feed; keyed by the
+sensor identifier.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.monitor.LiveDataFeed.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>sensor</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#LiveDataFeed.add_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.LiveDataFeed.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new data to the feed.</p>
+<p>Args:
+sensor (str): sensor identifier for the data point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.monitor.LiveDataFeed.read_data">
+<code class="descname">read_data</code><span class="sig-paren">(</span><em>sensor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#LiveDataFeed.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.LiveDataFeed.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the most recent data.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="useful-utility-functions">
+<h1>Useful Utility Functions<a class="headerlink" href="#useful-utility-functions" title="Permalink to this headline">¶</a></h1>
+<p>The monitoring module also exposes some useful functions for interacting with
+the data and error queues, and for listing available serial ports on a machine.</p>
+<span class="target" id="module-liveserial.monitor"></span><p>Class for monitoring a COM port using pyserial on a separate thread so that
+that the main UI thread is not blocked or slowed. Code adapted from
+<a class="reference external" href="https://github.com/mba7/SerialPort-RealTime-Data-Plotter/blob/master/com_monitor.py">https://github.com/mba7/SerialPort-RealTime-Data-Plotter/blob/master/com_monitor.py</a></p>
+<dl class="function">
+<dt id="liveserial.monitor.enumerate_serial_ports">
+<code class="descclassname">liveserial.monitor.</code><code class="descname">enumerate_serial_ports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#enumerate_serial_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.enumerate_serial_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans for available serial ports.</p>
+<p>Returns:
+list: of <cite>str</cite> with  the availables port names.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.monitor.get_all_from_queue">
+<code class="descclassname">liveserial.monitor.</code><code class="descname">get_all_from_queue</code><span class="sig-paren">(</span><em>Q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#get_all_from_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.get_all_from_queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generator to yield one after the others all items currently in the queue Q,</dt>
+<dd>without any waiting.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Q</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; queue to empty items from.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.monitor.get_item_from_queue">
+<code class="descclassname">liveserial.monitor.</code><code class="descname">get_item_from_queue</code><span class="sig-paren">(</span><em>Q</em>, <em>timeout=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#get_item_from_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.get_item_from_queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Attempts to retrieve an item from the queue Q. If Q is</dt>
+<dd>empty, None is returned.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Q</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; queue to get an item from.</li>
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Blocks for &#8216;timeout&#8217; seconds in case the queue is empty,
+so don&#8217;t use this method for speedy retrieval of multiple
+items (use get_all_from_queue for that).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Serial Port Monitoring</a></li>
+<li><a class="reference internal" href="#live-feed-for-data-aggregation">Live Feed for Data Aggregation</a></li>
+<li><a class="reference internal" href="#useful-utility-functions">Useful Utility Functions</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Plotting and Logging Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="logging.html"
+                        title="next chapter">Data Logging</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/monitor.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Data Logging"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Plotting and Logging Overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

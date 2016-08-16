@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liveserial.monitor &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for liveserial.monitor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class for monitoring a COM port using pyserial on a separate thread so that</span>
+<span class="sd">that the main UI thread is not blocked or slowed. Code adapted from</span>
+<span class="sd">https://github.com/mba7/SerialPort-RealTime-Data-Plotter/blob/master/com_monitor.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">threading</span><span class="o">,</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">Queue</span>
+<span class="kn">from</span> <span class="nn">liveserial</span> <span class="k">import</span> <span class="n">msg</span>
+<div class="viewcode-block" id="ComMonitorThread"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread">[docs]</a><span class="k">class</span> <span class="nc">ComMonitorThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A thread for monitoring a COM port. The COM port is </span>
+<span class="sd">        opened when the thread is started.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        data_q (Queue.Queue):</span>
+<span class="sd">            Queue for received data. Items in the queue are</span>
+<span class="sd">            (data, timestamp) pairs, where data is a binary </span>
+<span class="sd">            string representing the received data, and timestamp</span>
+<span class="sd">            is the time elapsed from the thread&#39;s start (in </span>
+<span class="sd">            seconds).</span>
+<span class="sd">        </span>
+<span class="sd">        error_q (Queue.Queue):</span>
+<span class="sd">            Queue for error messages. In particular, if the </span>
+<span class="sd">            serial port fails to open for some reason, an error</span>
+<span class="sd">            is placed into this queue.</span>
+<span class="sd">        </span>
+<span class="sd">        port (str):</span>
+<span class="sd">            The COM port to open. Must be recognized by the </span>
+<span class="sd">            system.</span>
+<span class="sd">        </span>
+<span class="sd">        port_baud (int):</span>
+<span class="sd">            Rate at which information is transferred in a communication channel</span>
+<span class="sd">            (in bits/second).    </span>
+
+<span class="sd">        stopbits (float): Serial communication parameter; one of (1, 1.5, 2).</span>
+<span class="sd">        parity: (str): Serial communication parameter; one of [&#39;N&#39;, &#39;E&#39;, &#39;O&#39;, &#39;M&#39;, &#39;S&#39;].</span>
+<span class="sd">        </span>
+<span class="sd">        port_timeout (float):</span>
+<span class="sd">            The timeout used for reading the COM port. If this</span>
+<span class="sd">            value is low, the thread will return data in finer</span>
+<span class="sd">            grained chunks, with more accurate timestamps, but</span>
+<span class="sd">            it will also consume more CPU.</span>
+<span class="sd">        listener (bool): specifies that this COMThread is a listener, which prints</span>
+<span class="sd">            out the raw stream in real-time, but doesn&#39;t analyze it.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        alive (threading.Event): event for asynchronously handling the reads from</span>
+<span class="sd">          the serial port.</span>
+<span class="sd">        serial_arg (dict): arguments used to contstruct the :class:`serial.Serial`.</span>
+<span class="sd">        serial_port (serial.Serial): serial instance for communication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_q</span><span class="p">,</span> <span class="n">error_q</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">port_baud</span><span class="p">,</span>
+                 <span class="n">port_stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+                 <span class="n">port_parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span> <span class="n">port_timeout</span>  <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                 <span class="n">listener</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span>  <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">port</span>      <span class="o">=</span> <span class="n">port</span><span class="p">,</span>
+                                <span class="n">baudrate</span>  <span class="o">=</span> <span class="n">port_baud</span><span class="p">,</span>
+                                <span class="n">stopbits</span>  <span class="o">=</span> <span class="n">port_stopbits</span><span class="p">,</span>
+                                <span class="n">parity</span>    <span class="o">=</span> <span class="n">port_parity</span><span class="p">,</span>
+                                <span class="n">timeout</span>   <span class="o">=</span> <span class="n">port_timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">virtual</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span><span class="p">[</span><span class="s2">&quot;dsrdtr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span><span class="p">[</span><span class="s2">&quot;rtscts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_q</span>   <span class="o">=</span> <span class="n">data_q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_q</span>  <span class="o">=</span> <span class="n">error_q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listener</span> <span class="o">=</span> <span class="n">listener</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alive</span>    <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        
+<div class="viewcode-block" id="ComMonitorThread.run"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts the COM monitoring thread. If an existing serial connection is</span>
+<span class="sd">        open, it will be closed and a new one will be created. The monitoring</span>
+<span class="sd">        will continue indefinitely until :meth:`join` is called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span><span class="p">)</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Serial port communication enabled.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">lastlisten</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="o">.</span><span class="n">isSet</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">listener</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">lastlisten</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">lastlisten</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">lastlisten</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="k">continue</span>
+                    
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="n">sensor</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">qdata</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">sensor</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">qdata</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># There must have been a communication glitch; just ignore</span>
+                    <span class="c1"># this data point.</span>
+                    <span class="k">pass</span>
+            
+        <span class="c1"># clean up</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            
+<div class="viewcode-block" id="ComMonitorThread.join"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tells the thread monitoring the COM port to clean up and return.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float): number of seconds (or fractions of seconds) to wait</span>
+<span class="sd">              until returning. If `None`, then the operation will</span>
+<span class="sd">              block until the thread terminates. See also</span>
+<span class="sd">              :meth:`threading.Thread.join`.</span>
+<span class="sd">            terminate (bool): when True, the data collection is told to stop before</span>
+<span class="sd">              trying to join the underlying thread; otherwise, the thread will</span>
+<span class="sd">              keep processing data until join is called with terminate=True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">terminate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="enumerate_serial_ports"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.enumerate_serial_ports">[docs]</a><span class="k">def</span> <span class="nf">enumerate_serial_ports</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Scans for available serial ports.</span>
+
+<span class="sd">    Returns:         </span>
+<span class="sd">    list: of `str` with  the availables port names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">name</span>
+    <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+    <span class="k">if</span> <span class="n">name</span>  <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+        <span class="n">outAvailablePorts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">outAvailablePorts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">portstr</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   
+            <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">outAvailablePorts</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/dev/tty.*&#39;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="get_all_from_queue"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.get_all_from_queue">[docs]</a><span class="k">def</span> <span class="nf">get_all_from_queue</span><span class="p">(</span><span class="n">Q</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generator to yield one after the others all items currently in the queue Q,</span>
+<span class="sd">        without any waiting.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Q (Queue.Queue): queue to empty items from.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieving entire queue.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Q</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span></div>
+
+<div class="viewcode-block" id="get_item_from_queue"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.get_item_from_queue">[docs]</a><span class="k">def</span> <span class="nf">get_item_from_queue</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Attempts to retrieve an item from the queue Q. If Q is</span>
+<span class="sd">        empty, None is returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Q (Queue.Queue): queue to get an item from.</span>
+<span class="sd">        timeout (float):</span>
+<span class="sd">            Blocks for &#39;timeout&#39; seconds in case the queue is empty,</span>
+<span class="sd">            so don&#39;t use this method for speedy retrieval of multiple</span>
+<span class="sd">            items (use get_all_from_queue for that).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="n">item</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="LiveDataFeed"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.LiveDataFeed">[docs]</a><span class="k">class</span> <span class="nc">LiveDataFeed</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple &quot;live data feed&quot; abstraction that allows a reader to read the most</span>
+<span class="sd">    recent data and find out whether it was updated since the last read.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        has_new_data (dict): A boolean attribute telling the reader whether the</span>
+<span class="sd">          data was updated since the last read; keyed by sensor identifier.</span>
+<span class="sd">        cur_data (dict): most recent data point placed on the feed; keyed by the</span>
+<span class="sd">          sensor identifier.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_new_data</span> <span class="o">=</span> <span class="p">{}</span>
+        
+<div class="viewcode-block" id="LiveDataFeed.add_data"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.LiveDataFeed.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add new data to the feed.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">        sensor (str): sensor identifier for the data point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_data</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_new_data</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+    
+<div class="viewcode-block" id="LiveDataFeed.read_data"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.LiveDataFeed.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the most recent data.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_new_data</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_data</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Multiple Sensor Configuration File &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="prev" title="Data Plotting" href="plotting.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Data Plotting"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="multiple-sensor-configuration-file">
+<h1>Multiple Sensor Configuration File<a class="headerlink" href="#multiple-sensor-configuration-file" title="Permalink to this headline">¶</a></h1>
+<p><cite>liveserial</cite> can handle multiple serial ports simultaneously, as well as
+multiple sensor streams per serial port. Since each device can have a different
+data format arriving at the serial port, we need a way for the user to specify
+what to expect for each sensor.</p>
+<p>An example file is in the repo (see <a class="reference download internal" href="_downloads/sensors.cfg" download=""><code class="xref download docutils literal"><span class="pre">sensors.cfg</span></code></a>). Basically, each sensor has its own section with
+the following possible options:</p>
+<ul class="simple">
+<li><strong>key</strong> text that identifies this sensor when it is part of a multi-sensor
+stream on a single port.</li>
+<li><strong>format</strong> comma-separated list of python data types (<cite>str</cite>, <cite>int</cite>, <cite>float</cite>)
+and <cite>key</cite> to specify the column location that the key will be at.</li>
+<li><strong>port</strong> name of the serial port on the local machine that this sensor&#8217;s data
+will arive at.</li>
+<li><strong>label</strong> for plotting, what label to include on the <cite>y</cite> axis.</li>
+</ul>
+<p>Since the config file format is extensible, it is easy to add additional options
+later on. The default <a class="reference external" href="https://docs.python.org/2/library/configparser.html#ConfigParser.ConfigParser" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></code></a> is used to extract the
+sections (sensors) and their options.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="previous chapter">Data Plotting</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/config.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Data Plotting"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

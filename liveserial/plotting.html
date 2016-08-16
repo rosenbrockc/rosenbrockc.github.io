@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data Plotting &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="next" title="Multiple Sensor Configuration File" href="config.html" />
+    <link rel="prev" title="Data Logging" href="logging.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Multiple Sensor Configuration File"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Data Logging"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="data-plotting">
+<h1>Data Plotting<a class="headerlink" href="#data-plotting" title="Permalink to this headline">¶</a></h1>
+<p>Because <cite>liveserial</cite> supports simultaneous reading from multiple serial ports,
+each also supporting streams of data from multiple sensors, the plotting has to
+be flexible enough to support animation for multiple data sets. Plotting uses a
+single class that inherits from <a class="reference external" href="http://matplotlib.org/api/animation_api.html#matplotlib.animation.TimedAnimation" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">TimedAnimation</span></code></a> and
+overrides the methods for frame drawing to get the latest data points from the
+<a class="reference internal" href="monitor.html#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><code class="xref py py-class docutils literal"><span class="pre">LiveDataFeed</span></code></a>. Using <a class="reference external" href="https://docs.python.org/2/library/collections.html#collections.deque" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">deque</span></code></a>
+instances allows a fixed number of data points to be plotted so that the plot
+window moves intuitively as the stream continues to come in. Older values are
+discarded so that memory doesn&#8217;t become an issue either.</p>
+<p>For unit testing, the base class initializer is ignored in favor of a standard
+system timer to test the drawing methods and the data acquisition and
+passing. The background is also switched to <cite>Agg</cite> so that no plot window is
+generated.</p>
+<span class="target" id="module-liveserial.plotting"></span><p>Methods for plotting the real-time data feed.</p>
+<dl class="class">
+<dt id="liveserial.plotting.Plotter">
+<em class="property">class </em><code class="descclassname">liveserial.plotting.</code><code class="descname">Plotter</code><span class="sig-paren">(</span><em>livefeed</em>, <em>interval</em>, <em>maxlen=100</em>, <em>window=20</em>, <em>testmode=False</em>, <em>**plotargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the live stream for each of the sensors in a subplot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>livefeed</strong> (<a class="reference internal" href="monitor.html#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><em>monitor.LiveDataFeed</em></a>) &#8211; data feed with the latest data points to
+plot. Also an attribute on the class instance.</li>
+<li><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; how often (in milliseconds) to redraw the plot with the
+latest plot values.</li>
+<li><strong>maxlen</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum number of time points kept for each subplot.</li>
+<li><strong>window</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; width of the plot window for sensors.</li>
+<li><strong>testmode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the animator is not initialized so that a
+backend isn&#8217;t required to run the unit tests.</li>
+<li><strong>plotargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; arguments that get passed through directly to the
+<cite>matplotlib</cite> plotting function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="liveserial.plotting.Plotter.lines">
+<code class="descname">lines</code><a class="headerlink" href="#liveserial.plotting.Plotter.lines" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/lines_api.html#matplotlib.lines.Line2D" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.lines.Line2D</span></code></a> being animated with
+the serial data; keyed by the sensor identifiers.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="liveserial.plotting.Plotter.axes">
+<code class="descname">axes</code><a class="headerlink" href="#liveserial.plotting.Plotter.axes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a> being animated with the
+serial data; keyed by the sensor identifiers.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="liveserial.plotting.Plotter.ts">
+<code class="descname">ts</code><a class="headerlink" href="#liveserial.plotting.Plotter.ts" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; of lists of the last <cite>maxlen</cite> sensor timestamp readings.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="liveserial.plotting.Plotter.ys">
+<code class="descname">ys</code><a class="headerlink" href="#liveserial.plotting.Plotter.ys" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; of lists of the last <cite>maxlen</cite> sensor value readings.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.plotting.colorspace">
+<code class="descclassname">liveserial.plotting.</code><code class="descname">colorspace</code><span class="sig-paren">(</span><em>size</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#colorspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.colorspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an cycler over a linear color space with &#8216;size&#8217; entries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the number of colors to define in the space.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">iterable cycler with &#8216;size&#8217; colors.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/itertools.html#itertools.cycle" title="(in Python v2.7)">itertools.cycle</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="logging.html"
+                        title="previous chapter">Data Logging</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="config.html"
+                        title="next chapter">Multiple Sensor Configuration File</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/plotting.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Multiple Sensor Configuration File"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Data Logging"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

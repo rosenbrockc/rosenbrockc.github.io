@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data Logging &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="next" title="Data Plotting" href="plotting.html" />
+    <link rel="prev" title="Serial Port Monitoring" href="monitor.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Data Plotting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="monitor.html" title="Serial Port Monitoring"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="data-logging">
+<h1>Data Logging<a class="headerlink" href="#data-logging" title="Permalink to this headline">¶</a></h1>
+<p><cite>liveserial</cite> provides support for logging multiple sensor streams from a single
+serial port. To differentiate the streams, serial expects a key to be specified
+in the global configuration file (see <a class="reference internal" href="config.html"><span class="doc">Multiple Sensor Configuration File</span></a>). Once the data lines can be
+differentiated by the sensor key, the data is split in the plots and log files.</p>
+<p>In addition to just logging the data to <cite>csv</cite> files, the logging module also
+handles the periodic querying of the data queues that the serial monitor threads
+continuously write to (see <a class="reference internal" href="monitor.html"><span class="doc">Serial Port Monitoring</span></a>). Thus, even in the event that the user
+chooses no file logging, a <a class="reference internal" href="#liveserial.logging.Logger" title="liveserial.logging.Logger"><code class="xref py py-class docutils literal"><span class="pre">liveserial.logging.Logger</span></code></a> instance is still
+needed to help the <a class="reference internal" href="plotting.html"><span class="doc">Data Plotting</span></a> and <a class="reference internal" href="monitor.html"><span class="doc">Serial Port Monitoring</span></a> to talk to each other.</p>
+<p>There are two different intervals configured for the logging:</p>
+<ol class="arabic simple">
+<li><cite>buffertime</cite>: how often (in milliseconds) the logger aggregates the serial
+data queues to produce a single value.</li>
+<li><cite>logfreq</cite>: how often (in seconds) the logger appends the latest data points
+to the <cite>csv</cite> files for persistent storage.</li>
+</ol>
+<p>Because the logger implements <a class="reference external" href="https://docs.python.org/2/library/threading.html#threading.Timer" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">threading.Timer</span></code></a> to handle the aggregation
+and saving, the main thread doesn&#8217;t experience latency for large datasets being
+written to disk, which allows the plotting to continue smoothly.</p>
+<span class="target" id="module-liveserial.logging"></span><p>Methods for grabbing data and logging it to CSV files.</p>
+<dl class="class">
+<dt id="liveserial.logging.Logger">
+<em class="property">class </em><code class="descclassname">liveserial.logging.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>interval</em>, <em>dataq</em>, <em>errorq</em>, <em>livefeed</em>, <em>method='last'</em>, <em>logdir=None</em>, <em>logfreq=10</em>, <em>plotting=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs data points from the serial port to CSV. The arguments to this class
+constructor are also available as attributes on the class instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; how often (in milliseconds) to read data from the serial
+buffer.</li>
+<li><strong>dataq</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; stores the data read in from the serial port.</li>
+<li><strong>errorq</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; stores any error raised during serial port</li>
+<li><strong>reading.</strong> &#8211; </li>
+<li><strong>livefeed</strong> (<a class="reference internal" href="monitor.html#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><em>monitor.LiveDataFeed</em></a>) &#8211; feed for storing the latest data points
+obtained from the serial port.</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;average&#8217;, &#8216;last&#8217;] specifies how to aggregate multiple
+data points in the buffer.</li>
+<li><strong>logdir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; directory to place log files in for the sensors. If <cite>None</cite>,
+then data will <em>not</em> be logged to disk.</li>
+<li><strong>logfreq</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; how often (in seconds) to write the accumulated data points
+to CSV.</li>
+<li><strong>plotting</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when False, the values being read off will be printed if
+logging is not enabled.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="liveserial.logging.Logger.timer">
+<code class="descname">timer</code><a class="headerlink" href="#liveserial.logging.Logger.timer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.Timer</em> &#8211; latest data and push it to the live feed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="liveserial.logging.Logger.lastsave">
+<code class="descname">lastsave</code><a class="headerlink" href="#liveserial.logging.Logger.lastsave" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; timestamp indicating the last time the CSV file was
+appended to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="liveserial.logging.Logger.csvdata">
+<code class="descname">csvdata</code><a class="headerlink" href="#liveserial.logging.Logger.csvdata" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; lists of sensor time and value readings, keyed by sensor
+identifier.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.logging.Logger.ready">
+<code class="descname">ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True once we have accumulated a few timer calls of data. This
+ensures that we know how many sensors are running on the same COM port.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.logging.Logger.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the logger&#8217;s buffered points to a CSV file. If the file exists,
+then the data points are appended.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.logging.Logger.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a new timer for the configured interval to gather data from
+the serial stream.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.logging.Logger.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the automatic collection and logging of data.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="monitor.html"
+                        title="previous chapter">Serial Port Monitoring</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter">Data Plotting</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/logging.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Data Plotting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="monitor.html" title="Serial Port Monitoring"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

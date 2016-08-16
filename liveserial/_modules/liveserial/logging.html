@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liveserial.logging &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for liveserial.logging</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods for grabbing data and logging it to CSV files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../logging.html#liveserial.logging.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Logs data points from the serial port to CSV. The arguments to this class</span>
+<span class="sd">    constructor are also available as attributes on the class instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        interval (int): how often (in milliseconds) to read data from the serial</span>
+<span class="sd">          buffer.</span>
+<span class="sd">        dataq (Queue.Queue): stores the data read in from the serial port.</span>
+<span class="sd">        errorq (Queue.Queue): stores any error raised during serial port</span>
+<span class="sd">        reading.</span>
+<span class="sd">        livefeed (monitor.LiveDataFeed): feed for storing the latest data points</span>
+<span class="sd">          obtained from the serial port.</span>
+<span class="sd">        method (str): one of [&#39;average&#39;, &#39;last&#39;] specifies how to aggregate multiple</span>
+<span class="sd">          data points in the buffer.</span>
+<span class="sd">        logdir (str): directory to place log files in for the sensors. If `None`,</span>
+<span class="sd">          then data will *not* be logged to disk.</span>
+<span class="sd">        logfreq (int): how often (in seconds) to write the accumulated data points</span>
+<span class="sd">          to CSV.</span>
+<span class="sd">        plotting (bool): when False, the values being read off will be printed if</span>
+<span class="sd">          logging is not enabled.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        timer (threading.Timer) executes calls to the serial port reader to get the</span>
+<span class="sd">          latest data and push it to the live feed.    </span>
+<span class="sd">        lastsave (float): timestamp indicating the last time the CSV file was</span>
+<span class="sd">          appended to</span>
+<span class="sd">        csvdata (dict): lists of sensor time and value readings, keyed by sensor</span>
+<span class="sd">          identifier.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span> <span class="n">livefeed</span><span class="p">,</span>
+                 <span class="n">method</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">,</span> <span class="n">logdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfreq</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">plotting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataq</span> <span class="o">=</span> <span class="n">dataq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errorq</span> <span class="o">=</span> <span class="n">errorq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span> <span class="o">=</span> <span class="n">livefeed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="o">=</span> <span class="n">logdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logfreq</span> <span class="o">=</span> <span class="n">logfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span> <span class="o">=</span> <span class="n">plotting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timer_calls</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="sd">&quot;&quot;&quot;Number of times that the timer has executed during the application</span>
+<span class="sd">        run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cancel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="sd">&quot;&quot;&quot;When true, the main thread is trying to shut us down; don&#39;t start the</span>
+<span class="sd">        timer again once it fires.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Logger.ready"><a class="viewcode-back" href="../../logging.html#liveserial.logging.Logger.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True once we have accumulated a few timer calls of data. This</span>
+<span class="sd">        ensures that we know how many sensors are running on the same COM port.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">havepts</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">datapoints</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">)</span>
+            <span class="n">havepts</span> <span class="o">=</span> <span class="n">datapoints</span> <span class="o">&gt;</span> <span class="mi">2</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timer_calls</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">havepts</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Logger.start"><a class="viewcode-back" href="../../logging.html#liveserial.logging.Logger.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a new timer for the configured interval to gather data from</span>
+<span class="sd">        the serial stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancel</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Timer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_serial</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Logger.stop"><a class="viewcode-back" href="../../logging.html#liveserial.logging.Logger.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stops the automatic collection and logging of data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cancel</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="c1">#Write whatever data is left over to CSV file.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_csv_append</span><span class="p">()</span></div>
+        
+    <span class="k">def</span> <span class="nf">_read_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads the latest buffered serial information and places it onto the live</span>
+<span class="sd">        feed for the application.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timer_calls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">get_all_from_queue</span>
+        <span class="n">sensedata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">havedata</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">qdata</span> <span class="ow">in</span> <span class="n">get_all_from_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataq</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">sensor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sensedata</span><span class="p">:</span>
+                <span class="n">sensedata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sensedata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">qdata</span><span class="p">))</span>
+            <span class="n">havedata</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># We average/discard the data in the queue to produce the single entry that</span>
+        <span class="c1"># will be posted to the livefeed.</span>
+        <span class="k">if</span> <span class="n">havedata</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">qdata</span> <span class="ow">in</span> <span class="n">sensedata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;average&quot;</span><span class="p">:</span>
+                    <span class="c1">#We use the last data point&#39;s time stamp as the authoritative</span>
+                    <span class="c1">#one for the averaged set.</span>
+                    <span class="n">tstamp</span> <span class="o">=</span> <span class="n">qdata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="c1">#For the values, we take a simple mean.</span>
+                    <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">mean</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">tstamp</span><span class="p">,</span> <span class="n">mean</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">qdata</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">qdata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sensor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0: &lt;20f}</span><span class="s2">  </span><span class="si">{1: &lt;20f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">))</span>
+
+            <span class="c1">#Before we restart the timer again, see if we need to save the data to</span>
+            <span class="c1">#CSV.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_csv_append</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Appends the new data points to the relevant CSV files for each of the</span>
+<span class="sd">        sensor&#39;s whose data is being tracked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="kn">import</span> <span class="nn">csv</span>
+        <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">logpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">logpath</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">logpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Time,Value</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">logpath</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]:</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">idata</span><span class="p">)</span>
+                <span class="c1">#Since we appended the most recent data points, just reset the</span>
+                <span class="c1">#lists of points to be empty again.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>        
+        
+<div class="viewcode-block" id="Logger.save"><a class="viewcode-back" href="../../logging.html#liveserial.logging.Logger.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Saves the logger&#39;s buffered points to a CSV file. If the file exists,</span>
+<span class="sd">        then the data points are appended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#We need to see if enough time has passed since the last</span>
+        <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+        <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="p">())</span> <span class="o">-</span>
+                       <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span><span class="p">))</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfreq</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfreq</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_csv_append</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>
