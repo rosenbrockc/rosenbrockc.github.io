@@ -79,12 +79,12 @@
 
     <span class="n">msg</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">explain</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">outputfmt</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">_list_serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_list_serial</span><span class="p">(</span><span class="n">ports</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Lists all of the available serial ports on the local machine. If `port`</span>
 <span class="sd">    is specified, then returns True if port is in the list.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    port (str): name of a port to check existence for.</span>
+<span class="sd">    ports (list): name(s) of ports to check existence for.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    bool: specifying whether the given port is in the list, or</span>
@@ -92,8 +92,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">enumerate_serial_ports</span>
     <span class="n">available</span> <span class="o">=</span> <span class="n">enumerate_serial_ports</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">available</span>
+    <span class="k">if</span> <span class="n">ports</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">port</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Port &#39;</span><span class="si">{}</span><span class="s2">&#39; is not valid.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">result</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">available</span>
     
@@ -103,10 +108,17 @@
     <span class="kn">from</span> <span class="nn">liveserial</span> <span class="k">import</span> <span class="n">base</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">base</span><span class="o">.</span><span class="n">bparser</span><span class="p">],</span>
                                      <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Real-time serial port plotter/logger.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the port to plot/log.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the port(s) to plot/log.&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-noplot&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Don&#39;t plot the data; only log it.&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-auto&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Runs in automatic mode by loading a &quot;</span>
+                              <span class="s2">&quot;configuration file in the current directory &quot;</span>
+                              <span class="s2">&quot;called &#39;sensors.cfg&#39;.&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-config&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specify a configuration file to get sensor &quot;</span>
+                              <span class="s2">&quot;setup information from.&quot;</span><span class="p">))</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-logdir&quot;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Path to the directory where sensor data will &quot;</span>
                               <span class="s2">&quot;be logged.&quot;</span><span class="p">))</span>
@@ -145,16 +157,22 @@
                               <span class="s2">&quot;parameters for connection.&quot;</span><span class="p">))</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-sensors&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filter the list of sensors being logged/plotted.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-maxpts&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Maximum number of values to keep in the plot &quot;</span>
+                              <span class="s2">&quot;for each sensor&quot;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-window&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Width of window in time units.&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">exhandler</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
 
-    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]:</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Available Serial Ports&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">_list_serial</span><span class="p">():</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_list_serial</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]):</span>
-            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Port &#39;</span><span class="si">{}</span><span class="s2">&#39; is not valid.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]))</span>
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="c1">#Convert the units for the buffer and refresh times.</span>
@@ -164,38 +182,57 @@
     <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logdir&quot;</span><span class="p">]:</span> <span class="c1"># pragma: no cover</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Data will only be logged if `-logdir` is specified.&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="c1">#Handle the automatic configuration file setup.</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">]:</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;sensors.cfg&quot;</span><span class="p">)</span>
+        
     <span class="k">return</span> <span class="n">args</span>
 
 <span class="k">def</span> <span class="nf">_get_com</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Gets a configured COM port for serial communication.</span>
+    <span class="sd">&quot;&quot;&quot;Gets a list of configured COM ports for serial communication.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">ComMonitorThread</span>
-    <span class="kn">from</span> <span class="nn">Queue</span> <span class="k">import</span> <span class="n">Queue</span>
-    <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting monitoring of port &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">ComMonitorThread</span> <span class="k">as</span> <span class="n">CMT</span>
+    <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Queue</span>
     <span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">(),</span> <span class="n">Queue</span><span class="p">()</span>
-    <span class="n">com</span> <span class="o">=</span> <span class="n">ComMonitorThread</span><span class="p">(</span><span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;baudrate&quot;</span><span class="p">],</span>
-                           <span class="n">args</span><span class="p">[</span><span class="s2">&quot;stopbits&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;parity&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">],</span>
-                           <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">com</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting setup of ports </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]:</span>
+            <span class="n">com</span> <span class="o">=</span> <span class="n">CMT</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span> <span class="n">port</span><span class="p">,</span> <span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span>
+                                  <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;sensors&quot;</span><span class="p">])</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">com</span><span class="p">)</span>                                            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]:</span>
+            <span class="n">com</span> <span class="o">=</span> <span class="n">CMT</span><span class="p">(</span><span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;baudrate&quot;</span><span class="p">],</span>
+                      <span class="n">args</span><span class="p">[</span><span class="s2">&quot;stopbits&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;parity&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">],</span>
+                      <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">])</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">com</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
 
-<span class="k">def</span> <span class="nf">_com_start</span><span class="p">(</span><span class="n">com</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_com_start</span><span class="p">(</span><span class="n">coms</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Starts the serial port communication thread using the specified object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coms (list): of :class:`monitor.ComMonitorThread` instances to start</span>
+<span class="sd">          running.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">get_item_from_queue</span>
-    <span class="n">com</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;COM monitoring thread started.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">com</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coms</span><span class="p">):</span>
+        <span class="n">com</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;COM monitoring thread </span><span class="si">{}</span><span class="s2"> started.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
 
-    <span class="c1">#Even though the thread is going, it doesn&#39;t mean that everything is working</span>
-    <span class="c1">#the way we hope. Check the first item. We have to sleep to give it time to</span>
-    <span class="c1">#initialize.</span>
-    <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-    <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>    
-    <span class="n">com_error</span> <span class="o">=</span> <span class="n">get_item_from_queue</span><span class="p">(</span><span class="n">com</span><span class="o">.</span><span class="n">error_q</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">com_error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;monitor thread error--</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">com_error</span><span class="p">))</span>
-        <span class="n">com</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#Even though the thread is going, it doesn&#39;t mean that everything is working</span>
+        <span class="c1">#the way we hope. Check the first item. We have to sleep to give it time to</span>
+        <span class="c1">#initialize.</span>
+        <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">com_error</span> <span class="o">=</span> <span class="n">get_item_from_queue</span><span class="p">(</span><span class="n">com</span><span class="o">.</span><span class="n">error_q</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">com_error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+            <span class="c1">#We can&#39;t easily simulate failure on the serial port to test this message.</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;monitor thread error--</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">com_error</span><span class="p">))</span>
+            <span class="n">coms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     
-<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../overview.html#liveserial.livemon.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vardir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">testmode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../overview.html#liveserial.livemon.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">testmode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Starts monitoring of the serial data in a separate thread. Starts the</span>
 <span class="sd">    plotting or logging based on command-line args.</span>
 
@@ -204,7 +241,7 @@
 <span class="sd">        vardir (dict): to get access to the COM port, logger, feed and plotter</span>
 <span class="sd">          objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">base</span> <span class="k">import</span> <span class="n">set_testmode</span>
+    <span class="kn">from</span> <span class="nn">liveserial.base</span> <span class="k">import</span> <span class="n">set_testmode</span>
     <span class="n">set_testmode</span><span class="p">(</span><span class="n">testmode</span><span class="p">)</span>    
     <span class="c1">#When args is None, it means that examples or help or equivalent wants to</span>
     <span class="c1">#cancel the execution of the script.</span>
@@ -213,27 +250,37 @@
     
     <span class="c1">#Get the serial port for communications; this also tests that we are getting</span>
     <span class="c1">#data.</span>
-    <span class="n">com</span> <span class="o">=</span> <span class="n">_get_com</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">vardir</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">coms</span> <span class="o">=</span> <span class="n">_get_com</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
     <span class="c1">#The data feed keeps track of the latest, aggregated data selected from the</span>
     <span class="c1">#buffer in the com thread.</span>
     <span class="kn">from</span> <span class="nn">liveserial.monitor</span> <span class="k">import</span> <span class="n">LiveDataFeed</span>
     <span class="n">feed</span> <span class="o">=</span> <span class="n">LiveDataFeed</span><span class="p">()</span>
+    
     <span class="c1">#Logging queries the com thread buffer to get data, and then aggregates it</span>
     <span class="c1">#and puts it on the live data feed. Optionally, the data is also</span>
     <span class="c1">#periodically saved to CSV.</span>
-    <span class="kn">from</span> <span class="nn">liveserial.logging</span> <span class="k">import</span> <span class="n">Logger</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;buffertime&quot;</span><span class="p">],</span> <span class="n">com</span><span class="o">.</span><span class="n">data_q</span><span class="p">,</span> <span class="n">com</span><span class="o">.</span><span class="n">error_q</span><span class="p">,</span> <span class="n">feed</span><span class="p">,</span>
+    <span class="kn">from</span> <span class="nn">liveserial.log</span> <span class="k">import</span> <span class="n">Logger</span>
+    <span class="n">dataqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">data_q</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">]</span>
+    <span class="c1">#The logger prints values to screen if it isn&#39;t running in plotting</span>
+    <span class="c1">#mode. Plotting mode means that the plot window is present, or that</span>
+    <span class="c1">#&#39;-listen&#39; was specified.</span>
+    <span class="n">plotting</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">])</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;buffertime&quot;</span><span class="p">],</span> <span class="n">dataqs</span><span class="p">,</span> <span class="n">feed</span><span class="p">,</span>
                     <span class="n">args</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logdir&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logfreq&quot;</span><span class="p">],</span>
-                    <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">])</span>
+                    <span class="n">plotting</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">])</span>
     
     <span class="kn">import</span> <span class="nn">signal</span>
-    <span class="k">def</span> <span class="nf">exit_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">exit_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Cleans up the serial communication and logging.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;SIGINT &gt;&gt; cleaning up threads.&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">:</span>
+            <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plotter</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1">#Matplotlib&#39;s cleanup code for animations is lousy--it doesn&#39;t</span>
@@ -245,41 +292,67 @@
     <span class="c1">#tests usually, which want to investigate the values in each object.</span>
     <span class="k">if</span> <span class="n">vardir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">vardir</span><span class="p">[</span><span class="s2">&quot;feed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feed</span>
-        <span class="n">vardir</span><span class="p">[</span><span class="s2">&quot;com&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">com</span>
+        <span class="n">vardir</span><span class="p">[</span><span class="s2">&quot;com&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coms</span>
         <span class="n">vardir</span><span class="p">[</span><span class="s2">&quot;logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger</span>
         
     <span class="c1">#Now that we actually have a way to quit the infinite loop, we can start the</span>
     <span class="c1">#data acquisition process.</span>
-    <span class="n">_com_start</span><span class="p">(</span><span class="n">com</span><span class="p">)</span>
-    
+    <span class="n">plotter</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_com_start</span><span class="p">(</span><span class="n">coms</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">com</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">]):</span> <span class="c1"># pragma: no cover</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;One of the COM threads didn&#39;t initialize properly.&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;COM Threads that were Okay&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">com</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">com</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">return</span>
+
     <span class="c1">#Wait until we have some data before the logger gets put to work with it.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">]:</span>
         <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-        <span class="k">while</span> <span class="n">com</span><span class="o">.</span><span class="n">data_q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="ow">not</span> <span class="n">com</span><span class="o">.</span><span class="n">data_q</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">])</span>
+               <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
+            <span class="c1">#If we don&#39;t need this delay, it shouldn&#39;t trigger unit test</span>
+            <span class="c1">#problems.</span>
             <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    
+
     <span class="c1">#The plotter looks at the live feed data to plot the latest aggregated</span>
     <span class="c1">#points.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">]:</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="n">logger</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
-            <span class="k">pass</span>
+        <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">logger</span><span class="o">.</span><span class="n">ready</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="kn">from</span> <span class="nn">liveserial.plotting</span> <span class="k">import</span> <span class="n">Plotter</span>
         <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-        <span class="n">plotter</span> <span class="o">=</span> <span class="n">Plotter</span><span class="p">(</span><span class="n">feed</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;refresh&quot;</span><span class="p">])</span>
+        <span class="n">plotter</span> <span class="o">=</span> <span class="n">Plotter</span><span class="p">(</span><span class="n">feed</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;refresh&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;maxpts&quot;</span><span class="p">],</span>
+                          <span class="n">args</span><span class="p">[</span><span class="s2">&quot;window&quot;</span><span class="p">],</span> <span class="n">testmode</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vardir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vardir</span><span class="p">[</span><span class="s2">&quot;plotter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plotter</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">testmode</span><span class="p">:</span> <span class="c1"># pragma: no test</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">testmode</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="n">_runtime</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">com</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-        <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">_runtime</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="nb">all</span><span class="p">([</span><span class="n">com</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">]):</span>
+        <span class="c1">#Here is the tricky bit; we want to join the threads for a second to</span>
+        <span class="c1">#keep the main thread busy while everything is going on. More than a</span>
+        <span class="c1">#second causes delay when the user sends SIGINT to stop the whole</span>
+        <span class="c1">#process. We instead join on every thread for fractions of a second.</span>
+        <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">:</span>
+            <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">coms</span><span class="p">),</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">_runtime</span> <span class="o">+=</span> <span class="mf">1.</span>
         <span class="k">if</span> <span class="n">runtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">_runtime</span> <span class="o">&gt;=</span> <span class="n">runtime</span><span class="p">:</span>
-                <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">coms</span><span class="p">:</span>
+                    <span class="n">com</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">plotter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">plotter</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">vardir</span></div>
         
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
     <span class="n">run</span><span class="p">(</span><span class="n">_parser_options</span><span class="p">())</span>

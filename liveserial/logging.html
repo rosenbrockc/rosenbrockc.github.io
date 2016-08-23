@@ -62,7 +62,7 @@ differentiated by the sensor key, the data is split in the plots and log files.<
 <p>In addition to just logging the data to <cite>csv</cite> files, the logging module also
 handles the periodic querying of the data queues that the serial monitor threads
 continuously write to (see <a class="reference internal" href="monitor.html"><span class="doc">Serial Port Monitoring</span></a>). Thus, even in the event that the user
-chooses no file logging, a <a class="reference internal" href="#liveserial.logging.Logger" title="liveserial.logging.Logger"><code class="xref py py-class docutils literal"><span class="pre">liveserial.logging.Logger</span></code></a> instance is still
+chooses no file logging, a <a class="reference internal" href="#liveserial.log.Logger" title="liveserial.log.Logger"><code class="xref py py-class docutils literal"><span class="pre">liveserial.log.Logger</span></code></a> instance is still
 needed to help the <a class="reference internal" href="plotting.html"><span class="doc">Data Plotting</span></a> and <a class="reference internal" href="monitor.html"><span class="doc">Serial Port Monitoring</span></a> to talk to each other.</p>
 <p>There are two different intervals configured for the logging:</p>
 <ol class="arabic simple">
@@ -74,10 +74,10 @@ to the <cite>csv</cite> files for persistent storage.</li>
 <p>Because the logger implements <a class="reference external" href="https://docs.python.org/2/library/threading.html#threading.Timer" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">threading.Timer</span></code></a> to handle the aggregation
 and saving, the main thread doesn&#8217;t experience latency for large datasets being
 written to disk, which allows the plotting to continue smoothly.</p>
-<span class="target" id="module-liveserial.logging"></span><p>Methods for grabbing data and logging it to CSV files.</p>
+<span class="target" id="module-liveserial.log"></span><p>Methods for grabbing data and logging it to CSV files.</p>
 <dl class="class">
-<dt id="liveserial.logging.Logger">
-<em class="property">class </em><code class="descclassname">liveserial.logging.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>interval</em>, <em>dataq</em>, <em>errorq</em>, <em>livefeed</em>, <em>method='last'</em>, <em>logdir=None</em>, <em>logfreq=10</em>, <em>plotting=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger">
+<em class="property">class </em><code class="descclassname">liveserial.log.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>interval</em>, <em>dataqs</em>, <em>livefeed</em>, <em>method='last'</em>, <em>logdir=None</em>, <em>logfreq=10</em>, <em>plotting=False</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs data points from the serial port to CSV. The arguments to this class
 constructor are also available as attributes on the class instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -87,9 +87,10 @@ constructor are also available as attributes on the class instance.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; how often (in milliseconds) to read data from the serial
 buffer.</li>
-<li><strong>dataq</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; stores the data read in from the serial port.</li>
-<li><strong>errorq</strong> (<a class="reference external" href="https://docs.python.org/2/library/queue.html#Queue.Queue" title="(in Python v2.7)"><em>Queue.Queue</em></a>) &#8211; stores any error raised during serial port</li>
-<li><strong>reading.</strong> &#8211; </li>
+<li><strong>dataqs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <a class="reference external" href="https://docs.python.org/2/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">multiprocessing.Queue</span></code></a>; stores the data read
+in from the serial port.</li>
+<li><strong>errorqs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <a class="reference external" href="https://docs.python.org/2/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">multiprocessing.Queue</span></code></a>; stores any error
+raised during serial port reading.</li>
 <li><strong>livefeed</strong> (<a class="reference internal" href="monitor.html#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><em>monitor.LiveDataFeed</em></a>) &#8211; feed for storing the latest data points
 obtained from the serial port.</li>
 <li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;average&#8217;, &#8216;last&#8217;] specifies how to aggregate multiple
@@ -100,56 +101,82 @@ then data will <em>not</em> be logged to disk.</li>
 to CSV.</li>
 <li><strong>plotting</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when False, the values being read off will be printed if
 logging is not enabled.</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/configparser.html#module-ConfigParser" title="(in Python v2.7)"><em>ConfigParser</em></a>) &#8211; global sensor configuration parser; if the
+argument is a <cite>str</cite>, then the file path.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="liveserial.logging.Logger.timer">
-<code class="descname">timer</code><a class="headerlink" href="#liveserial.logging.Logger.timer" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger.timer">
+<code class="descname">timer</code><a class="headerlink" href="#liveserial.log.Logger.timer" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>threading.Timer</em> &#8211; latest data and push it to the live feed.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="liveserial.logging.Logger.lastsave">
-<code class="descname">lastsave</code><a class="headerlink" href="#liveserial.logging.Logger.lastsave" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger.lastsave">
+<code class="descname">lastsave</code><a class="headerlink" href="#liveserial.log.Logger.lastsave" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>float</em> &#8211; timestamp indicating the last time the CSV file was
 appended to</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="liveserial.logging.Logger.csvdata">
-<code class="descname">csvdata</code><a class="headerlink" href="#liveserial.logging.Logger.csvdata" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger.csvdata">
+<code class="descname">csvdata</code><a class="headerlink" href="#liveserial.log.Logger.csvdata" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; lists of sensor time and value readings, keyed by sensor
 identifier.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="liveserial.logging.Logger.ready">
-<code class="descname">ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.ready" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True once we have accumulated a few timer calls of data. This
-ensures that we know how many sensors are running on the same COM port.</p>
+<dl class="attribute">
+<dt id="liveserial.log.Logger.config">
+<code class="descname">config</code><a class="headerlink" href="#liveserial.log.Logger.config" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>ConfigParser</em> &#8211; global sensor configuration parser.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="liveserial.logging.Logger.save">
-<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.save" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger.ready">
+<code class="descname">ready</code><span class="sig-paren">(</span><em>delay=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True once we have accumulated a few timer calls of data. This
+ensures that we know how many sensors are running on the same COM port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; fraction of a second to wait before checking if the
+data is there.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.log.Logger.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves the logger&#8217;s buffered points to a CSV file. If the file exists,
 then the data points are appended.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="liveserial.logging.Logger.start">
-<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.start" title="Permalink to this definition">¶</a></dt>
+<dt id="liveserial.log.Logger.sensor_option">
+<code class="descname">sensor_option</code><span class="sig-paren">(</span><em>sensor</em>, <em>option</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.sensor_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.sensor_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the specified sensor option if available.</p>
+<p>Args:
+sensor (str): name of the sensor to return <cite>option</cite> for.
+option (str): option name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.log.Logger.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts a new timer for the configured interval to gather data from
 the serial stream.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="liveserial.logging.Logger.stop">
-<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/logging.html#Logger.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.logging.Logger.stop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stops the automatic collection and logging of data.</p>
+<dt id="liveserial.log.Logger.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the automatic collection and logging of data. Cleans up threads.</p>
 </dd></dl>
 
 </dd></dl>

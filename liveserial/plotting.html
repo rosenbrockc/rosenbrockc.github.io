@@ -71,7 +71,7 @@ generated.</p>
 <span class="target" id="module-liveserial.plotting"></span><p>Methods for plotting the real-time data feed.</p>
 <dl class="class">
 <dt id="liveserial.plotting.Plotter">
-<em class="property">class </em><code class="descclassname">liveserial.plotting.</code><code class="descname">Plotter</code><span class="sig-paren">(</span><em>livefeed</em>, <em>interval</em>, <em>maxlen=100</em>, <em>window=20</em>, <em>testmode=False</em>, <em>**plotargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">liveserial.plotting.</code><code class="descname">Plotter</code><span class="sig-paren">(</span><em>livefeed</em>, <em>interval</em>, <em>maxlen=100</em>, <em>window=20</em>, <em>testmode=False</em>, <em>logger=None</em>, <em>**plotargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the live stream for each of the sensors in a subplot.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -86,6 +86,8 @@ latest plot values.</li>
 <li><strong>window</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; width of the plot window for sensors.</li>
 <li><strong>testmode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the animator is not initialized so that a
 backend isn&#8217;t required to run the unit tests.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="logging.html#liveserial.log.Logger" title="liveserial.log.Logger"><em>log.Logger</em></a>) &#8211; logger instance for interacting with config
+parameters.</li>
 <li><strong>plotargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; arguments that get passed through directly to the
 <cite>matplotlib</cite> plotting function.</li>
 </ul>
@@ -117,6 +119,12 @@ serial data; keyed by the sensor identifiers.</p>
 <dt id="liveserial.plotting.Plotter.ys">
 <code class="descname">ys</code><a class="headerlink" href="#liveserial.plotting.Plotter.ys" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; of lists of the last <cite>maxlen</cite> sensor value readings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.plotting.Plotter.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans up the timer when the plotter is running in test mode.</p>
 </dd></dl>
 
 </dd></dl>

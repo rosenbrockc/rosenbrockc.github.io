@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Serial Port Simulation &mdash; liveserial 0.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="prev" title="Multiple Sensor Configuration File" href="config.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Multiple Sensor Configuration File"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="serial-port-simulation">
+<h1>Serial Port Simulation<a class="headerlink" href="#serial-port-simulation" title="Permalink to this headline">¶</a></h1>
+<p>For unit testing, we setup virtual serial ports. On UNIX-based systems, we can
+use <cite>socat</cite> to create the virtual ports. Once the linked, virtual ports exist,
+we write random data to them (with fixed random seed) using a simulator
+thread. The simulator is defined in
+<a class="reference internal" href="#liveserial.simulator.ComSimulatorThread" title="liveserial.simulator.ComSimulatorThread"><code class="xref py py-class docutils literal"><span class="pre">liveserial.simulator.ComSimulatorThread</span></code></a> and an entry script for
+creating a local simulator is included in <cite>simport.py</cite>.</p>
+<span class="target" id="module-liveserial.simulator"></span><p>Thread for simulating writes to a virtual port.</p>
+<dl class="class">
+<dt id="liveserial.simulator.ComSimulatorThread">
+<em class="property">class </em><code class="descclassname">liveserial.simulator.</code><code class="descname">ComSimulatorThread</code><span class="sig-paren">(</span><em>port='lscom-w', sensors=['W', None, 'K'], dataform=[(&lt;type 'int'&gt;, &lt;type 'float'&gt;), (&lt;type 'float'&gt;, &lt;type 'float'&gt;), (&lt;type 'int'&gt;, &lt;type 'float'&gt;)], seed=42</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates a sine wave, masquerading as a separate COM port on the machine so
+that we can unit test the code against it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the simulated port to write to.</li>
+<li><strong>dataform</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keys are sensor ids; values are tuples of <cite>type</cite> that
+specifies how a row of simulated data will look when written to the COM
+port.</li>
+<li><strong>sensors</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <cite>str</cite> giving sensor ids for which data will be randomly
+generated with equal probability between each sensor.</li>
+<li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; random seed so the values are predictable.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="liveserial.simulator.ComSimulatorThread.alive">
+<code class="descname">alive</code><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread.alive" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.Event</em> &#8211; event for asynchronously handling the reads from
+the serial port.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.simulator.ComSimulatorThread.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>terminate=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells the thread simulating the COM port to clean up and return.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; number of seconds (or fractions of seconds) to wait
+until returning. If <cite>None</cite>, then the operation will
+block until the thread terminates. See also
+<a class="reference external" href="https://docs.python.org/2/library/threading.html#threading.Thread.join" title="(in Python v2.7)"><code class="xref py py-meth docutils literal"><span class="pre">threading.Thread.join()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.simulator.ComSimulatorThread.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts simulating the communication.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="config.html"
+                        title="previous chapter">Multiple Sensor Configuration File</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/simulate.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Multiple Sensor Configuration File"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

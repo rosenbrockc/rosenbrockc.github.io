@@ -59,7 +59,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Timer</span>
 
-<div class="viewcode-block" id="colorspace"><a class="viewcode-back" href="../../plotting.html#liveserial.plotting.colorspace">[docs]</a><span class="k">def</span> <span class="nf">colorspace</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">rainbow</span><span class="p">):</span>
+<div class="viewcode-block" id="colorspace"><a class="viewcode-back" href="../../plotting.html#liveserial.plotting.colorspace">[docs]</a><span class="k">def</span> <span class="nf">colorspace</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">winter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns an cycler over a linear color space with &#39;size&#39; entries.</span>
 <span class="sd">    </span>
 <span class="sd">    :arg int size: the number of colors to define in the space.</span>
@@ -83,6 +83,8 @@
 <span class="sd">        window (float): width of the plot window for sensors.</span>
 <span class="sd">        testmode (bool): when True, the animator is not initialized so that a</span>
 <span class="sd">          backend isn&#39;t required to run the unit tests.</span>
+<span class="sd">        logger (log.Logger): logger instance for interacting with config</span>
+<span class="sd">          parameters.</span>
 <span class="sd">        plotargs (dict): arguments that get passed through directly to the</span>
 <span class="sd">          `matplotlib` plotting function.</span>
 
@@ -96,12 +98,13 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">livefeed</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-                 <span class="n">testmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">plotargs</span><span class="p">):</span>
+                 <span class="n">testmode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">plotargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span> <span class="o">=</span> <span class="n">livefeed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxlen</span> <span class="o">=</span> <span class="n">maxlen</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">testmode</span> <span class="o">=</span> <span class="n">testmode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plotargs</span> <span class="o">=</span> <span class="n">plotargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="p">{}</span>
@@ -111,9 +114,15 @@
         <span class="sd">&quot;&quot;&quot;Sensor keys, ordered alphabetically; this is the order in which the</span>
 <span class="sd">        subplots show up in the figure.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;Timer for unit testing the plotting code data acquisition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="c1">#Find out how many subplots we will need; sort their keys for plotting.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">cur_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">cur_data</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Live feed has no sensor data keys. &quot;</span>
+                             <span class="s2">&quot;Can&#39;t setup plotting.&quot;</span><span class="p">)</span>
         <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
         <span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="k">import</span> <span class="n">Line2D</span>
 
@@ -125,10 +134,20 @@
         <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
         <span class="k">for</span> <span class="n">isense</span><span class="p">,</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span><span class="p">):</span>
             <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">sensor_option</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">sensor</span><span class="p">)</span>
+                <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">sensor_option</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ylabel</span> <span class="o">=</span> <span class="n">label</span>
+                <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Auto </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">isense</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                
             <span class="n">line</span> <span class="o">=</span> <span class="n">Line2D</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="n">cspace</span><span class="p">[</span><span class="n">isense</span><span class="p">])</span>
             <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">))</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">isense</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">window</span> <span class="o">+</span> <span class="mf">2.5</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maxlen</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maxlen</span><span class="p">)</span>
@@ -143,12 +162,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">animation</span><span class="o">.</span><span class="n">TimedAnimation</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1">#Call the initialization code that matplotlib would usually call to</span>
-            <span class="c1">#get the plot going.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">new_frame_seq</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_draw</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-                                        
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_frame_seq</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_frame</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            
         <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting animation configured.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">new_frame_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -163,18 +181,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="n">sensor</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">[</span><span class="n">sensor</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="c1"># We don&#39;t want the tests to run long enough for this window to</span>
+                <span class="c1"># kick in (at least for the moment).</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="n">sensor</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span> <span class="o">+</span> <span class="mf">2.5</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span> <span class="c1"># reset intern limits of the current axes </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">()</span>   <span class="c1"># reset axes limits </span>
             
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawn_artists</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">testmode</span><span class="p">:</span>
-            <span class="c1">#Reconfigure the timer so we can still unit test this section.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">testmode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_frame</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         
     <span class="k">def</span> <span class="nf">_init_draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initializes all the subplot line objects to be empty.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">set_data</span><span class="p">([],</span> <span class="p">[])</span></div>
+            <span class="n">l</span><span class="o">.</span><span class="n">set_data</span><span class="p">([],</span> <span class="p">[])</span>
+
+<div class="viewcode-block" id="Plotter.stop"><a class="viewcode-back" href="../../plotting.html#liveserial.plotting.Plotter.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cleans up the timer when the plotter is running in test mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>
