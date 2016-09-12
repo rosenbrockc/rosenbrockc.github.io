@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>liveserial.log &mdash; liveserial 0.1.2 documentation</title>
+    <title>liveserial.log &mdash; liveserial 0.1.3 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.1.2 documentation" href="../../index.html" />
+    <link rel="top" title="liveserial 0.1.3 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -74,6 +74,8 @@
 <span class="sd">          logging is not enabled.</span>
 <span class="sd">        config (ConfigParser): global sensor configuration parser; if the</span>
 <span class="sd">          argument is a `str`, then the file path.</span>
+<span class="sd">        aggregate (bool): when True, the logger should check sensor config for</span>
+<span class="sd">          aggregate ports to be handled; otherwise, aggregate ports are ignored.</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        timer (threading.Timer): executes calls to the serial port reader to get the</span>
 <span class="sd">          latest data and push it to the live feed.    </span>
@@ -83,10 +85,13 @@
 <span class="sd">          identifier.</span>
 <span class="sd">        config (ConfigParser or str): global sensor configuration parser. If</span>
 <span class="sd">          `str`, then the config is loaded from the specified file path.</span>
+<span class="sd">        aggregate (dict): keys are *aggregate* sensor names; values are functions</span>
+<span class="sd">          that accept a dict of the latest physical sensor values, and return</span>
+<span class="sd">          single, aggregated values for plotting.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">dataqs</span><span class="p">,</span> <span class="n">livefeed</span><span class="p">,</span>
                  <span class="n">method</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">,</span> <span class="n">logdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfreq</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                 <span class="n">plotting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">plotting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
         <span class="c1">#Our first business is to make sure that we have only a list of *unique*</span>
@@ -123,7 +128,40 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="k">if</span> <span class="n">aggregate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_aggregates</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="k">def</span> <span class="nf">_sensor_aggregates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the transformations for each aggregate sensor so that they</span>
+<span class="sd">        can be quickly compiled each time the logger timer executes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">liveserial.config</span> <span class="k">import</span> <span class="n">sensors</span>
+        <span class="n">aggsensors</span> <span class="o">=</span> <span class="n">sensors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="s2">&quot;aggregate&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">aggsensors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">sensors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">def</span> <span class="nf">aggfun</span><span class="p">(</span><span class="n">aggdata</span><span class="p">):</span>
+                    <span class="c1">#We don&#39;t take the first index in the data element because</span>
+                    <span class="c1">#it is the time stamp, which must be common to all of them.</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">sensors</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">aggdata</span><span class="p">:</span>
+                            <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aggdata</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+                            <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">aggdata</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+
+                    <span class="k">for</span> <span class="n">vals</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">):</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="n">t</span>
+                        
+                <span class="n">result</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggfun</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+        
 <div class="viewcode-block" id="Logger.sensor_option"><a class="viewcode-back" href="../../logging.html#liveserial.log.Logger.sensor_option">[docs]</a>    <span class="k">def</span> <span class="nf">sensor_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the specified sensor option if available.</span>
 
@@ -206,6 +244,9 @@
         <span class="c1"># We average/discard the data in the queue to produce the single entry that</span>
         <span class="c1"># will be posted to the livefeed.</span>
         <span class="k">if</span> <span class="n">havedata</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">:</span>
+                <span class="n">aggdata</span> <span class="o">=</span> <span class="p">{}</span>
+                
             <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">qdata</span> <span class="ow">in</span> <span class="n">sensedata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;average&quot;</span><span class="p">:</span>
@@ -217,15 +258,33 @@
                     <span class="n">ldata</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">qdata</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span>
                     <span class="n">ldata</span> <span class="o">=</span> <span class="n">qdata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    
                 <span class="k">if</span> <span class="n">ldata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">ldata</span><span class="p">)</span>
+                    
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">sensor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ldata</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1: &lt;20f}</span><span class="s2">  </span><span class="si">{2: &lt;20f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">ldata</span><span class="p">))</span>
 
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">:</span>
+                    <span class="n">aggdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">ldata</span>
+
+            <span class="c1">#Now that we have processed all the physical sensors, let&#39;s see if</span>
+            <span class="c1">#we have any aggregate sensors that need to be processed. </span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">aggsense</span><span class="p">,</span> <span class="n">aggfun</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">adata</span> <span class="o">=</span> <span class="n">aggfun</span><span class="p">(</span><span class="n">aggdata</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">aggsense</span><span class="p">,</span> <span class="n">adata</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">aggsense</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">aggsense</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">aggsense</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aggsense</span><span class="p">,</span> <span class="n">adata</span><span class="p">))</span>
+                        
             <span class="c1">#Before we restart the timer again, see if we need to save the data to</span>
             <span class="c1">#CSV.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
@@ -309,7 +368,11 @@
                 <span class="n">logids</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                    
                 <span class="k">for</span> <span class="n">idata</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]:</span>
-                    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">idata</span><span class="p">[</span><span class="n">li</span><span class="p">]</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">logids</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">idata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1">#Sometimes, the aggregate data functions return None</span>
+                        <span class="c1">#because one of the sensors didn&#39;t have data ready when</span>
+                        <span class="c1">#the aggregation was performed. Just ignore those.</span>
+                        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">idata</span><span class="p">[</span><span class="n">li</span><span class="p">]</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">logids</span><span class="p">])</span>
                     
                 <span class="c1">#Since we appended the most recent data points, just reset the</span>
                 <span class="c1">#lists of points to be empty again.</span>
@@ -361,7 +424,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

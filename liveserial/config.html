@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Multiple Sensor Configuration File &mdash; liveserial 0.1.2 documentation</title>
+    <title>Multiple Sensor Configuration File &mdash; liveserial 0.1.3 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.3 documentation" href="index.html" />
     <link rel="next" title="Serial Port Simulation" href="simulate.html" />
     <link rel="prev" title="Data Plotting" href="plotting.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="plotting.html" title="Data Plotting"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -91,6 +91,28 @@ assigned to the port where the data originated from.</p>
 <p>Since the config file format is extensible, it is easy to add additional options
 later on. The default <a class="reference external" href="https://docs.python.org/2/library/configparser.html#ConfigParser.ConfigParser" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></code></a> is used to extract the
 sections (sensors) and their options.</p>
+</div>
+<div class="section" id="aggregate-sensor-types">
+<h2>Aggregate Sensor Types<a class="headerlink" href="#aggregate-sensor-types" title="Permalink to this headline">¶</a></h2>
+<p>In addition to physical sensors on serial ports, we can also plot aggregate
+information for multiple sensors. For example, suppose we know that the sum of
+two sensor values should be conserved, then we could configure an aggregate
+sensor to take the sum of the two physical sensor values.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[sensor.total]</span>
+<span class="na">port</span><span class="o">=</span><span class="s">aggregate</span>
+<span class="na">label</span><span class="o">=</span><span class="s">Total Sensor</span>
+<span class="na">value_index</span><span class="o">=</span><span class="s">1,2</span>
+<span class="na">sensors</span><span class="o">=</span><span class="s">cardio,weight</span>
+<span class="na">function</span><span class="o">=</span><span class="s">sum</span>
+<span class="na">legends</span><span class="o">=</span><span class="s">I,F</span>
+<span class="na">columns</span><span class="o">=</span><span class="s">isum,fsum</span>
+</pre></div>
+</div>
+<p>This takes the total of <cite>cardio</cite> and <cite>weight</cite> physical sensor values and sums
+them (each column is summed separately) to create a new, aggregate sensor called
+<cite>total</cite>. The columns in the CSV file are labeled <cite>isum</cite> and <cite>fsum</cite> respectively
+and the plotting will show two lines on the subplot, with legend labels of <cite>I</cite>
+and <cite>F</cite>.</p>
 </div>
 <div class="section" id="port-configuration-options">
 <h2>Port Configuration Options<a class="headerlink" href="#port-configuration-options" title="Permalink to this headline">¶</a></h2>
@@ -167,7 +189,7 @@ whatever the default units are for the method/function call.</p>
 modules.</p>
 <dl class="class">
 <dt id="liveserial.config.Sensor">
-<em class="property">class </em><code class="descclassname">liveserial.config.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>monitor, name, key=None, value_index=None, dtype=['key', 'int', 'float'], label=None, port=None, logging=None, columns=None, legends=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.Sensor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">liveserial.config.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>monitor, name, key=None, value_index=None, dtype=['key', 'int', 'float'], label=None, port=None, logging=None, columns=None, legends=None, function=None, sensors=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.Sensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents the configuration of a sensor on the serial port.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -198,6 +220,11 @@ default to <cite>Time</cite> and <cite>Value1</cite>, <cite>Value2</cite>, etc.<
 than one index, multiple lines are plotted on the same subplot. In that
 case, <cite>legends</cite> allows a comma-separated list of legend labels to be
 provided for each of those lines.</li>
+<li><strong>sensors</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; comma-separated list of sensor names to include in the data
+vector that will be passed to <cite>function</cite> to be aggregated to a single
+value. This only applies to the case of aggregate sensors.</li>
+<li><strong>function</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of a function to use to transform the data. Only
+applies to the case of aggregate sensors.</li>
 <li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; additional keyword arguments supported that do not require
 special processing (i.e., are just simple string values).</li>
 </ul>
@@ -340,6 +367,7 @@ should be the path to the config file to load.</li>
   <ul>
 <li><a class="reference internal" href="#">Multiple Sensor Configuration File</a><ul>
 <li><a class="reference internal" href="#sensor-configuration-options">Sensor Configuration Options</a></li>
+<li><a class="reference internal" href="#aggregate-sensor-types">Aggregate Sensor Types</a></li>
 <li><a class="reference internal" href="#port-configuration-options">Port Configuration Options</a></li>
 <li><a class="reference internal" href="#script-configuration-options">Script Configuration Options</a></li>
 <li><a class="reference internal" href="#plotting-configuration-options">Plotting Configuration Options</a></li>
@@ -390,7 +418,7 @@ should be the path to the config file to load.</li>
         <li class="right" >
           <a href="plotting.html" title="Data Plotting"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>liveserial.livemon &mdash; liveserial 0.1.2 documentation</title>
+    <title>liveserial.livemon &mdash; liveserial 0.1.3 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.1.2 documentation" href="../../index.html" />
+    <link rel="top" title="liveserial 0.1.3 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -68,13 +68,20 @@
                 <span class="p">(</span><span class="s2">&quot;Log the data, but don&#39;t generate a live plot.&quot;</span><span class="p">,</span>
                  <span class="s2">&quot;livemon.py COM3 -noplot -logdir C:</span><span class="se">\\</span><span class="s2">sensordata</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
                 <span class="p">(</span><span class="s2">&quot;List the available serial ports on the system.&quot;</span><span class="p">,</span>
-                 <span class="s2">&quot;livemon.py list&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span>
+                 <span class="s2">&quot;livemon.py list&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;Use the config file `custom.cfg` to log and plot the data. &quot;</span>
+                 <span class="s2">&quot;Plot any sensors listed in that file.&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;livemon.py auto -config custom.cfg&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;If your file is called `sensors.cfg`, you can just use &quot;</span>
+                 <span class="s2">&quot;`livemon.py auto`.&quot;</span><span class="p">)]</span>
     <span class="n">required</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;REQUIRED: working serial port.&quot;</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;RETURNS: plot window; for logging-only mode, the data being &quot;</span>
               <span class="s2">&quot;logged is also periodically printed to stdout.&quot;</span><span class="p">)</span>
     <span class="n">details</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The plotting uses `matplotlib` with the default configured &quot;</span>
                <span class="s2">&quot;backend. If you want a different backend, set the rc config &quot;</span>
-               <span class="s2">&quot;for `matplotlib` using online documentation.&quot;</span><span class="p">)</span>
+               <span class="s2">&quot;for `matplotlib` using online documentation. However, many &quot;</span>
+               <span class="s2">&quot;backends don&#39;t play well with the animation (depending on OS &quot;</span>
+               <span class="s2">&quot;type and version, etc., etc.; so use carefully.&quot;</span><span class="p">)</span>
     <span class="n">outputfmt</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="n">msg</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">explain</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">outputfmt</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span>
@@ -251,9 +258,13 @@
     <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting setup of ports </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]:</span>
-            <span class="n">com</span> <span class="o">=</span> <span class="n">CMT</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span> <span class="n">port</span><span class="p">,</span> <span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span>
-                                  <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;sensors&quot;</span><span class="p">])</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">com</span><span class="p">)</span>                                            
+            <span class="k">if</span> <span class="n">port</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;aggregate&quot;</span><span class="p">:</span>
+                <span class="c1">#The aggregate port name is just a shortcut so that we can plot</span>
+                <span class="c1">#transforms between multiple sensor streams. It doesn&#39;t actually</span>
+                <span class="c1">#represent a physical port that will be monitored.</span>
+                <span class="n">com</span> <span class="o">=</span> <span class="n">CMT</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span> <span class="n">port</span><span class="p">,</span> <span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span>
+                                      <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;sensors&quot;</span><span class="p">])</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">com</span><span class="p">)</span>                               
     <span class="k">else</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]:</span>
             <span class="n">com</span> <span class="o">=</span> <span class="n">CMT</span><span class="p">(</span><span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;baudrate&quot;</span><span class="p">],</span>
@@ -325,7 +336,8 @@
     <span class="n">plotting</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">])</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;buffertime&quot;</span><span class="p">],</span> <span class="n">dataqs</span><span class="p">,</span> <span class="n">feed</span><span class="p">,</span>
                     <span class="n">args</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logdir&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logfreq&quot;</span><span class="p">],</span>
-                    <span class="n">plotting</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">])</span>
+                    <span class="n">plotting</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+                    <span class="n">aggregate</span><span class="o">=</span><span class="s2">&quot;aggregate&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">])</span>
     
     <span class="kn">import</span> <span class="nn">signal</span>
     <span class="k">def</span> <span class="nf">exit_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
@@ -443,7 +455,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

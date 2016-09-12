@@ -43,6 +43,31 @@ Since the config file format is extensible, it is easy to add additional options
 later on. The default :class:`~ConfigParser.ConfigParser` is used to extract the
 sections (sensors) and their options.
 
+Aggregate Sensor Types
+----------------------
+
+In addition to physical sensors on serial ports, we can also plot aggregate
+information for multiple sensors. For example, suppose we know that the sum of
+two sensor values should be conserved, then we could configure an aggregate
+sensor to take the sum of the two physical sensor values.
+
+.. code-block:: ini
+		
+   [sensor.total]
+   port=aggregate
+   label=Total Sensor
+   value_index=1,2
+   sensors=cardio,weight
+   function=sum
+   legends=I,F
+   columns=isum,fsum
+
+This takes the total of `cardio` and `weight` physical sensor values and sums
+them (each column is summed separately) to create a new, aggregate sensor called
+`total`. The columns in the CSV file are labeled `isum` and `fsum` respectively
+and the plotting will show two lines on the subplot, with legend labels of `I`
+and `F`.
+
 Port Configuration Options
 --------------------------
 
