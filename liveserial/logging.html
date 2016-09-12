@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Data Logging &mdash; liveserial 0.0.2 documentation</title>
+    <title>Data Logging &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="next" title="Data Plotting" href="plotting.html" />
     <link rel="prev" title="Serial Port Monitoring" href="monitor.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="monitor.html" title="Serial Port Monitoring"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -111,7 +111,8 @@ argument is a <cite>str</cite>, then the file path.</li>
 <dl class="attribute">
 <dt id="liveserial.log.Logger.timer">
 <code class="descname">timer</code><a class="headerlink" href="#liveserial.log.Logger.timer" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>threading.Timer</em> &#8211; latest data and push it to the live feed.</p>
+<dd><p><em>threading.Timer</em> &#8211; executes calls to the serial port reader to get the
+latest data and push it to the live feed.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -131,7 +132,8 @@ identifier.</p>
 <dl class="attribute">
 <dt id="liveserial.log.Logger.config">
 <code class="descname">config</code><a class="headerlink" href="#liveserial.log.Logger.config" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>ConfigParser</em> &#8211; global sensor configuration parser.</p>
+<dd><p><em>ConfigParser or str</em> &#8211; global sensor configuration parser. If
+<cite>str</cite>, then the config is loaded from the specified file path.</p>
 </dd></dl>
 
 <dl class="method">
@@ -159,11 +161,23 @@ then the data points are appended.</p>
 
 <dl class="method">
 <dt id="liveserial.log.Logger.sensor_option">
-<code class="descname">sensor_option</code><span class="sig-paren">(</span><em>sensor</em>, <em>option</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.sensor_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.sensor_option" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sensor_option</code><span class="sig-paren">(</span><em>sensor</em>, <em>option</em>, <em>default=None</em>, <em>cast=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/log.html#Logger.sensor_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.log.Logger.sensor_option" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the specified sensor option if available.</p>
-<p>Args:
-sensor (str): name of the sensor to return <cite>option</cite> for.
-option (str): option name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sensor</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the sensor to return <cite>option</cite> for.</li>
+<li><strong>option</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; option name.</li>
+<li><strong>default</strong> &#8211; if the option is not configured, the default value to return.</li>
+<li><strong>cast</strong> (<em>function</em>) &#8211; if the raw value needs to be cast or transformed, the
+function to perform that transformation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -231,7 +245,7 @@ the serial stream.</p>
         <li class="right" >
           <a href="monitor.html" title="Serial Port Monitoring"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

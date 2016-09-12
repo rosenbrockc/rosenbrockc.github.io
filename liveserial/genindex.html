@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; liveserial 0.0.2 documentation</title>
+    <title>Index &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" /> 
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -59,6 +59,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -133,12 +134,6 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="monitor.html#liveserial.monitor.enumerate_serial_ports">enumerate_serial_ports() (in module liveserial.monitor)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="overview.html#liveserial.livemon.examples">examples() (in module liveserial.livemon)</a>
   </dt>
 
   </dl></td>
@@ -238,15 +233,19 @@
   </dt>
 
       
-  <dt><a href="overview.html#module-liveserial.livemon">liveserial.livemon (module)</a>
+  <dt><a href="config.html#module-liveserial.config">liveserial.config (module)</a>
   </dt>
 
       
-  <dt><a href="logging.html#module-liveserial.log">liveserial.log (module)</a>
+  <dt><a href="overview.html#module-liveserial.livemon">liveserial.livemon (module)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="logging.html#module-liveserial.log">liveserial.log (module)</a>
+  </dt>
+
       
   <dt><a href="monitor.html#module-liveserial.monitor">liveserial.monitor (module)</a>
   </dt>
@@ -266,23 +265,45 @@
   </dl></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="config.html#liveserial.config.Sensor.options">options (liveserial.config.Sensor attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="monitor.html#liveserial.monitor.FormatInferrer.parse">parse() (liveserial.monitor.FormatInferrer method)</a>
+  <dt><a href="config.html#liveserial.config.Sensor.parse">parse() (liveserial.config.Sensor method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="monitor.html#liveserial.monitor.Sensor.parse">(liveserial.monitor.Sensor method)</a>
+  <dt><a href="monitor.html#liveserial.monitor.FormatInferrer.parse">(liveserial.monitor.FormatInferrer method)</a>
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="config.html#liveserial.config.plot">plot() (in module liveserial.config)</a>
+  </dt>
+
+      
+  <dt><a href="plotting.html#liveserial.plotting.Plotter">Plotter (class in liveserial.plotting)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="plotting.html#liveserial.plotting.Plotter">Plotter (class in liveserial.plotting)</a>
+  <dt><a href="config.html#liveserial.config.portdefaults">portdefaults (in module liveserial.config)</a>
+  </dt>
+
+      
+  <dt><a href="config.html#liveserial.config.ports">ports() (in module liveserial.config)</a>
   </dt>
 
   </dl></td>
@@ -301,6 +322,10 @@
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="config.html#liveserial.config.reset_config">reset_config() (in module liveserial.config)</a>
+  </dt>
+
       
   <dt><a href="overview.html#liveserial.livemon.run">run() (in module liveserial.livemon)</a>
   </dt>
@@ -326,7 +351,15 @@
   </dt>
 
       
-  <dt><a href="monitor.html#liveserial.monitor.Sensor">Sensor (class in liveserial.monitor)</a>
+  <dt><a href="config.html#liveserial.config.script">script() (in module liveserial.config)</a>
+  </dt>
+
+      
+  <dt><a href="config.html#liveserial.livemon.script_options">script_options (in module liveserial.livemon)</a>
+  </dt>
+
+      
+  <dt><a href="config.html#liveserial.config.Sensor">Sensor (class in liveserial.config)</a>
   </dt>
 
       
@@ -339,6 +372,10 @@
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="config.html#liveserial.config.sensors">sensors() (in module liveserial.config)</a>
+  </dt>
+
       
   <dt><a href="monitor.html#ComMonitorThread.serial_arg">serial_arg (ComMonitorThread attribute)</a>
   </dt>
@@ -423,7 +460,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Serial Port Simulation &mdash; liveserial 0.0.2 documentation</title>
+    <title>Serial Port Simulation &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="prev" title="Multiple Sensor Configuration File" href="config.html" /> 
   </head>
   <body role="document">
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="config.html" title="Multiple Sensor Configuration File"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -60,7 +60,7 @@ creating a local simulator is included in <cite>simport.py</cite>.</p>
 <span class="target" id="module-liveserial.simulator"></span><p>Thread for simulating writes to a virtual port.</p>
 <dl class="class">
 <dt id="liveserial.simulator.ComSimulatorThread">
-<em class="property">class </em><code class="descclassname">liveserial.simulator.</code><code class="descname">ComSimulatorThread</code><span class="sig-paren">(</span><em>port='lscom-w', sensors=['W', None, 'K'], dataform=[(&lt;type 'int'&gt;, &lt;type 'float'&gt;), (&lt;type 'float'&gt;, &lt;type 'float'&gt;), (&lt;type 'int'&gt;, &lt;type 'float'&gt;)], seed=42</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">liveserial.simulator.</code><code class="descname">ComSimulatorThread</code><span class="sig-paren">(</span><em>port='lscom-w', sensors=['W', None, 'K'], dataform=[(&lt;type 'int'&gt;, &lt;type 'float'&gt;), (&lt;type 'float'&gt;, &lt;type 'float'&gt;, &lt;type 'float'&gt;), (&lt;type 'int'&gt;, &lt;type 'float'&gt;)], seed=42</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulates a sine wave, masquerading as a separate COM port on the machine so
 that we can unit test the code against it.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -73,7 +73,8 @@ that we can unit test the code against it.</p>
 specifies how a row of simulated data will look when written to the COM
 port.</li>
 <li><strong>sensors</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <cite>str</cite> giving sensor ids for which data will be randomly
-generated with equal probability between each sensor.</li>
+generated with equal probability between each sensor. If the sensor id
+is <cite>None</cite>, then no sensor key will be written to the stream.</li>
 <li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; random seed so the values are predictable.</li>
 </ul>
 </td>
@@ -87,6 +88,27 @@ generated with equal probability between each sensor.</li>
 the serial port.</p>
 </dd></dl>
 
+<p class="rubric">Examples</p>
+<p>Write three random columns with data types <cite>int</cite>, <cite>float</cite> and <cite>float</cite> to
+<cite>COM3</cite> <em>without</em> any sensor identifying column.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">liveserial.simulator</span> <span class="k">import</span> <span class="n">ComSimulatorThread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cst</span> <span class="o">=</span> <span class="n">ComSimulatorThread</span><span class="p">(</span><span class="s2">&quot;COM3&quot;</span><span class="p">,</span> <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+<span class="go">    ... dataform=[(int, float, float)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cst</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that the writing happens in its own thread (<a class="reference internal" href="#liveserial.simulator.ComSimulatorThread" title="liveserial.simulator.ComSimulatorThread"><code class="xref py py-class docutils literal"><span class="pre">ComSimulatorThread</span></code></a>
+inherits from <a class="reference external" href="https://docs.python.org/2/library/threading.html#threading.Thread" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></a>), so it will run indefinitely if the
+thread is not joined. A typical use case is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">signal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">exit_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<span class="go">    ... cst.join(1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">exit_handler</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cst</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This wires the signal interrupt request (usually raised by pressing ^C) to
+join the simulator thread.</p>
 <dl class="method">
 <dt id="liveserial.simulator.ComSimulatorThread.join">
 <code class="descname">join</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>terminate=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread.join" title="Permalink to this definition">¶</a></dt>
@@ -107,7 +129,9 @@ block until the thread terminates. See also
 <dl class="method">
 <dt id="liveserial.simulator.ComSimulatorThread.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/simulator.html#ComSimulatorThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.simulator.ComSimulatorThread.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts simulating the communication.</p>
+<dd><p>Starts simulating the communication. This method should not be called
+directly. Instead, it is invoked automatically when <code class="xref py py-meth docutils literal"><span class="pre">start()</span></code> is
+called on this thread object.</p>
 </dd></dl>
 
 </dd></dl>
@@ -156,7 +180,7 @@ block until the thread terminates. See also
         <li class="right" >
           <a href="config.html" title="Multiple Sensor Configuration File"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

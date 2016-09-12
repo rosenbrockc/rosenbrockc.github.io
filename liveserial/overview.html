@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Plotting and Logging Overview &mdash; liveserial 0.0.2 documentation</title>
+    <title>Plotting and Logging Overview &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="next" title="Serial Port Monitoring" href="monitor.html" />
     <link rel="prev" title="liveserial API Documentation" href="index.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="index.html" title="liveserial API Documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -68,12 +68,6 @@ threads:</p>
 connecting them together so that plotting and logging can happen
 simultaneously.</p>
 <span class="target" id="module-liveserial.livemon"></span><dl class="function">
-<dt id="liveserial.livemon.examples">
-<code class="descclassname">liveserial.livemon.</code><code class="descname">examples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/livemon.html#examples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.livemon.examples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints examples of using the script to the console using colored output.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="liveserial.livemon.run">
 <code class="descclassname">liveserial.livemon.</code><code class="descname">run</code><span class="sig-paren">(</span><em>args</em>, <em>runtime=None</em>, <em>testmode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/livemon.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.livemon.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts monitoring of the serial data in a separate thread. Starts the
@@ -83,9 +77,13 @@ plotting or logging based on command-line args.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; result of <code class="xref py py-func docutils literal"><span class="pre">_parser_options()</span></code> call that parses the
+command-line arguments. Could also be <a class="reference internal" href="config.html#liveserial.livemon.script_options" title="liveserial.livemon.script_options"><code class="xref py py-data docutils literal"><span class="pre">script_options</span></code></a> to use all
+default values.</li>
 <li><strong>runtime</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; how many seconds to run for before terminating.</li>
-<li><strong>vardir</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; to get access to the COM port, logger, feed and plotter
-objects.</li>
+<li><strong>testmode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the plotting backend is changed so that no
+window is produced; plotting functions are altered slightly to make
+testing possible.</li>
 </ul>
 </td>
 </tr>
@@ -143,7 +141,7 @@ objects.</li>
         <li class="right" >
           <a href="index.html" title="liveserial API Documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

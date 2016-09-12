@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>liveserial.monitor &mdash; liveserial 0.0.2 documentation</title>
+    <title>liveserial.monitor &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="../../index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -60,123 +60,6 @@
     <span class="kn">from</span> <span class="nn">queue</span> <span class="k">import</span> <span class="n">Empty</span>
     
 <span class="kn">from</span> <span class="nn">liveserial</span> <span class="k">import</span> <span class="n">msg</span>
-<span class="n">portdefaults</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;port_baud&quot;</span><span class="p">:</span> <span class="mi">9600</span><span class="p">,</span>
-    <span class="s2">&quot;port_stopbits&quot;</span><span class="p">:</span> <span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
-    <span class="s2">&quot;port_parity&quot;</span><span class="p">:</span> <span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
-    <span class="s2">&quot;port_timeout&quot;</span><span class="p">:</span>  <span class="mf">0.01</span><span class="p">,</span>
-    <span class="s2">&quot;virtual&quot;</span><span class="p">:</span> <span class="kc">False</span>
-    <span class="p">}</span>
-<span class="sd">&quot;&quot;&quot;dict: default parameters passed to the :class:`serial.Serial` constructor for</span>
-<span class="sd">communicating with the serial port.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="Sensor"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.Sensor">[docs]</a><span class="k">class</span> <span class="nc">Sensor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the configuration of a sensor on the serial port.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        monitor (ComMonitorThread): parent instance that this sensor is being logged</span>
-<span class="sd">          with.</span>
-<span class="sd">        name (str): name of the sensor in the configuration file.</span>
-<span class="sd">        dtype (list): of `str` or `type`; items must belong to [&#39;key&#39;, int, float,</span>
-<span class="sd">          str]. Represents the order in which values are found in a single line of</span>
-<span class="sd">          data read from the serial port. Thus `W 129229 0.928379` would be given by</span>
-<span class="sd">          [&quot;key&quot;, int, float].</span>
-<span class="sd">        label (str): for plots, what to put on the y-axis. Defaults to `name`.</span>
-<span class="sd">        port (str): name of the port to read this sensor from. Defaults to</span>
-<span class="sd">          :attr:`ComMonitorThread.port`.</span>
-<span class="sd">        value_index (int): column index of the value that will be plotted.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monitor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span> <span class="o">=</span> <span class="n">monitor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-
-        <span class="c1">#We analyze the string values set for the dtypes to return the python</span>
-        <span class="c1">#`types` that can cast strings to actual type values.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sentry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">sentry</span> <span class="o">==</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="o">=</span> <span class="n">i</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify a sensor key if &#39;key&#39; &quot;</span>
-                                     <span class="s2">&quot;is in the &#39;dtype&#39; option list.&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">caster</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">sentry</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">caster</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value_index</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">monitor</span><span class="o">.</span><span class="n">port</span> <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">port</span>
-
-    <span class="k">def</span> <span class="nf">_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Casts all the values in the given list to their relevant data</span>
-<span class="sd">        types. Assumes that the list has the correct format.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            vals (list): string values from the split line to cast.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-            <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)):</span> <span class="c1"># pragma: no cover</span>
-            <span class="k">return</span>
-        
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">iv</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">iv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span><span class="p">:</span>
-                    <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)](</span><span class="n">v</span><span class="p">))</span>
-                    
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c1">#We have to change the order in which the values are</span>
-                <span class="c1">#returned. The plotting and logging routines expect the plotted</span>
-                <span class="c1">#value to be in position 2 (after sensor and timestamp). The</span>
-                <span class="c1">#remaining values can come in any order.</span>
-
-                <span class="c1">#The value index is specified relative the full list of columns;</span>
-                <span class="c1">#but we exclude the key from the list of values. If a key is</span>
-                <span class="c1">#specified, we need to subtract 1 from value index, if the key</span>
-                <span class="c1">#index comes before the value index.</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span><span class="p">:</span>
-                    <span class="n">first</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value_index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">first</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value_index</span><span class="p">]</span>
-                    
-                <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">first</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span><span class="p">:</span>
-                        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">result</span>
-            <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover </span>
-                <span class="k">return</span> <span class="n">vals</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        
-<div class="viewcode-block" id="Sensor.parse"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.Sensor.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parses a single line read from the serial port and returns a tuple of</span>
-<span class="sd">        values.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            raw (list): of split ASCII-encoded strings from the serial port. </span>
-<span class="sd">        </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            list: of values parsed using :attr:`Sensor.dtype` casting.</span>
-<span class="sd">            None: if the `key` was not found in the correct location.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">raw</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
-            
-        <span class="k">return</span> <span class="n">result</span></div></div>
-
 <div class="viewcode-block" id="FormatInferrer"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.FormatInferrer">[docs]</a><span class="k">class</span> <span class="nc">FormatInferrer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class that can infer the data types of an unknown sensor stream, provided</span>
 <span class="sd">    they are consistent between calls.</span>
@@ -196,10 +79,11 @@
 <span class="sd">        sensor key can be found in the raw line.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inferred</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="sd">&quot;&quot;&quot;dict: keys are inferred sensor ids, values are lists of casting</span>
-<span class="sd">        types as for the implementation in :class:`Sensor`. This dict only</span>
+        <span class="sd">&quot;&quot;&quot;dict: keys are inferred sensor ids, values are lists of casting types as for</span>
+<span class="sd">        the implementation in :class:`liveserial.config.Sensor`. This dict only</span>
 <span class="sd">        gets populated when no configuration is available and data structure has</span>
 <span class="sd">        to be inferred from the incoming stream.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>        
 
     <span class="k">def</span> <span class="nf">_infer_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
@@ -284,7 +168,13 @@
             <span class="c1">#the formatting of the stream so that it should always parse</span>
             <span class="c1">#properly.</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div></div>
-        
+
+<span class="n">rxdelims</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are port names; values are compiled regex objects. We wanted to</span>
+<span class="sd">put these in the thread object, but then it can&#39;t be pickled, which makes issues</span>
+<span class="sd">for the multiprocessing. Instead, we just have to do a dict lookup in the local</span>
+<span class="sd">:meth:`Thread.run()`.</span>
+<span class="sd">&quot;&quot;&quot;</span>        
 <div class="viewcode-block" id="ComMonitorThread"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread">[docs]</a><span class="k">class</span> <span class="nc">ComMonitorThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A thread for monitoring a COM port. The COM port is </span>
 <span class="sd">        opened when the thread is started.</span>
@@ -325,12 +215,17 @@
 <span class="sd">            inferrer is not created.</span>
 <span class="sd">        virtual (bool): when True, additional serial port parameters are set so that</span>
 <span class="sd">            the monitor can work with `socat` or other virtual ports.</span>
+<span class="sd">        encoding (str): encoding type used to decode the byte stream from the serial</span>
+<span class="sd">            port.</span>
+<span class="sd">        delimiter (str): regex describing the sequence of characters used to</span>
+<span class="sd">            separate columns of values in a single line from the serial port.</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        alive (threading.Event): event for asynchronously handling the reads from</span>
 <span class="sd">          the serial port.</span>
 <span class="sd">        serial_arg (dict): arguments used to contstruct the :class:`serial.Serial`.</span>
 <span class="sd">        serial_port (serial.Serial): serial instance for communication.</span>
-<span class="sd">        sensors (dict): keys are sensor names; values are Sensor instances used to</span>
+<span class="sd">        sensors (dict): keys are sensor names; values are</span>
+<span class="sd">          :class:`liveserial.config.Sensor` instances used to</span>
 <span class="sd">          parse raw lines read from the serial port.</span>
 <span class="sd">        inferrer (FormatInferrer): for inferring the format in the absence of</span>
 <span class="sd">            configured sensor structure.</span>
@@ -338,16 +233,17 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_q</span><span class="p">,</span> <span class="n">error_q</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">port_baud</span><span class="p">,</span>
                  <span class="n">port_stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
                  <span class="n">port_parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span> <span class="n">port_timeout</span>  <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
-                 <span class="n">listener</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">infer_limit</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+                 <span class="n">listener</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">infer_limit</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                 <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">r&quot;\s&quot;</span><span class="p">):</span>
         <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span>  <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">port</span>      <span class="o">=</span> <span class="n">port</span><span class="p">,</span>
-                                <span class="n">baudrate</span>  <span class="o">=</span> <span class="n">port_baud</span><span class="p">,</span>
-                                <span class="n">stopbits</span>  <span class="o">=</span> <span class="n">port_stopbits</span><span class="p">,</span>
+                                <span class="n">baudrate</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port_baud</span><span class="p">),</span>
+                                <span class="n">stopbits</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">port_stopbits</span><span class="p">),</span>
                                 <span class="n">parity</span>    <span class="o">=</span> <span class="n">port_parity</span><span class="p">,</span>
-                                <span class="n">timeout</span>   <span class="o">=</span> <span class="n">port_timeout</span><span class="p">)</span>
+                                <span class="n">timeout</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">port_timeout</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">virtual</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;Running in virtual serial port mode.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span><span class="p">[</span><span class="s2">&quot;dsrdtr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
@@ -356,6 +252,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_q</span>   <span class="o">=</span> <span class="n">data_q</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_q</span>  <span class="o">=</span> <span class="n">error_q</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">listener</span> <span class="o">=</span> <span class="n">listener</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span>
+        
+        <span class="kn">import</span> <span class="nn">re</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="n">delimiter</span>
+        <span class="k">global</span> <span class="n">rxdelims</span>
+        <span class="n">rxdelims</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_manual_sensors</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="sd">&quot;&quot;&quot;bool: when True, the sensors list was constructed manually using a</span>
@@ -418,19 +321,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            ComMonitorThread: instance created using the configuration</span>
 <span class="sd">            parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
-            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
-                <span class="c1">#Renaming of modules to lower case in python 3.</span>
-                <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
-                
-            <span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
-            <span class="n">parser</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
-            <span class="n">parser</span> <span class="o">=</span> <span class="n">config</span>
-        
+<span class="sd">        &quot;&quot;&quot;</span>        
         <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Queue</span>
         <span class="c1">#We allow the user to choose to use a common data and error queue</span>
         <span class="c1">#between all the threads. If they don&#39;t specify one, then we will just</span>
@@ -443,57 +334,32 @@
         <span class="k">if</span> <span class="n">errorq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="n">errorq</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
 
-        <span class="c1">#If the port has non-default settings, they will be in a special section</span>
-        <span class="c1">#with the port name.</span>
-        <span class="n">portsec</span> <span class="o">=</span> <span class="s2">&quot;port.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">portdefaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">portsec</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="c1">#Override the value using the config value unless it doesn&#39;t</span>
-                <span class="c1">#exist.</span>
-                <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">portsec</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
-                    <span class="n">params</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">portsec</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
-
-        <span class="c1">#Python&#39;s bool is interesting because bool(&#39;0&#39;) =&gt; True. So, we test</span>
-        <span class="c1">#explicitly here for the option value the user set.</span>
-        <span class="kn">import</span> <span class="nn">re</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;\b\d+\b&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]):</span>
-                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]))</span>
-            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;[a-z]&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">):</span>
-                <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;t&#39;</span>
-
-        <span class="n">vtext</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: using </span><span class="si">{}</span><span class="s2"> as config-set serial paramaters.&quot;</span>
+        <span class="kn">from</span> <span class="nn">liveserial.config</span> <span class="k">import</span> <span class="n">ports</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">ports</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">vtext</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: using </span><span class="si">{}</span><span class="s2"> as config-set serial parameters.&quot;</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">vtext</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">ComMonitorThread</span><span class="p">(</span><span class="n">dataq</span><span class="p">,</span> <span class="n">errorq</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">listener</span><span class="o">=</span><span class="n">listener</span><span class="p">,</span>
                                   <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
-        <span class="c1">#Now that we have the thread, we can add configuration for each of the</span>
-        <span class="c1">#sensors in the config file.</span>
-        <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
-        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;sensor.*&quot;</span><span class="p">):</span>
-                <span class="n">sport</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">):</span>
-                    <span class="n">sport</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">sport</span> <span class="o">==</span> <span class="n">port</span><span class="p">:</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">result</span><span class="o">.</span><span class="n">add_sensor</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">section</span><span class="p">)))</span>
+        <span class="kn">from</span> <span class="nn">liveserial.config</span> <span class="k">import</span> <span class="n">sensors</span><span class="p">,</span> <span class="n">Sensor</span>
+        <span class="n">sdict</span> <span class="o">=</span> <span class="n">sensors</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">sdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sfilter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="n">sfilter</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">add_sensor</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="ComMonitorThread.add_sensor"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread.add_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">add_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="ComMonitorThread.add_sensor"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread.add_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">add_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a sensor to the COM monitors active list. Sensors in the active</span>
 <span class="sd">        list have their data parsed and pushed to the data queue. If no sensors</span>
 <span class="sd">        are added to the list, the monitor will try to infer the sensor</span>
 <span class="sd">        configuration using the first few raw data samples.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            options (dict): keys are option names from the sensors.cfg file; values</span>
-<span class="sd">              are the option values.</span>
+<span class="sd">            sensor (liveserial.config.Sensor): instance with parsed</span>
+<span class="sd">              configuration values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_manual_sensors</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">sensor</span> <span class="o">=</span> <span class="n">Sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sensor</span></div>
         
 <div class="viewcode-block" id="ComMonitorThread.run"><a class="viewcode-back" href="../../monitor.html#liveserial.monitor.ComMonitorThread.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -507,12 +373,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_arg</span><span class="p">)</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Serial port communication enabled.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">lastlisten</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">decoderr</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#Number of types the decode has failed.</span>
+        <span class="n">rxsplit</span> <span class="o">=</span> <span class="n">rxdelims</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">]</span>
+        
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="o">.</span><span class="n">isSet</span><span class="p">():</span>
             <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>                
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">listener</span><span class="p">:</span>
@@ -523,16 +392,28 @@
                 <span class="c1">#are covered by the unit tests, but coverage claims that this</span>
                 <span class="c1">#continue statement is not...</span>
                 <span class="k">continue</span> <span class="c1"># pragma: no cover</span>
-                    
-            <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ASCII&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="c1">#It is too much hassle to get our port data simulator to simulate garbage</span>
+                <span class="c1">#for now. TODO: update the simulator to randomly spew out garbage.</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">decoderr</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">decoderr</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">emsg</span> <span class="o">=</span> <span class="s2">&quot;Couldn&#39;t decode line </span><span class="si">{}</span><span class="s2"> using </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                        <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">emsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">rxsplit</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
                 <span class="c1">#No data read from the stream.</span>
                 <span class="k">continue</span>
             
             <span class="n">vals</span><span class="p">,</span> <span class="n">sensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manual_sensors</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="n">vals</span><span class="p">,</span> <span class="n">sensor</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">sensor</span><span class="o">.</span><span class="n">key</span>
+                <span class="k">for</span> <span class="n">osensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">vals</span><span class="p">,</span> <span class="n">skey</span> <span class="o">=</span> <span class="n">osensor</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span> <span class="n">osensor</span><span class="o">.</span><span class="n">key</span>
+                    <span class="n">sensor</span> <span class="o">=</span> <span class="n">osensor</span><span class="o">.</span><span class="n">name</span>
                     <span class="c1">#The parsing will return None if the raw line does not apply</span>
                     <span class="c1">#to its configuration. The moment we found the one that does</span>
                     <span class="c1">#apply, there is not sense in still checking.</span>
@@ -542,7 +423,7 @@
                 <span class="c1">#We try to infer the structure of the data from the raw line.</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inferrer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">vals</span><span class="p">,</span> <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inferrer</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
-                
+
             <span class="k">if</span> <span class="n">vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">sensor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1">#We use the id of the com thread (which corresponds</span>
@@ -586,15 +467,20 @@
     <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
     <span class="k">if</span> <span class="n">name</span>  <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
         <span class="c1">#We don&#39;t have CI setup for windows at the moment.</span>
-        <span class="n">outAvailablePorts</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">outAvailablePorts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">portstr</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   
-            <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">:</span>
-                <span class="k">pass</span>
-        <span class="k">return</span> <span class="n">outAvailablePorts</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">waitpid</span><span class="p">,</span> <span class="n">path</span>
+        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;powershell -c &quot;[System.IO.Ports.SerialPort]::getportnames()&quot;&#39;</span>
+        <span class="n">pps</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">pps</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">error</span><span class="p">]))</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">oline</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">oline</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oline</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/dev/tty.*&#39;</span><span class="p">)</span></div>
     
@@ -605,7 +491,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        Q (Queue.Queue): queue to empty items from.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieving entire queue.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieving entire queue.&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">Q</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
@@ -686,7 +572,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

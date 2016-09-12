@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Data Plotting &mdash; liveserial 0.0.2 documentation</title>
+    <title>Data Plotting &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="next" title="Multiple Sensor Configuration File" href="config.html" />
     <link rel="prev" title="Data Logging" href="logging.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="logging.html" title="Data Logging"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,7 @@
 <p>Because <cite>liveserial</cite> supports simultaneous reading from multiple serial ports,
 each also supporting streams of data from multiple sensors, the plotting has to
 be flexible enough to support animation for multiple data sets. Plotting uses a
-single class that inherits from <a class="reference external" href="http://matplotlib.org/api/animation_api.html#matplotlib.animation.TimedAnimation" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">TimedAnimation</span></code></a> and
+single class that inherits from <a class="reference external" href="http://matplotlib.org/api/animation_api.html#matplotlib.animation.TimedAnimation" title="(in Matplotlib v1.5.3)"><code class="xref py py-class docutils literal"><span class="pre">TimedAnimation</span></code></a> and
 overrides the methods for frame drawing to get the latest data points from the
 <a class="reference internal" href="monitor.html#liveserial.monitor.LiveDataFeed" title="liveserial.monitor.LiveDataFeed"><code class="xref py py-class docutils literal"><span class="pre">LiveDataFeed</span></code></a>. Using <a class="reference external" href="https://docs.python.org/2/library/collections.html#collections.deque" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">deque</span></code></a>
 instances allows a fixed number of data points to be plotted so that the plot
@@ -71,7 +71,7 @@ generated.</p>
 <span class="target" id="module-liveserial.plotting"></span><p>Methods for plotting the real-time data feed.</p>
 <dl class="class">
 <dt id="liveserial.plotting.Plotter">
-<em class="property">class </em><code class="descclassname">liveserial.plotting.</code><code class="descname">Plotter</code><span class="sig-paren">(</span><em>livefeed</em>, <em>interval</em>, <em>maxlen=100</em>, <em>window=20</em>, <em>testmode=False</em>, <em>logger=None</em>, <em>**plotargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">liveserial.plotting.</code><code class="descname">Plotter</code><span class="sig-paren">(</span><em>livefeed</em>, <em>interval</em>, <em>maxlen=100</em>, <em>window=20</em>, <em>testmode=False</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/plotting.html#Plotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.plotting.Plotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the live stream for each of the sensors in a subplot.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -88,8 +88,6 @@ latest plot values.</li>
 backend isn&#8217;t required to run the unit tests.</li>
 <li><strong>logger</strong> (<a class="reference internal" href="logging.html#liveserial.log.Logger" title="liveserial.log.Logger"><em>log.Logger</em></a>) &#8211; logger instance for interacting with config
 parameters.</li>
-<li><strong>plotargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; arguments that get passed through directly to the
-<cite>matplotlib</cite> plotting function.</li>
 </ul>
 </td>
 </tr>
@@ -98,14 +96,14 @@ parameters.</li>
 <dl class="attribute">
 <dt id="liveserial.plotting.Plotter.lines">
 <code class="descname">lines</code><a class="headerlink" href="#liveserial.plotting.Plotter.lines" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/lines_api.html#matplotlib.lines.Line2D" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.lines.Line2D</span></code></a> being animated with
+<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/lines_api.html#matplotlib.lines.Line2D" title="(in Matplotlib v1.5.3)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.lines.Line2D</span></code></a> being animated with
 the serial data; keyed by the sensor identifiers.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="liveserial.plotting.Plotter.axes">
 <code class="descname">axes</code><a class="headerlink" href="#liveserial.plotting.Plotter.axes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a> being animated with the
+<dd><p><em>dict</em> &#8211; of <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.3)"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.axes.Axes</span></code></a> being animated with the
 serial data; keyed by the sensor identifiers.</p>
 </dd></dl>
 
@@ -118,7 +116,11 @@ serial data; keyed by the sensor identifiers.</p>
 <dl class="attribute">
 <dt id="liveserial.plotting.Plotter.ys">
 <code class="descname">ys</code><a class="headerlink" href="#liveserial.plotting.Plotter.ys" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; of lists of the last <cite>maxlen</cite> sensor value readings.</p>
+<dd><p><em>dict</em> &#8211; of lists of the last <cite>maxlen</cite> sensor value readings. Keys for
+this dict are sensor names if only one value is specified in the
+sensor&#8217;s <cite>value_index</cite> config option; otherwise, the keys are <cite>(sensor,
+vindex)</cite> tuple, where <cite>vindex</cite> is the zero-based, integer column index
+being plotted.</p>
 </dd></dl>
 
 <dl class="method">
@@ -197,7 +199,7 @@ serial data; keyed by the sensor identifiers.</p>
         <li class="right" >
           <a href="logging.html" title="Data Logging"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

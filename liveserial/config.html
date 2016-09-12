@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Multiple Sensor Configuration File &mdash; liveserial 0.0.2 documentation</title>
+    <title>Multiple Sensor Configuration File &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="next" title="Serial Port Simulation" href="simulate.html" />
     <link rel="prev" title="Data Plotting" href="plotting.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="plotting.html" title="Data Plotting"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -74,12 +74,16 @@ and <cite>key</cite> to specify the column location that the key will be at.</li
 <li><strong>port</strong> name of the serial port on the local machine that this sensor&#8217;s data
 will arive at.</li>
 <li><strong>label</strong> for plotting, what label to include on the <cite>y</cite> axis.</li>
-<li><strong>value_index</strong> when multiple columns are present, this is the column index
-(0-based) that will be used for plotting.</li>
+<li><strong>value_index</strong> when multiple columns are present, a comma-separated list of
+column indices (0-based) that will be used for plotting. These columns will be
+included on the <em>same</em> subplot of the figure. They can be labelled using the
+<em>legends</em> option (described below).</li>
 <li><strong>logging</strong> comma-separated list of 0-based column indices to include in the
 log file generated for this sensor.</li>
 <li><strong>columns</strong> comma-separated list of custom column names to use in the CSV
 files. There should be the same number of entries in <em>logging</em> and <em>columns</em>.</li>
+<li><strong>legends</strong> comma-separated list of legend labels for cases where more than
+one index is specified in <cite>value_index</cite>.</li>
 </ul>
 <p><strong>Note</strong>: if a <em>key</em> is not specified, then one will be auto-generated using the
 <code class="xref py py-meth docutils literal"><span class="pre">id()</span></code> of the <a class="reference internal" href="monitor.html#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><code class="xref py py-class docutils literal"><span class="pre">ComMonitorThread</span></code></a> object instance
@@ -107,7 +111,222 @@ low, the thread will return data in finer grained chunks, with more
 accurate timestamps, but it will also consume more CPU. Default <cite>0.01</cite>.</li>
 <li><strong>virtual</strong>: when True, additional serial port parameters are set so that the
 monitor can work with <cite>socat</cite> or other virtual ports. Default <cite>0</cite>.</li>
+<li><strong>encoding</strong>: by default, we assume the encoding on the serial port to be
+<cite>UTF-8</cite>. If it is different, then specify the encoding here; a common
+alternative option is <cite>ASCII</cite>, though we have also seen <cite>UTF-16</cite> before.</li>
+<li><strong>delimiter</strong>: by default, we assume whitespace separated values on each line
+of the serial stream. If you use <cite>,</cite> or <cite>|</cite> or something else, specify it
+here. The value <em>is interpreted as regular expression</em> (hence the default valued
+of <cite>s</cite>).</li>
 </ul>
+</div>
+<div class="section" id="script-configuration-options">
+<h2>Script Configuration Options<a class="headerlink" href="#script-configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>Any of the options that can be passed as command-line arguments to the script
+can also be set in the configuration file under the <cite>[global]</cite> section
+heading. These are documented internally in the <cite>livemon.py</cite> script and can be
+seen by executing <cite>livemon.py -h</cite>.</p>
+<dl class="data">
+<dt id="liveserial.livemon.script_options">
+<code class="descclassname">liveserial.livemon.</code><code class="descname">script_options</code><em class="property"> Default script parameter arguments.</em><a class="headerlink" href="#liveserial.livemon.script_options" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; default command-line arguments and their
+<a class="reference external" href="https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument" title="(in Python v2.7)"><code class="xref py py-meth docutils literal"><span class="pre">argparse.ArgumentParser.add_argument()</span></code></a> keyword arguments.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="plotting-configuration-options">
+<h2>Plotting Configuration Options<a class="headerlink" href="#plotting-configuration-options" title="Permalink to this headline">¶</a></h2>
+<p><cite>matplotlib</cite> is used for plotting the live serial feeds. Within that framework,
+we have the following support:</p>
+<ul class="simple">
+<li><strong>figure</strong>: describes options that are passed as keyword arguments to
+<a class="reference external" href="http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.figure" title="(in Matplotlib v1.5.3)"><code class="xref py py-func docutils literal"><span class="pre">figure()</span></code></a> when the plot is initialized.</li>
+<li><strong>axes</strong>: keyword arguments passed to <code class="xref py py-meth docutils literal"><span class="pre">add_subplots()</span></code>,
+which can override initialization behavior of the axes.</li>
+<li><strong>label</strong>: keyword arguments passed to <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.set_xlabel" title="(in Matplotlib v1.5.3)"><code class="xref py py-meth docutils literal"><span class="pre">set_xlabel()</span></code></a>
+and <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.set_ylabel" title="(in Matplotlib v1.5.3)"><code class="xref py py-meth docutils literal"><span class="pre">set_ylabel()</span></code></a>. They can format the font-size, color,
+etc. of the axes labels on the subplots.</li>
+<li><strong>ticks</strong>: keyword arguments passed to <a class="reference external" href="http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.tick_params" title="(in Matplotlib v1.5.3)"><code class="xref py py-func docutils literal"><span class="pre">tick_params()</span></code></a>
+once the plot has been initialized to format the ticks on the subplots.</li>
+</ul>
+<p>To override the keyword arguments, specify an option in a section (labelled
+<cite>[plot.figure]</cite>, <cite>[plot.axes]</cite>, <cite>[plot.label]</cite> or <cite>[plot.ticks]</cite>) that has the
+same name as the keyword argument and then the new value. For example, to
+override the font size on the axes labels, I would use <cite>fontsize=12</cite> in a
+<cite>[plot.label]</cite> section of the configuration file.</p>
+<p>Note that we do <em>not</em> cast the string values from the config file except in the
+case of <cite>figsize</cite> for the <em>figure</em> options. However, for most of the useful
+matplotlib keywords, this is not a problem since instead of a number like <cite>12</cite>,
+matplotlib accepts strings with units (e.g., <cite>12pt</cite>) which can be parsed. For
+strings without units specified, it will also usually interpret the string using
+whatever the default units are for the method/function call.</p>
+</div>
+<div class="section" id="module-liveserial.config">
+<span id="configuration-objects"></span><h2>Configuration Objects<a class="headerlink" href="#module-liveserial.config" title="Permalink to this headline">¶</a></h2>
+<p>Method for sharing global sensor and port configuration values between
+modules.</p>
+<dl class="class">
+<dt id="liveserial.config.Sensor">
+<em class="property">class </em><code class="descclassname">liveserial.config.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>monitor, name, key=None, value_index=None, dtype=['key', 'int', 'float'], label=None, port=None, logging=None, columns=None, legends=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.Sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the configuration of a sensor on the serial port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>monitor</strong> (<a class="reference internal" href="monitor.html#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><em>ComMonitorThread</em></a>) &#8211; parent instance that this sensor is being logged
+with.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the sensor in the configuration file.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; sensor key as it will be written to the serial stream, or <cite>None</cite>
+if there isn&#8217;t a key in the stream (i.e., only values).</li>
+<li><strong>value_index</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; column index/indices of the value that will
+be plotted.</li>
+<li><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <cite>str</cite> or <cite>type</cite>; items must belong to [&#8216;key&#8217;, int, float,
+str]. Represents the order in which values are found in a single line of
+data read from the serial port. Thus <cite>W 129229 0.928379</cite> would be given by
+[&#8220;key&#8221;, int, float].</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; for plots, what to put on the y-axis. Defaults to <cite>name</cite>.</li>
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the port to read this sensor from. Defaults to
+<code class="xref py py-data docutils literal"><span class="pre">ComMonitorThread.port</span></code>.</li>
+<li><strong>logging</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; comma-separated list of columns indices (zero-based) to
+include in the log file. If not specified, then the default is to
+include <em>all</em> data columns in the log file.</li>
+<li><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; comma-separated list of columns headings for the CSV file;
+these are written in the first row of the file. If excluded, they
+default to <cite>Time</cite> and <cite>Value1</cite>, <cite>Value2</cite>, etc.</li>
+<li><strong>legends</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; if the comma-separated list in <cite>value_index</cite> includes more
+than one index, multiple lines are plotted on the same subplot. In that
+case, <cite>legends</cite> allows a comma-separated list of legend labels to be
+provided for each of those lines.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; additional keyword arguments supported that do not require
+special processing (i.e., are just simple string values).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="liveserial.config.Sensor.options">
+<code class="descname">options</code><a class="headerlink" href="#liveserial.config.Sensor.options" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; additional keyword arguments (or configurable options) for
+the sensor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="liveserial.config.Sensor.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>raw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#Sensor.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.Sensor.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a single line read from the serial port and returns a tuple of
+values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of split ASCII-encoded strings from the serial port.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of values parsed using <code class="xref py py-attr docutils literal"><span class="pre">Sensor.dtype</span></code> casting.
+None: if the <cite>key</cite> was not found in the correct location.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.config.plot">
+<code class="descclassname">liveserial.config.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>config</em>, <em>element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the matplotlib configuration options for the specified plotting
+element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/configparser.html#module-ConfigParser" title="(in Python v2.7)"><em>ConfigParser</em></a>) &#8211; instance from which to extract the port
+information. <cite>str</cite> is also allowed, in which case it
+should be the path to the config file to load.</li>
+<li><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;line&#8217;, &#8216;axes&#8217;, &#8216;figure&#8217;, &#8216;label&#8217;, &#8216;ticks&#8217;];
+specifies which part of the plot the options will apply to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="liveserial.config.portdefaults">
+<code class="descclassname">liveserial.config.</code><code class="descname">portdefaults</code><em class="property"> = {'port_baud': 9600, 'port_stopbits': 1, 'encoding': 'UTF-8', 'virtual': False, 'port_timeout': 0.01, 'delimiter': '\\s', 'port_parity': 'N'}</em><a class="headerlink" href="#liveserial.config.portdefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; default parameters passed to the <a class="reference external" href="https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial" title="(in pySerial v3.0)"><code class="xref py py-class docutils literal"><span class="pre">serial.Serial</span></code></a> constructor for
+communicating with the serial port.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.config.ports">
+<code class="descclassname">liveserial.config.</code><code class="descname">ports</code><span class="sig-paren">(</span><em>config</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the port configuration dictionary for the specified port name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/configparser.html#module-ConfigParser" title="(in Python v2.7)"><em>ConfigParser</em></a>) &#8211; instance from which to extract the port
+information. <cite>str</cite> is also allowed, in which case it
+should be the path to the config file to load.</li>
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the port to return configuration for.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.config.reset_config">
+<code class="descclassname">liveserial.config.</code><code class="descname">reset_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#reset_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.reset_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the global config variables so that a session can be continued
+with a new config file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.config.script">
+<code class="descclassname">liveserial.config.</code><code class="descname">script</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#script"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the config options configured globally for the script.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/configparser.html#module-ConfigParser" title="(in Python v2.7)"><em>ConfigParser</em></a>) &#8211; instance from which to extract the port
+information. <cite>str</cite> is also allowed, in which case it
+should be the path to the config file to load.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="liveserial.config.sensors">
+<code class="descclassname">liveserial.config.</code><code class="descname">sensors</code><span class="sig-paren">(</span><em>config</em>, <em>sensor=None</em>, <em>port=None</em>, <em>monitor=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/config.html#sensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.config.sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of <a class="reference internal" href="#liveserial.config.Sensor" title="liveserial.config.Sensor"><code class="xref py py-class docutils literal"><span class="pre">liveserial.config.Sensor</span></code></a> instances that have
+the specified port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/configparser.html#module-ConfigParser" title="(in Python v2.7)"><em>ConfigParser</em></a>) &#8211; instance from which to extract the sensor list
+and port information. <cite>str</cite> is also allowed, in which case it
+should be the path to the config file to load.</li>
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the port to configure for.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -122,6 +341,9 @@ monitor can work with <cite>socat</cite> or other virtual ports. Default <cite>0
 <li><a class="reference internal" href="#">Multiple Sensor Configuration File</a><ul>
 <li><a class="reference internal" href="#sensor-configuration-options">Sensor Configuration Options</a></li>
 <li><a class="reference internal" href="#port-configuration-options">Port Configuration Options</a></li>
+<li><a class="reference internal" href="#script-configuration-options">Script Configuration Options</a></li>
+<li><a class="reference internal" href="#plotting-configuration-options">Plotting Configuration Options</a></li>
+<li><a class="reference internal" href="#module-liveserial.config">Configuration Objects</a></li>
 </ul>
 </li>
 </ul>
@@ -168,7 +390,7 @@ monitor can work with <cite>socat</cite> or other virtual ports. Default <cite>0
         <li class="right" >
           <a href="plotting.html" title="Data Plotting"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

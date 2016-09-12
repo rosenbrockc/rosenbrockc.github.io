@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Serial Port Monitoring &mdash; liveserial 0.0.2 documentation</title>
+    <title>Serial Port Monitoring &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="index.html" />
     <link rel="next" title="Data Logging" href="logging.html" />
     <link rel="prev" title="Plotting and Logging Overview" href="overview.html" /> 
   </head>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="overview.html" title="Plotting and Logging Overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -62,7 +62,7 @@ plot. Synchronization is handled through <a class="reference external" href="htt
 allow multi-thread access to putting and getting data.</p>
 <dl class="class">
 <dt id="liveserial.monitor.ComMonitorThread">
-<em class="property">class </em><code class="descclassname">liveserial.monitor.</code><code class="descname">ComMonitorThread</code><span class="sig-paren">(</span><em>data_q</em>, <em>error_q</em>, <em>port</em>, <em>port_baud</em>, <em>port_stopbits=1</em>, <em>port_parity='N'</em>, <em>port_timeout=0.01</em>, <em>listener=False</em>, <em>virtual=False</em>, <em>infer_limit=15</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">liveserial.monitor.</code><code class="descname">ComMonitorThread</code><span class="sig-paren">(</span><em>data_q</em>, <em>error_q</em>, <em>port</em>, <em>port_baud</em>, <em>port_stopbits=1</em>, <em>port_parity='N'</em>, <em>port_timeout=0.01</em>, <em>listener=False</em>, <em>virtual=False</em>, <em>infer_limit=15</em>, <em>encoding='UTF-8'</em>, <em>delimiter='\s'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>A thread for monitoring a COM port. The COM port is</dt>
 <dd>opened when the thread is started.</dd>
@@ -97,6 +97,10 @@ on the format of the data (when inferring). If None, then a format
 inferrer is not created.</li>
 <li><strong>virtual</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, additional serial port parameters are set so that
 the monitor can work with <cite>socat</cite> or other virtual ports.</li>
+<li><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; encoding type used to decode the byte stream from the serial
+port.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; regex describing the sequence of characters used to
+separate columns of values in a single line from the serial port.</li>
 </ul>
 </td>
 </tr>
@@ -124,7 +128,8 @@ the serial port.</p>
 <dl class="attribute">
 <dt id="ComMonitorThread.sensors">
 <code class="descname">sensors</code><a class="headerlink" href="#ComMonitorThread.sensors" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; keys are sensor names; values are Sensor instances used to
+<dd><p><em>dict</em> &#8211; keys are sensor names; values are
+<a class="reference internal" href="config.html#liveserial.config.Sensor" title="liveserial.config.Sensor"><code class="xref py py-class docutils literal"><span class="pre">liveserial.config.Sensor</span></code></a> instances used to
 parse raw lines read from the serial port.</p>
 </dd></dl>
 
@@ -137,7 +142,7 @@ configured sensor structure.</p>
 
 <dl class="method">
 <dt id="liveserial.monitor.ComMonitorThread.add_sensor">
-<code class="descname">add_sensor</code><span class="sig-paren">(</span><em>name</em>, <em>options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread.add_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread.add_sensor" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_sensor</code><span class="sig-paren">(</span><em>name</em>, <em>sensor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#ComMonitorThread.add_sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.ComMonitorThread.add_sensor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a sensor to the COM monitors active list. Sensors in the active
 list have their data parsed and pushed to the data queue. If no sensors
 are added to the list, the monitor will try to infer the sensor
@@ -146,8 +151,8 @@ configuration using the first few raw data samples.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keys are option names from the sensors.cfg file; values
-are the option values.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> (<a class="reference internal" href="config.html#liveserial.config.Sensor" title="liveserial.config.Sensor"><em>liveserial.config.Sensor</em></a>) &#8211; instance with parsed
+configuration values.</td>
 </tr>
 </tbody>
 </table>
@@ -249,59 +254,6 @@ will continue indefinitely until <code class="xref py py-meth docutils literal">
 
 </dd></dl>
 
-<div class="section" id="configuration-objects">
-<h2>Configuration Objects<a class="headerlink" href="#configuration-objects" title="Permalink to this headline">¶</a></h2>
-<p>Because the monitors can be configured using an external file, we have an
-additional object definition that represents a pre-configured sensor, and which
-provides methods for parsing raw data according to the pre-configured format.</p>
-<dl class="class">
-<dt id="liveserial.monitor.Sensor">
-<em class="property">class </em><code class="descclassname">liveserial.monitor.</code><code class="descname">Sensor</code><span class="sig-paren">(</span><em>monitor, name, key=None, value_index=None, dtype=['key', 'int', 'float'], label=None, port=None, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.Sensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents the configuration of a sensor on the serial port.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>monitor</strong> (<a class="reference internal" href="#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><em>ComMonitorThread</em></a>) &#8211; parent instance that this sensor is being logged
-with.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the sensor in the configuration file.</li>
-<li><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of <cite>str</cite> or <cite>type</cite>; items must belong to [&#8216;key&#8217;, int, float,
-str]. Represents the order in which values are found in a single line of
-data read from the serial port. Thus <cite>W 129229 0.928379</cite> would be given by
-[&#8220;key&#8221;, int, float].</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; for plots, what to put on the y-axis. Defaults to <cite>name</cite>.</li>
-<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the port to read this sensor from. Defaults to
-<code class="xref py py-attr docutils literal"><span class="pre">ComMonitorThread.port</span></code>.</li>
-<li><strong>value_index</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; column index of the value that will be plotted.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="liveserial.monitor.Sensor.parse">
-<code class="descname">parse</code><span class="sig-paren">(</span><em>raw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/liveserial/monitor.html#Sensor.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liveserial.monitor.Sensor.parse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses a single line read from the serial port and returns a tuple of
-values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; of split ASCII-encoded strings from the serial port.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of values parsed using <code class="xref py py-attr docutils literal"><span class="pre">Sensor.dtype</span></code> casting.
-None: if the <cite>key</cite> was not found in the correct location.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="inferring-raw-data-format">
 <h2>Inferring Raw Data Format<a class="headerlink" href="#inferring-raw-data-format" title="Permalink to this headline">¶</a></h2>
 <p>When sensors are not pre-configured, the package provides options for inferring
@@ -327,8 +279,8 @@ on the format of the data (when inferring).</td>
 <dl class="attribute">
 <dt id="liveserial.monitor.FormatInferrer.inferred">
 <code class="descname">inferred</code><em class="property"> = None</em><a class="headerlink" href="#liveserial.monitor.FormatInferrer.inferred" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; keys are inferred sensor ids, values are lists of casting
-types as for the implementation in <code class="xref py py-class docutils literal"><span class="pre">Sensor</span></code>. This dict only
+<dd><p><em>dict</em> &#8211; keys are inferred sensor ids, values are lists of casting types as for
+the implementation in <a class="reference internal" href="config.html#liveserial.config.Sensor" title="liveserial.config.Sensor"><code class="xref py py-class docutils literal"><span class="pre">liveserial.config.Sensor</span></code></a>. This dict only
 gets populated when no configuration is available and data structure has
 to be inferred from the incoming stream.</p>
 </dd></dl>
@@ -463,7 +415,6 @@ items (use get_all_from_queue for that).</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Serial Port Monitoring</a><ul>
-<li><a class="reference internal" href="#configuration-objects">Configuration Objects</a></li>
 <li><a class="reference internal" href="#inferring-raw-data-format">Inferring Raw Data Format</a></li>
 <li><a class="reference internal" href="#live-feed-for-data-aggregation">Live Feed for Data Aggregation</a></li>
 <li><a class="reference internal" href="#useful-utility-functions">Useful Utility Functions</a></li>
@@ -513,7 +464,7 @@ items (use get_all_from_queue for that).</li>
         <li class="right" >
           <a href="overview.html" title="Plotting and Logging Overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">liveserial 0.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

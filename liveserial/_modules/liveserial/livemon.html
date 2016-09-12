@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>liveserial.livemon &mdash; liveserial 0.0.2 documentation</title>
+    <title>liveserial.livemon &mdash; liveserial 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="liveserial 0.0.2 documentation" href="../../index.html" />
+    <link rel="top" title="liveserial 0.1.2 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -50,7 +50,7 @@
   <h1>Source code for liveserial.livemon</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/python</span>
 <span class="kn">from</span> <span class="nn">liveserial</span> <span class="k">import</span> <span class="n">msg</span>
-<div class="viewcode-block" id="examples"><a class="viewcode-back" href="../../overview.html#liveserial.livemon.examples">[docs]</a><span class="k">def</span> <span class="nf">examples</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">examples</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Prints examples of using the script to the console using colored output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;LIVE-SERIAL Real-time Serial Port Plotter/Logger&quot;</span>
@@ -77,7 +77,7 @@
                <span class="s2">&quot;for `matplotlib` using online documentation.&quot;</span><span class="p">)</span>
     <span class="n">outputfmt</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">msg</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">explain</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">outputfmt</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span></div>
+    <span class="n">msg</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">explain</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">outputfmt</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_list_serial</span><span class="p">(</span><span class="n">ports</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Lists all of the available serial ports on the local machine. If `port`</span>
@@ -101,76 +101,133 @@
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">available</span>
+
+<span class="k">def</span> <span class="nf">_list_config_ports</span><span class="p">(</span><span class="n">configfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lists all the ports explicitly mentioned in the config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="c1">#Renaming of modules to lower case in python 3.</span>
+        <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">configfile</span><span class="p">))</span>
     
+    <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;sensor.*&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">):</span>
+                <span class="n">port</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">port</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port.*&quot;</span><span class="p">):</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="n">port</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="n">script_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;nargs&quot;</span><span class="p">:</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Name of the port(s) to plot/log.&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;-noplot&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Don&#39;t plot the data; only log it.&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;-autoconf&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Runs in automatic mode by loading a &quot;</span>
+                           <span class="s2">&quot;configuration file in the current directory &quot;</span>
+                           <span class="s2">&quot;called &#39;sensors.cfg&#39;.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Specify a configuration file to get sensor &quot;</span>
+                         <span class="s2">&quot;setup information from.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-logdir&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Path to the directory where sensor data will &quot;</span>
+                         <span class="s2">&quot;be logged.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-baudrate&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">9600</span><span class="p">,</span>
+                  <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Rate at which information is transferred in a &quot;</span>
+                           <span class="s2">&quot;communication channel (in bits/second).&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-stopbits&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                  <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Serial communication parameter.&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;-parity&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Serial communication parameter.&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;-timeout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                 <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;The timeout used for reading the COM port. If &quot;</span>
+                          <span class="s2">&quot;this value is low, the thread will return data &quot;</span>
+                          <span class="s2">&quot;in finer grained chunks, with more accurate &quot;</span>
+                          <span class="s2">&quot;timestamps, but it will also consume more CPU.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-refresh&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                 <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;How often (in milliseconds) to plot new data &quot;</span>
+                          <span class="s2">&quot;obtained from the serial port.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-buffertime&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+                    <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;How often (in milliseconds) to query buffered data &quot;</span>
+                             <span class="s2">&quot;obtained from the serial port.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-logfreq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;How often (in *seconds*) to save the buffered &quot;</span>
+                          <span class="s2">&quot;data points to CSV.&quot;</span><span class="p">)},</span>
+    <span class="s2">&quot;-method&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;last&quot;</span><span class="p">,</span> <span class="s2">&quot;average&quot;</span><span class="p">],</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specifies how buffered data is aggregated each &quot;</span>
+                          <span class="s2">&quot;time it is read from the serial port.&quot;</span><span class="p">)),</span>
+    <span class="s2">&quot;-listen&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Prints the raw output from the serial port &quot;</span>
+                          <span class="s2">&quot;instead of plotting and logging it. Useful &quot;</span>
+                          <span class="s2">&quot;for debugging port connection issues.&quot;</span><span class="p">)),</span>
+    <span class="s2">&quot;-virtual&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                     <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specifies that the port being connected to is &quot;</span>
+                           <span class="s2">&quot;virtual (e.g., with `socat`), which changes the &quot;</span>
+                           <span class="s2">&quot;parameters for connection.&quot;</span><span class="p">)),</span>
+    <span class="s2">&quot;-sensors&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                     <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filter the list of sensors being logged/plotted.&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;-maxpts&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Maximum number of values to keep in the plot &quot;</span>
+                          <span class="s2">&quot;for each sensor&quot;</span><span class="p">)),</span>
+    <span class="s2">&quot;-window&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Width of window in time units.&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;-wait&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+                  <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Number of seconds to wait before failing because &quot;</span>
+                        <span class="s2">&quot;no data is present on the stream for plotting.&quot;</span><span class="p">))</span>
+    <span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;dict: default command-line arguments and their</span>
+<span class="sd">    :meth:`argparse.ArgumentParser.add_argument` keyword arguments.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="k">def</span> <span class="nf">_parser_options</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Parses the options and arguments from the command line.&quot;&quot;&quot;</span>
+    <span class="c1">#We have two options: get some of the details from the config file,</span>
     <span class="kn">import</span> <span class="nn">argparse</span>
     <span class="kn">from</span> <span class="nn">liveserial</span> <span class="k">import</span> <span class="n">base</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">base</span><span class="o">.</span><span class="n">bparser</span><span class="p">],</span>
-                                     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Real-time serial port plotter/logger.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the port(s) to plot/log.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-noplot&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Don&#39;t plot the data; only log it.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-auto&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Runs in automatic mode by loading a &quot;</span>
-                              <span class="s2">&quot;configuration file in the current directory &quot;</span>
-                              <span class="s2">&quot;called &#39;sensors.cfg&#39;.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-config&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specify a configuration file to get sensor &quot;</span>
-                              <span class="s2">&quot;setup information from.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-logdir&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Path to the directory where sensor data will &quot;</span>
-                              <span class="s2">&quot;be logged.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-baudrate&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Rate at which information is transferred in a &quot;</span>
-                              <span class="s2">&quot;communication channel (in bits/second).&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-stopbits&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Serial communication parameter.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-parity&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
-                        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">],</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Serial communication parameter.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;The timeout used for reading the COM port. If &quot;</span>
-                              <span class="s2">&quot;this value is low, the thread will return data &quot;</span>
-                              <span class="s2">&quot;in finer grained chunks, with more accurate &quot;</span>
-                              <span class="s2">&quot;timestamps, but it will also consume more CPU.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-refresh&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;How often (in milliseconds) to plot new data &quot;</span>
-                              <span class="s2">&quot;obtained from the serial port.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-buffertime&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;How often (in milliseconds) to query buffered data &quot;</span>
-                              <span class="s2">&quot;obtained from the serial port.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-logfreq&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;How often (in *seconds*) to save the buffered &quot;</span>
-                              <span class="s2">&quot;data points to CSV.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-method&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;last&quot;</span><span class="p">,</span> <span class="s2">&quot;average&quot;</span><span class="p">],</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specifies how buffered data is aggregated each &quot;</span>
-                              <span class="s2">&quot;time it is read from the serial port.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-listen&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Prints the raw output from the serial port &quot;</span>
-                              <span class="s2">&quot;instead of plotting and logging it. Useful &quot;</span>
-                              <span class="s2">&quot;for debugging port connection issues.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-virtual&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Specifies that the port being connected to is &quot;</span>
-                              <span class="s2">&quot;virtual (e.g., with `socat`), which changes the &quot;</span>
-                              <span class="s2">&quot;parameters for connection.&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-sensors&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filter the list of sensors being logged/plotted.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-maxpts&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Maximum number of values to keep in the plot &quot;</span>
-                              <span class="s2">&quot;for each sensor&quot;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-window&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Width of window in time units.&quot;</span><span class="p">)</span>
+    <span class="n">pdescr</span> <span class="o">=</span> <span class="s2">&quot;Real-time serial port plotter/logger.&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">base</span><span class="o">.</span><span class="n">bparser</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="n">pdescr</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">options</span> <span class="ow">in</span> <span class="n">script_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        
     <span class="n">args</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">exhandler</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
 
+    <span class="c1">#Handle the automatic configuration file setup.</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;autoconf&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span><span class="o">==</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]):</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;sensors.cfg&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using </span><span class="si">{}</span><span class="s2"> as auto-selected config path&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]:</span>
+        <span class="c1">#Try and override any of the other options with those of the config</span>
+        <span class="c1">#file, if it exists.</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]))</span>
+        <span class="kn">from</span> <span class="nn">liveserial.config</span> <span class="k">import</span> <span class="n">script</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">script</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]))</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using script args from config </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]))</span>
+        
     <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]:</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Available Serial Ports&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">_list_serial</span><span class="p">():</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">]:</span>
+        <span class="c1">#We load all the ports present in the config file and assume that the</span>
+        <span class="c1">#user meant all of those.</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_list_config_ports</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_list_serial</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">]):</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -182,11 +239,6 @@
     <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;logdir&quot;</span><span class="p">]:</span> <span class="c1"># pragma: no cover</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Data will only be logged if `-logdir` is specified.&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1">#Handle the automatic configuration file setup.</span>
-    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">]:</span>
-        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
-        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;sensors.cfg&quot;</span><span class="p">)</span>
-        
     <span class="k">return</span> <span class="n">args</span>
 
 <span class="k">def</span> <span class="nf">_get_com</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
@@ -237,9 +289,13 @@
 <span class="sd">    plotting or logging based on command-line args.</span>
 
 <span class="sd">    Args:</span>
+<span class="sd">        args (dict): result of :func:`_parser_options` call that parses the</span>
+<span class="sd">          command-line arguments. Could also be :data:`script_options` to use all</span>
+<span class="sd">          default values.</span>
 <span class="sd">        runtime (float): how many seconds to run for before terminating.</span>
-<span class="sd">        vardir (dict): to get access to the COM port, logger, feed and plotter</span>
-<span class="sd">          objects.</span>
+<span class="sd">        testmode (bool): when True, the plotting backend is changed so that no</span>
+<span class="sd">          window is produced; plotting functions are altered slightly to make</span>
+<span class="sd">          testing possible.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">liveserial.base</span> <span class="k">import</span> <span class="n">set_testmode</span>
     <span class="n">set_testmode</span><span class="p">(</span><span class="n">testmode</span><span class="p">)</span>    
@@ -323,7 +379,8 @@
     <span class="c1">#points.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;noplot&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;listen&quot;</span><span class="p">]:</span>
         <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="n">logger</span><span class="o">.</span><span class="n">ready</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">maxtries</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;wait&quot;</span><span class="p">]</span><span class="o">/</span><span class="mf">0.05</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">logger</span><span class="o">.</span><span class="n">ready</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tries</span> <span class="o">&lt;=</span> <span class="n">maxtries</span><span class="p">:</span>
             <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="kn">from</span> <span class="nn">liveserial.plotting</span> <span class="k">import</span> <span class="n">Plotter</span>
@@ -353,7 +410,7 @@
                     <span class="n">plotter</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">vardir</span></div>
-        
+
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
     <span class="n">run</span><span class="p">(</span><span class="n">_parser_options</span><span class="p">())</span>
 </pre></div>
@@ -386,7 +443,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.0.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

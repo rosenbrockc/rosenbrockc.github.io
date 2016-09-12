@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>liveserial.config &mdash; liveserial 0.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="liveserial 0.1.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for liveserial.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Method for sharing global sensor and port configuration values between</span>
+<span class="sd">modules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="n">portdefaults</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;port_baud&quot;</span><span class="p">:</span> <span class="mi">9600</span><span class="p">,</span>
+    <span class="s2">&quot;port_stopbits&quot;</span><span class="p">:</span> <span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+    <span class="s2">&quot;port_parity&quot;</span><span class="p">:</span> <span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+    <span class="s2">&quot;port_timeout&quot;</span><span class="p">:</span>  <span class="mf">0.01</span><span class="p">,</span>
+    <span class="s2">&quot;virtual&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">r&quot;\s&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span>
+    <span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;dict: default parameters passed to the :class:`serial.Serial` constructor for</span>
+<span class="sd">communicating with the serial port.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">_get_parser</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a :class:`~configparser.ConfigParser` instance for the specified</span>
+<span class="sd">    file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the sensor list</span>
+<span class="sd">          and port information. `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="c1">#Renaming of modules to lower case in python 3.</span>
+        <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>    
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">config</span>               
+
+    <span class="k">return</span> <span class="n">parser</span>
+        
+<span class="n">_sensors</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are sensor names, values are :class:`liveserial.config.Sensor`</span>
+<span class="sd">instances.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_sensors_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, we have already scanned the config file for sensor</span>
+<span class="sd">settings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_sensors</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads all the sensors from the specified config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the sensor list.</span>
+<span class="sd">          `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_sensors</span><span class="p">,</span> <span class="n">_sensors_parsed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_sensors_parsed</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">_get_parser</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#Now that we have the thread, we can add configuration for each of the</span>
+            <span class="c1">#sensors in the config file.</span>
+            <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+            <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;sensor.*&quot;</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;sensor.&quot;</span><span class="p">):]</span>
+                    <span class="n">_sensors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sensor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">section</span><span class="p">)))</span>
+                
+        <span class="n">_sensors_parsed</span> <span class="o">=</span> <span class="kc">True</span>
+    
+<div class="viewcode-block" id="sensors"><a class="viewcode-back" href="../../config.html#liveserial.config.sensors">[docs]</a><span class="k">def</span> <span class="nf">sensors</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the list of :class:`liveserial.config.Sensor` instances that have</span>
+<span class="sd">    the specified port.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the sensor list</span>
+<span class="sd">          and port information. `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">        port (str): name of the port to configure for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_load_sensors</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">global</span> <span class="n">_sensors</span>
+    <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">sensor_n</span><span class="p">,</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">_sensors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="n">port</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">monitor</span> <span class="o">=</span> <span class="n">monitor</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">monitor</span><span class="o">.</span><span class="n">port</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">sensor_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span>
+    <span class="k">elif</span> <span class="n">sensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="n">_sensors</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_sensors</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+                    
+<span class="n">_ports</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are port names, values are updated parameter dictionaries that can</span>
+<span class="sd">be passed to the :class:`liveserial.monitor.ComMonitorThread` constructor.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_ports_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, we have already examined the config file for port settings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_ports</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the configured port information from the specified configuraton.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_ports</span><span class="p">,</span> <span class="n">_ports_parsed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_ports_parsed</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">_get_parser</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+            <span class="n">_ports_parsed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span>
+        
+        <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;port.*&quot;</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;port.&quot;</span><span class="p">):]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="k">continue</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="n">portdefaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#Override the value using the config value unless it doesn&#39;t</span>
+                <span class="c1">#exist.</span>
+                <span class="k">if</span> <span class="n">parser</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+                    <span class="n">params</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+
+            <span class="c1">#Python&#39;s bool is interesting because bool(&#39;0&#39;) =&gt; True. So, we test</span>
+            <span class="c1">#explicitly here for the option value the user set.</span>
+            <span class="kn">import</span> <span class="nn">re</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;\b\d+\b&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]):</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;[a-z]&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">):</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;virtual&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;t&#39;</span>
+
+            <span class="n">_ports</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+            
+        <span class="n">_ports_parsed</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="ports"><a class="viewcode-back" href="../../config.html#liveserial.config.ports">[docs]</a><span class="k">def</span> <span class="nf">ports</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the port configuration dictionary for the specified port name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the port</span>
+<span class="sd">          information. `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">        port (str): name of the port to return configuration for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_load_ports</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">_ports</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_ports</span><span class="p">[</span><span class="n">port</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="k">return</span> <span class="n">portdefaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+<span class="n">_script</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are command-line arguments usually accepted by the script when it</span>
+<span class="sd">is run. Values are configured option values from the config file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_script_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, the script options have been parsed already.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="script"><a class="viewcode-back" href="../../config.html#liveserial.config.script">[docs]</a><span class="k">def</span> <span class="nf">script</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the config options configured globally for the script.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the port</span>
+<span class="sd">          information. `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_script</span><span class="p">,</span> <span class="n">_script_parsed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_script_parsed</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">_get_parser</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s2">&quot;global&quot;</span><span class="p">:</span>
+                    <span class="n">_script</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="s2">&quot;global&quot;</span><span class="p">))</span>
+
+            <span class="c1">#We also need to handle the types, since all the options are just</span>
+            <span class="c1">#strings by default.</span>
+            <span class="kn">from</span> <span class="nn">liveserial.livemon</span> <span class="k">import</span> <span class="n">script_options</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_script</span><span class="p">:</span>
+                <span class="n">optname</span> <span class="o">=</span> <span class="s2">&quot;-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">optname</span> <span class="ow">in</span> <span class="n">script_options</span> <span class="ow">and</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">script_options</span><span class="p">[</span><span class="n">optname</span><span class="p">]:</span>
+                    <span class="n">caster</span> <span class="o">=</span> <span class="n">script_options</span><span class="p">[</span><span class="n">optname</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+                    <span class="n">_script</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">caster</span><span class="p">(</span><span class="n">_script</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="n">_script_parsed</span> <span class="o">=</span> <span class="kc">True</span>
+                
+    <span class="k">return</span> <span class="n">_script</span></div>
+    
+<span class="k">def</span> <span class="nf">_config_split</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">delim</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits the specified value using `delim` and optionally casting the</span>
+<span class="sd">    resulting items.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str): config option to split.</span>
+<span class="sd">        delim (str): string to split the option value on.</span>
+<span class="sd">        cast (function): to apply to each item after the split operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    
+    <span class="k">if</span> <span class="n">delim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delim</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">cast</span><span class="p">,</span> <span class="n">vals</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">vals</span>
+
+<span class="n">_plot</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: of plot options; keys are [&#39;line&#39;, &#39;axes&#39;, &#39;figure&#39;, &#39;label&#39;, &#39;ticks&#39;];</span>
+<span class="sd">values are dicts of matplotlib option values.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_plot_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, we have parsed plot options already.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="plot"><a class="viewcode-back" href="../../config.html#liveserial.config.plot">[docs]</a><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the matplotlib configuration options for the specified plotting</span>
+<span class="sd">    element.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigParser): instance from which to extract the port</span>
+<span class="sd">          information. `str` is also allowed, in which case it</span>
+<span class="sd">          should be the path to the config file to load.</span>
+<span class="sd">        element (str): one of [&#39;line&#39;, &#39;axes&#39;, &#39;figure&#39;, &#39;label&#39;, &#39;ticks&#39;];</span>
+<span class="sd">          specifies which part of the plot the options will apply to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_plot</span><span class="p">,</span> <span class="n">_plot_parsed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_plot_parsed</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">_get_parser</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+            <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;plot.*&quot;</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;plot.&quot;</span><span class="p">):]</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                    <span class="k">continue</span>
+
+                <span class="n">_plot</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">section</span><span class="p">))</span>
+        <span class="n">_plot_parsed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">_plot</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_plot</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="reset_config"><a class="viewcode-back" href="../../config.html#liveserial.config.reset_config">[docs]</a><span class="k">def</span> <span class="nf">reset_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Resets the global config variables so that a session can be continued</span>
+<span class="sd">    with a new config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_sensors</span><span class="p">,</span> <span class="n">_ports</span><span class="p">,</span> <span class="n">_plot</span><span class="p">,</span> <span class="n">_script</span>
+    <span class="k">global</span> <span class="n">_sensors_parsed</span><span class="p">,</span> <span class="n">_ports_parsed</span><span class="p">,</span> <span class="n">_plot_parsed</span><span class="p">,</span> <span class="n">_script_parsed</span>
+    <span class="n">_sensors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_sensors_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_ports</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_ports_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_plot</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_plot_parsed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_script</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_script_parsed</span> <span class="o">=</span> <span class="kc">False</span></div>
+    
+<div class="viewcode-block" id="Sensor"><a class="viewcode-back" href="../../config.html#liveserial.config.Sensor">[docs]</a><span class="k">class</span> <span class="nc">Sensor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents the configuration of a sensor on the serial port.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        monitor (ComMonitorThread): parent instance that this sensor is being logged</span>
+<span class="sd">          with.</span>
+<span class="sd">        name (str): name of the sensor in the configuration file.</span>
+<span class="sd">        key (str): sensor key as it will be written to the serial stream, or `None`</span>
+<span class="sd">          if there isn&#39;t a key in the stream (i.e., only values).</span>
+<span class="sd">        value_index (list): column index/indices of the value that will</span>
+<span class="sd">          be plotted.</span>
+<span class="sd">        dtype (list): of `str` or `type`; items must belong to [&#39;key&#39;, int, float,</span>
+<span class="sd">          str]. Represents the order in which values are found in a single line of</span>
+<span class="sd">          data read from the serial port. Thus `W 129229 0.928379` would be given by</span>
+<span class="sd">          [&quot;key&quot;, int, float].</span>
+<span class="sd">        label (str): for plots, what to put on the y-axis. Defaults to `name`.</span>
+<span class="sd">        port (str): name of the port to read this sensor from. Defaults to</span>
+<span class="sd">          :data:`ComMonitorThread.port`.</span>
+<span class="sd">        logging (str): comma-separated list of columns indices (zero-based) to</span>
+<span class="sd">            include in the log file. If not specified, then the default is to</span>
+<span class="sd">            include *all* data columns in the log file.</span>
+<span class="sd">        columns (str): comma-separated list of columns headings for the CSV file;</span>
+<span class="sd">            these are written in the first row of the file. If excluded, they</span>
+<span class="sd">            default to `Time` and `Value1`, `Value2`, etc.</span>
+<span class="sd">        legends (str): if the comma-separated list in `value_index` includes more</span>
+<span class="sd">            than one index, multiple lines are plotted on the same subplot. In that</span>
+<span class="sd">            case, `legends` allows a comma-separated list of legend labels to be</span>
+<span class="sd">            provided for each of those lines.</span>
+<span class="sd">        kwargs (dict): additional keyword arguments supported that do not require</span>
+<span class="sd">            special processing (i.e., are just simple string values).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        options (dict): additional keyword arguments (or configurable options) for</span>
+<span class="sd">          the sensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monitor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">logging</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legends</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span> <span class="o">=</span> <span class="n">monitor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+
+        <span class="c1">#We analyze the string values set for the dtypes to return the python</span>
+        <span class="c1">#`types` that can cast strings to actual type values.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">string_types</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sentry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">sentry</span> <span class="o">==</span> <span class="s2">&quot;key&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify a sensor key if &#39;key&#39; &quot;</span>
+                                     <span class="s2">&quot;is in the &#39;dtype&#39; option list.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">caster</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">sentry</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">caster</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_index</span> <span class="o">=</span> <span class="n">_config_split</span><span class="p">(</span><span class="n">value_index</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">monitor</span><span class="o">.</span><span class="n">port</span> <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="n">_config_split</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">_config_split</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">legends</span> <span class="o">=</span> <span class="n">_config_split</span><span class="p">(</span><span class="n">legends</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">kwargs</span>
+        
+    <span class="k">def</span> <span class="nf">_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Casts all the values in the given list to their relevant data</span>
+<span class="sd">        types. Assumes that the list has the correct format.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            vals (list): string values from the split line to cast.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)):</span> <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">iv</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">iv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span><span class="p">:</span>
+                    <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)](</span><span class="n">v</span><span class="p">))</span>
+
+            <span class="c1">#Previously, we were changing the order of the columns based on the</span>
+            <span class="c1">#value index to make it easier for the plotter. Since we allow</span>
+            <span class="c1">#multiple values to be plotted on the same subplot now, it is easier</span>
+            <span class="c1">#to just not mangle them in the first place.</span>
+            <span class="k">return</span> <span class="n">vals</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+<div class="viewcode-block" id="Sensor.parse"><a class="viewcode-back" href="../../config.html#liveserial.config.Sensor.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parses a single line read from the serial port and returns a tuple of</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            raw (list): of split ASCII-encoded strings from the serial port. </span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: of values parsed using :attr:`Sensor.dtype` casting.</span>
+<span class="sd">            None: if the `key` was not found in the correct location.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raw</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyloc</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">result</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">liveserial 0.1.2 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>
