@@ -265,7 +265,7 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">sensor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ldata</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">[</span><span class="n">sensor</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">qdata</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotting</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">ldata</span><span class="p">))</span>
 
@@ -339,11 +339,11 @@
                              <span class="s2">&quot;logging ids was specified in configuration.&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logids</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">vindex</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">vindex</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                         
             <span class="k">if</span> <span class="n">logids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1">#The user didn&#39;t say what to log, so we log everything.</span>
-                <span class="n">logids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+                <span class="n">logids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
 
             <span class="n">logpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">))</span>
             <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">linesep</span>

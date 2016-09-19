@@ -170,6 +170,9 @@ and <a class="reference external" href="http://matplotlib.org/api/axes_api.html#
 etc. of the axes labels on the subplots.</li>
 <li><strong>ticks</strong>: keyword arguments passed to <a class="reference external" href="http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.tick_params" title="(in Matplotlib v1.5.3)"><code class="xref py py-func docutils literal"><span class="pre">tick_params()</span></code></a>
 once the plot has been initialized to format the ticks on the subplots.</li>
+<li><strong>animation</strong>: option for controlling the animation class used by
+<cite>matplotlib</cite>. Currently, only the <cite>blit</cite> option is supported. It takes a value
+of <cite>1</cite> if blitting should be enabled.</li>
 </ul>
 <p>To override the keyword arguments, specify an option in a section (labelled
 <cite>[plot.figure]</cite>, <cite>[plot.axes]</cite>, <cite>[plot.label]</cite> or <cite>[plot.ticks]</cite>) that has the

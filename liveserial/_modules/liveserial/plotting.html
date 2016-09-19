@@ -137,7 +137,8 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Live feed has no sensor data keys. &quot;</span>
-                             <span class="s2">&quot;Can&#39;t setup plotting.&quot;</span><span class="p">)</span>
+                             <span class="s2">&quot;Can&#39;t setup plotting. Try fiddling with the &quot;</span>
+                             <span class="s2">&quot;`-wait` parameter.&quot;</span><span class="p">)</span>
 
         <span class="c1">#For the plot styling, we use the config files. Logger has access to the</span>
         <span class="c1">#config file setting, so we just use that.</span>
@@ -214,7 +215,17 @@
                 <span class="c1">#do the costly redraw at every iteration.</span>
                 <span class="n">animation</span><span class="o">.</span><span class="n">TimedAnimation</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">animation</span><span class="o">.</span><span class="n">TimedAnimation</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1">#If blitting is enabled, the plot labels don&#39;t update with</span>
+                <span class="c1">#auto-scaling. Since our machines are fast enough, we make it</span>
+                <span class="c1">#true by default. The user can override it using an option in</span>
+                <span class="c1">#the config file if they need the extra speed.</span>
+                <span class="n">animopts</span> <span class="o">=</span> <span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;animation&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;blit&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">animopts</span><span class="p">:</span>
+                    <span class="n">blit</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">blit</span> <span class="o">=</span> <span class="n">animopts</span><span class="p">[</span><span class="s2">&quot;blit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+                    
+                <span class="n">animation</span><span class="o">.</span><span class="n">TimedAnimation</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="n">blit</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_draw</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">new_frame_seq</span><span class="p">()</span>
@@ -232,7 +243,7 @@
         <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plotorder</span><span class="p">:</span>
             <span class="c1">#First, we get the latest data point from the live feed.</span>
             <span class="n">ldata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">livefeed</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ldata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ldata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
                 <span class="c1">#We don&#39;t have anything reasonable to plot; exit gracefully.</span>
                 <span class="k">continue</span>
             
