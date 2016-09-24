@@ -1,0 +1,238 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Acorn Automated Package Decoration on Import &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="Ipython Extension Module" href="ipython.html" />
+    <link rel="prev" title="Notebook Database Documentation" href="database.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ipython.html" title="Ipython Extension Module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Notebook Database Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Acorn Automated Package Decoration on Import</a><ul>
+<li><a class="reference internal" href="#module-acorn.importer">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="database.html"
+                        title="previous chapter">Notebook Database Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ipython.html"
+                        title="next chapter">Ipython Extension Module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/importer.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="acorn-automated-package-decoration-on-import">
+<h1>Acorn Automated Package Decoration on Import<a class="headerlink" href="#acorn-automated-package-decoration-on-import" title="Permalink to this headline">¶</a></h1>
+<p>Although the most commonly used (and largest) packages have been manually
+set-up and corrected for <cite>acorn</cite>, it would be painful for a user to create a new
+sub-package in the <cite>acorn</cite> distribution for every package that ever needs to be
+decorated. Considering that any pure python package will decorate without any
+problems, it would be nice if any package could just be decorated automatically.</p>
+<p><cite>acorn</cite> includes a special module finder
+<a class="reference internal" href="#acorn.importer.AcornMetaImportFinder" title="acorn.importer.AcornMetaImportFinder"><code class="xref py py-class docutils literal"><span class="pre">AcornMetaImportFinder</span></code></a> that intercepts all calls to
+<cite>import</cite> and can decorate packages &#8220;on the fly&#8221;. The only necessity is that the
+package have its name placed in the <cite>[acorn.packages]</cite> section of the global
+<a class="reference internal" href="configuration.html"><span class="doc">Global and Package Configuration in ACORN</span></a> file. Then the package can just be imported using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">acorn.package</span>
+</pre></div>
+</div>
+<p>where <cite>package</cite> is the name of the package. <cite>acorn</cite> intercepts the imports by
+using the <a class="reference external" href="https://docs.python.org/2/library/sys.html#sys.meta_path" title="(in Python v2.7)"><code class="xref py py-data docutils literal"><span class="pre">sys.meta_path</span></code></a> hook and inserting the <cite>acorn</cite> module finder in
+the first position of the list.</p>
+<div class="section" id="module-acorn.importer">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-acorn.importer" title="Permalink to this headline">¶</a></h2>
+<p>Class for altering the search paths within acorn for new/undecorated packages
+(i.e., those that weren&#8217;t checked explicitly when it was first designed.</p>
+<dl class="class">
+<dt id="acorn.importer.AcornDecoratingLoader">
+<em class="property">class </em><code class="descclassname">acorn.importer.</code><code class="descname">AcornDecoratingLoader</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#AcornDecoratingLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.AcornDecoratingLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads packages that need to be decorated for automatic logging by
+<cite>acorn</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package being loaded.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="acorn.importer.AcornMetaImportFinder">
+<em class="property">class </em><code class="descclassname">acorn.importer.</code><code class="descname">AcornMetaImportFinder</code><span class="sig-paren">(</span><em>prefix='acorn'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#AcornMetaImportFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.AcornMetaImportFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides the default <cite>import</cite> behavior of python for packages so that we
+can intercept and decorate certain packages, but not others.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; prefix on import full names before they are considered
+loadable by acorn. Also available as an attribute.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.importer.hooks">
+<code class="descclassname">acorn.importer.</code><code class="descname">hooks</code><em class="property"> = []</em><a class="headerlink" href="#acorn.importer.hooks" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of package names that have <em>already</em> been intercepted by our
+loader/decorator. This allows us to skip them the next time they are imported
+(by our scripts) so that we don&#8217;t get into an infinite loop.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.importer.load_decorate">
+<code class="descclassname">acorn.importer.</code><code class="descname">load_decorate</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#load_decorate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.load_decorate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports and decorates the package with the specified name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.importer.reload_cache">
+<code class="descclassname">acorn.importer.</code><code class="descname">reload_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#reload_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.reload_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reloads the configuration file settings for which packages to decorate.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.importer.restore">
+<code class="descclassname">acorn.importer.</code><code class="descname">restore</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restores the modules and sub-modules to <cite>sys.modules</cite> that were
+previously scratched.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package to restore to <cite>sys.modules</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.importer.scratch">
+<code class="descclassname">acorn.importer.</code><code class="descname">scratch</code><span class="sig-paren">(</span><em>package</em>, <em>store=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/importer.html#scratch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.importer.scratch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all traces of package and its sub-modules from <cite>sys.modules</cite>
+optionally storing the removed items in the <cite>store</cite> dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package to remove from <cite>sys.modules</cite>.</li>
+<li><strong>store</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when specified, each module/sub-module removed will first be
+appended to the global <code class="xref py py-data docutils literal"><span class="pre">_removed</span></code> dict so it can be restored
+later if needed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ipython.html" title="Ipython Extension Module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Notebook Database Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

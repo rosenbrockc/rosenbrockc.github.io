@@ -1,0 +1,154 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Special Sub-classes in ACORN &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="Method Call Analysis" href="analysis.html" />
+    <link rel="prev" title="Ipython Extension Module" href="ipython.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Method Call Analysis"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ipython.html" title="Ipython Extension Module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Special Sub-classes in ACORN</a><ul>
+<li><a class="reference internal" href="#module-acorn.subclass._numpy"><cite>numpy</cite> Special Sub-class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ipython.html"
+                        title="previous chapter">Ipython Extension Module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="analysis.html"
+                        title="next chapter">Method Call Analysis</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/subclass.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="special-sub-classes-in-acorn">
+<h1>Special Sub-classes in ACORN<a class="headerlink" href="#special-sub-classes-in-acorn" title="Permalink to this headline">¶</a></h1>
+<p>Some of the special C-extension objects that are wrapped by python run into
+issues with decoration. The poster-child for this is <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code>. In
+order to have its instance and special method calls be wrapped, the object needs
+to be sub-classed using <cite>numpy</cite> specific method calls and syntax (such as
+<cite>__arraywrap__</cite>). For cases such as these, <cite>acorn</cite> allows a developer to create
+a special module in <a href="#id1"><span class="problematic" id="id2">:module:`acorn.subclass._package`</span></a>, for a special
+package. Thus, <cite>acorn</cite> has a special <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> subclass in
+<a href="#id3"><span class="problematic" id="id4">:module:`acorn.subclass._numpy`</span></a>. Subclasses are specified in the <cite>acorn</cite> global
+<a class="reference internal" href="configuration.html"><span class="doc">Global and Package Configuration in ACORN</span></a> file so that they can be automatically incorporated by the
+decoration machinery.</p>
+<div class="section" id="module-acorn.subclass._numpy">
+<span id="numpy-special-sub-class"></span><h2><cite>numpy</cite> Special Sub-class<a class="headerlink" href="#module-acorn.subclass._numpy" title="Permalink to this headline">¶</a></h2>
+<p>Module for implementing the difficult case of array sub-classing for
+numpy. This is necessary because of the C-extension nature of the numpy package
+and complications with array slices etc. See
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.subclassing.html">http://docs.scipy.org/doc/numpy/user/basics.subclassing.html</a>.</p>
+<dl class="class">
+<dt id="acorn.subclass._numpy.ndarray">
+<em class="property">class </em><code class="descclassname">acorn.subclass._numpy.</code><code class="descname">ndarray</code><a class="reference internal" href="_modules/acorn/subclass/_numpy.html#ndarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.subclass._numpy.ndarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub-class of <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> so that we can implement logging for
+the instance method and special method calls of array objects.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Method Call Analysis"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ipython.html" title="Ipython Extension Module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

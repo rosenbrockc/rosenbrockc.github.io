@@ -1,0 +1,497 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.logging.database &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.logging.database</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods and classes for creating a JSON database from a tree of</span>
+<span class="sd">calls to methods with various objects passed as arguments.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
+<span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+
+<span class="n">oids</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are python :meth:`id` values, values are the :class:`Instance`</span>
+<span class="sd">class instances from which JSON database can be constructed.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">uuids</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are the :class:`UUID` string values; values are :class:`Instance`</span>
+<span class="sd">class instances (i.e., same values as :data:`oids`, but keyed by `uuid`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">dbs</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are tuple (project, task), values are the :class:`TaskDB`</span>
+<span class="sd">instances for the specified project and task.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">project</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+<span class="sd">&quot;&quot;&quot;str: currently active *project* name under which all logging is being saved.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+<span class="sd">&quot;&quot;&quot;str: currently active *task* name under which all logging is being saved.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">writeable</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, calling :meth:`acorn.logging.database.record` will</span>
+<span class="sd">eventually result in an entry being saved to disk; otherwise, records are</span>
+<span class="sd">organized in memory, but the disk write is disabled.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">dbdir</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;str: full path to the directory where the databases are being stored. If this</span>
+<span class="sd">is overwritten programatically, then the global settings for `acorn` will *not*</span>
+<span class="sd">be checked.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="set_dbdir"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.set_dbdir">[docs]</a><span class="k">def</span> <span class="nf">set_dbdir</span><span class="p">(</span><span class="n">dbdir_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets the path to the directory where the JSON files should be</span>
+<span class="sd">    stored. Calling this method side-steps the configuration settings in the</span>
+<span class="sd">    `acorn.cfg` global config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dbdir_ (str): path to the dbdir; can be relative.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">dbdir</span>
+    <span class="n">dbdir</span> <span class="o">=</span> <span class="n">dbdir_</span></div>
+
+<div class="viewcode-block" id="set_task"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.set_task">[docs]</a><span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="n">project_</span><span class="p">,</span> <span class="n">task_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets the active project and task. All subsequent logging will be saved to</span>
+<span class="sd">    the database with that project and task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        project_ (str): active project name; a project can have multiple tasks.</span>
+<span class="sd">        task_ (str): active task name. Logging is separated at the project and task</span>
+<span class="sd">          level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">project</span><span class="p">,</span> <span class="n">task</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="n">project_</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">task_</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Set project name to </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">task</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="set_writeable"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.set_writeable">[docs]</a><span class="k">def</span> <span class="nf">set_writeable</span><span class="p">(</span><span class="n">writeable_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets whether the database is being written to disk, or just organized in</span>
+<span class="sd">    memory.</span>
+
+<span class="sd">    Args: </span>
+
+<span class="sd">        writeable_ (bool): when True, calling :meth:`acorn.database.record` will</span>
+<span class="sd">          eventually result in an entry being saved to disk; otherwise, records are</span>
+<span class="sd">          organized in memory, but the disk write is disabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">writeable</span>
+    <span class="n">writeable</span> <span class="o">=</span> <span class="n">writeable_</span></div>
+
+<div class="viewcode-block" id="cleanup"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.cleanup">[docs]</a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Saves all the open databases to JSON so that the kernel can be shut down</span>
+<span class="sd">    without losing in-memory collections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">failed</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dbname</span><span class="p">,</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">dbs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1">#Force the database save, even if the time hasn&#39;t elapsed yet.</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">success</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">traceback</span>
+            <span class="n">xcls</span><span class="p">,</span> <span class="n">xerr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">failed</span><span class="p">[</span><span class="n">dbname</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">sdb</span> <span class="ow">in</span> <span class="n">success</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">writeable</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Project </span><span class="si">{0}</span><span class="s2">.</span><span class="si">{1}</span><span class="s2"> saved successfully.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">sdb</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fdb</span><span class="p">,</span> <span class="n">tb</span> <span class="ow">in</span> <span class="n">failed</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Project </span><span class="si">{1}</span><span class="s2">.</span><span class="si">{2}</span><span class="s2"> save failed:</span><span class="se">\n</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span> <span class="o">*</span><span class="n">fdb</span><span class="p">),</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="tracker"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.tracker">[docs]</a><span class="k">def</span> <span class="nf">tracker</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the Instance of the specified object if it is one that</span>
+<span class="sd">    we track by default.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj (object): any python object passed as an argument to a method.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Instance: if the object is trackable, the Instance instance of</span>
+<span class="sd">          that object; else None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">typ</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">anp</span>
+    <span class="k">global</span> <span class="n">oids</span><span class="p">,</span> <span class="n">uuids</span>
+    <span class="n">untracked</span> <span class="o">=</span> <span class="p">(</span><span class="n">basestring</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
+    <span class="n">semitrack</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">semitrack</span><span class="p">)</span> <span class="ow">and</span>
+        <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">untracked</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">])):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">semiform</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> len=</span><span class="si">{1:d}</span><span class="s2"> min=</span><span class="si">{2}</span><span class="s2"> max=</span><span class="si">{3}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">semiform</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">semiform</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> len=</span><span class="si">{1:d}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">semiform</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">semitrack</span><span class="p">):</span>
+        <span class="c1">#We have to run the tracker on each of the elements in the list, set,</span>
+        <span class="c1">#dict or tuple; this is necessary so that we can keep track of</span>
+        <span class="c1">#subsequent calls made with unpacked parts of the tuple.</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">tracker</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">typ</span><span class="o">.</span><span class="n">LambdaType</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;__fqdn__&quot;</span><span class="p">):</span>
+            <span class="c1">#We need to get the actual fqdn of the object *before* it was</span>
+            <span class="c1">#decorated.</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__fqdn__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;lambda (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">func_code</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">typ</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">MethodType</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">anp</span><span class="o">.</span><span class="n">ufunc</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;numpy.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">untracked</span><span class="p">):</span>
+        <span class="c1">#For many of the numpy/scipy methods, the result is a tuple of numpy</span>
+        <span class="c1">#arrays. In that case, we should maintain the tuple structure for</span>
+        <span class="c1">#descriptive purposes, but still return a tracker.</span>
+        <span class="n">oid</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">oids</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">oids</span><span class="p">[</span><span class="n">oid</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Instance</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="n">oids</span><span class="p">[</span><span class="n">oid</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="n">uuids</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="k">def</span> <span class="nf">_dbdir</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the path to the directory where acorn DBs are stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">dbdir</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span><span class="p">,</span> <span class="n">path</span>
+    
+    <span class="k">if</span> <span class="n">dbdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="s2">&quot;acorn&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;folder&quot;</span><span class="p">)):</span>
+            <span class="n">dbdir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;folder&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The folder to save DBs in must be configured&quot;</span>
+                             <span class="s2">&quot;  in &#39;acorn.cfg&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">dbdir</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1">#We want absolute paths to make it easier to port this to other OS.</span>
+        <span class="n">dbdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">dbdir</span><span class="p">))</span>
+        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dbdir</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
+        <span class="n">mkdir</span><span class="p">(</span><span class="n">dbdir</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">dbdir</span>
+
+<div class="viewcode-block" id="record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.record">[docs]</a><span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Records the specified entry to the key-value store under the specified</span>
+<span class="sd">    entity key.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
+<span class="sd">    entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">dbs</span>
+    <span class="c1"># The task database is encapsulated in a class for easier serialization to</span>
+    <span class="c1"># JSON. Get the DB for the (project, task) combination.</span>
+    <span class="n">dbkey</span> <span class="o">=</span> <span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dbkey</span> <span class="ow">in</span> <span class="n">dbs</span><span class="p">:</span>
+        <span class="n">taskdb</span> <span class="o">=</span> <span class="n">dbs</span><span class="p">[</span><span class="n">dbkey</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">taskdb</span> <span class="o">=</span> <span class="n">TaskDB</span><span class="p">()</span>
+        <span class="n">dbs</span><span class="p">[</span><span class="n">dbkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">taskdb</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Initialized JSON database for </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">dbkey</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">taskdb</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+    <span class="c1"># The task database save method makes sure that we only save as often as</span>
+    <span class="c1"># specified in the configuration file.</span>
+    <span class="n">taskdb</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="TaskDB"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB">[docs]</a><span class="k">class</span> <span class="nc">TaskDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents the database for a single task.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        entities (dict): keys are entity ids (fqdn or uuid); values are a list of</span>
+<span class="sd">          entries generated for that entity during this task.</span>
+<span class="sd">        uuids (dict): keys are `uuid` values for class instances; values are</span>
+<span class="sd">          dicts with attributes describing the class instance&#39;s origin.</span>
+<span class="sd">        dbpath (str): full path to the database JSON file for this task</span>
+<span class="sd">          database.</span>
+<span class="sd">        lastsave (float): timestamp since the last time the DB was saved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">dbdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dbdir</span> <span class="o">=</span> <span class="n">_dbdir</span><span class="p">()</span>
+
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="k">if</span> <span class="n">project</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span> <span class="ow">and</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The project and task are using default values. &quot;</span>
+                     <span class="s2">&quot;Use :meth:`acorn.set_task` to change them.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dbdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_log_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Logs the object with the specified `uuid` to `self.uuids` if</span>
+<span class="sd">        possible.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uuid (str): string value of :meth:`uuid.uuid4` value for the</span>
+<span class="sd">              object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#We only need to try and describe an object once; if it is already in</span>
+        <span class="c1">#our database, then just move along.</span>
+        <span class="k">if</span> <span class="n">uuid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span> <span class="ow">and</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">uuids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+        
+<div class="viewcode-block" id="TaskDB.record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Records the specified entry to the key-value store under the specified</span>
+<span class="sd">        entity key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
+<span class="sd">        entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ekey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">]</span>
+
+        <span class="c1">#We also need to make sure we have uuids and origin information stored</span>
+        <span class="c1">#for any uuids present in the parameter string.</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;returns&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">uid</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;returns&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+        <span class="k">for</span> <span class="n">larg</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="s2">&quot;__&quot;</span><span class="p">]:</span>
+            <span class="c1">#We use the constructor to determine if the format of the argument</span>
+            <span class="c1">#is a valid UUID; if it isn&#39;t then we catch the error and keep</span>
+            <span class="c1">#going.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">larg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">continue</span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">uid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">larg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="c1">#This was obviously not a UUID, we don&#39;t need to worry about it,</span>
+                <span class="c1">#it has a user-readable string instead.</span>
+                <span class="k">pass</span>
+
+        <span class="c1">#We also need to handle the keyword arguments; these are keyed by name.</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">karg</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;__&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">karg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1">#Skip the positional arguments since we already handled them.</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">uid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">karg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>            </div>
+
+    <span class="k">def</span> <span class="nf">_get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the option value for the specified acorn database option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="s2">&quot;acorn&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="n">option</span><span class="p">)):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">default</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+            
+<div class="viewcode-block" id="TaskDB.load"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserializes the database from disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#We load the database even when it is not configured to be</span>
+        <span class="c1">#writable. After all, the user may decide part-way through a session to</span>
+        <span class="c1">#begin writing again, and then we would want a history up to that point</span>
+        <span class="c1">#to be valid.</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">jdb</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="o">=</span> <span class="n">jdb</span><span class="p">[</span><span class="s2">&quot;entities&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span> <span class="o">=</span> <span class="n">jdb</span><span class="p">[</span><span class="s2">&quot;uuids&quot;</span><span class="p">]</span></div>
+            
+<div class="viewcode-block" id="TaskDB.save"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serializes the database file to disk.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            force (bool): when True, the elapsed time since last save is ignored</span>
+<span class="sd">                and the database is saved anyway (subject to global</span>
+<span class="sd">                :data:`writeable` setting).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+
+        <span class="c1"># Since the DBs can get rather large, we don&#39;t want to save them every</span>
+        <span class="c1"># single time a method is called. Instead, we only save them at the</span>
+        <span class="c1"># frequency specified in the global settings file.</span>
+        <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+        <span class="n">savefreq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_option</span><span class="p">(</span><span class="s2">&quot;savefreq&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="p">())</span> <span class="o">-</span>
+                     <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span><span class="p">))</span> 
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">savefreq</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;</span> <span class="n">savefreq</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">writeable</span><span class="p">:</span>
+                <span class="c1">#We still overwrite the lastsave value so that this message doesn&#39;t</span>
+                <span class="c1">#keep getting output for every :meth:`record` call.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;Skipping database write to disk by setting.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">jdb</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entities&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">,</span>
+                       <span class="s2">&quot;uuids&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">jdb</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">acorn.msg</span> <span class="k">import</span> <span class="n">err</span>
+                <span class="kn">import</span> <span class="nn">sys</span>
+                <span class="n">err</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span></div></div>
+    
+<div class="viewcode-block" id="Instance"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.Instance">[docs]</a><span class="k">class</span> <span class="nc">Instance</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a class instance in the current session which can be</span>
+<span class="sd">    passed as an argument to method calls, or have unbound methods</span>
+<span class="sd">    called in it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pid (int): python memory address (returned by :func:`id`).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        uuid (str): :meth:`uuid.uuid4` for the object.</span>
+<span class="sd">        obj: original object instance that this represents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+        
+<div class="viewcode-block" id="Instance.describe"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.Instance.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary describing the object based on its type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1">#Because we created an Instance object, we already know that this object</span>
+        <span class="c1">#is not one of the regular built-in types (except, perhaps, for list,</span>
+        <span class="c1">#dict and set objects that can have their tracking turned on).</span>
+
+        <span class="c1">#For objects that are instantiated by the user in __main__, we will</span>
+        <span class="c1">#already have a paper trail that shows exactly how it was done; but for</span>
+        <span class="c1">#these, we have to rely on human-specified descriptions.</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.descriptors</span> <span class="k">import</span> <span class="n">describe</span>
+        <span class="n">semitrack</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">semitrack</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">describe</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">describe</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">describe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

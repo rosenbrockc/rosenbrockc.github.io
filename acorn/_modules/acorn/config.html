@@ -1,0 +1,177 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.config &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Config parser to get the configuration for each of the packages being wrapped</span>
+<span class="sd">by acorn.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">packages</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names, values are ConfigParser() instances with</span>
+<span class="sd">configuration information for each package.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">_package_path</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the full path to the default package configuration file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    package (str): name of the python package to return a path for.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.cfg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">_read_single</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads a single config file into the parser, silently failing if the file</span>
+<span class="sd">    does not exist.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    parser (ConfigParser): parser to read the file into.</span>
+<span class="sd">    filepath (str): full path to the config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="k">global</span> <span class="n">packages</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
+<div class="viewcode-block" id="settings"><a class="viewcode-back" href="../../configuration.html#acorn.config.settings">[docs]</a><span class="k">def</span> <span class="nf">settings</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">reload_</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the config settings for the specified package.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the python package to get settings for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">packages</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages</span> <span class="ow">or</span> <span class="n">reload_</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="c1">#py3 rename of the module to lower case.</span>
+            <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+            
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">package</span> <span class="o">!=</span> <span class="s2">&quot;acorn&quot;</span><span class="p">:</span>
+            <span class="n">confpath</span> <span class="o">=</span> <span class="n">_package_path</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+            <span class="n">_read_single</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">confpath</span><span class="p">)</span>
+        <span class="n">_read_single</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">_package_path</span><span class="p">(</span><span class="s2">&quot;acorn&quot;</span><span class="p">))</span>
+        <span class="n">packages</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">packages</span><span class="p">[</span><span class="n">package</span><span class="p">]</span></div>
+
+<span class="k">def</span> <span class="nf">_descriptor_path</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the full path to the default package configuration file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    package (str): name of the python package to return a path for.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
+
+<div class="viewcode-block" id="descriptors"><a class="viewcode-back" href="../../configuration.html#acorn.config.descriptors">[docs]</a><span class="k">def</span> <span class="nf">descriptors</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dictionary of descriptors deserialized from JSON for the</span>
+<span class="sd">    specified package.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the python package to get settings for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="n">dpath</span> <span class="o">=</span> <span class="n">_descriptor_path</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dpath</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">jdb</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jdb</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

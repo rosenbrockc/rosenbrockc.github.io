@@ -1,0 +1,241 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ACORN Object Descriptor Interface &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="Notebook Database Documentation" href="database.html" />
+    <link rel="prev" title="Automatic Decoration of Packages" href="decoration.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Notebook Database Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="decoration.html" title="Automatic Decoration of Packages"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ACORN Object Descriptor Interface</a><ul>
+<li><a class="reference internal" href="#attribute-descriptor-fields">Attribute Descriptor Fields</a></li>
+<li><a class="reference internal" href="#instance-method-descriptor-fields">Instance Method Descriptor Fields</a></li>
+<li><a class="reference internal" href="#module-acorn.logging.descriptors">API Documentation for the Descriptor Machinery</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="decoration.html"
+                        title="previous chapter">Automatic Decoration of Packages</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="database.html"
+                        title="next chapter">Notebook Database Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/descriptors.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="acorn-object-descriptor-interface">
+<h1>ACORN Object Descriptor Interface<a class="headerlink" href="#acorn-object-descriptor-interface" title="Permalink to this headline">¶</a></h1>
+<p>In order for the database to be useful after several years, we need to keep some
+extra information about variables that get passed around. We obviously can&#8217;t
+keep copies of every variable (especially true for large matrices); however, we
+can keep certain statistics, such as shape, type and other standard statistical
+measures. The machinery for describing objects is quite generic and includes
+support for attributes, instance methods and calls to other functions that can
+return information for a given object.</p>
+<p>Descriptor methods are contained within JSON files (named <cite>package.json</cite>, where
+&#8216;package&#8217; is the name of the package where the object is defined). These JSON
+files describe dictionaries where the FQDN of an object is the key, and the
+value is a dictionary with attributes and values that describe <em>how to describe</em>
+the object. An object&#8217;s descriptor dictionary can have the following kinds of
+fields:</p>
+<ul class="simple">
+<li><strong>attribute</strong>: can be any attribute of the object; it can also be a FQDN for
+an attribute, specified with a &#8216;.&#8217;-separated list. E.g., <cite>columns.values</cite>.</li>
+<li><strong>instance</strong>: is a special keyword that specifies an instance method to be
+called on the object. It&#8217;s format is described below.</li>
+</ul>
+<div class="section" id="attribute-descriptor-fields">
+<h2>Attribute Descriptor Fields<a class="headerlink" href="#attribute-descriptor-fields" title="Permalink to this headline">¶</a></h2>
+<p>Attributes are added to the descriptor (dictionary) for an object by specifying
+the <em>name</em> of the attribute as a key and another dictionary as the value. If the
+value dictionary is empty, then the attribute&#8217;s value will be attached to the
+description under the <em>same name</em> as the original attribute. However, it can
+also be transformed using these options:</p>
+<ul>
+<li><p class="first"><em>rename</em>: expose the value under a new name when describing the object.</p>
+</li>
+<li><p class="first"><em>slice</em>: if the object is a list or array, you can select columns of the array
+using slice syntax. <cite>name:slice</cite> specifies that the result of taking the slice
+should be set on the descriptor under <cite>name</cite>. <cite>slice</cite> can be a &#8216;,&#8217;-separated
+list of indices to take. For example: <cite>0,1,2</cite> translates to <cite>obj[0][1][2]</cite>.
+.. code-block:: json</p>
+<blockquote>
+<div><p>{&#8220;values&#8221;: {&#8220;slice&#8221;: [&#8220;mean:1&#8221;, &#8220;std:2&#8221;]}}</p>
+</div></blockquote>
+<p>will take the <strong>second</strong> column of <cite>values</cite> attribute and label it as <cite>mean</cite>
+on the new object. It will take the <strong>third</strong> column of <cite>values</cite> and place it
+under the attribute <cite>std</cite>. If a name is not specified (i.e., no <cite>:</cite> is present
+in the slice), then it is just labelled by its index in the slice list.</p>
+</li>
+<li><p class="first"><em>transform</em>: apply a function to the value of the attribute. Functions can
+have <cite>numpy</cite>, <cite>math</cite>, <cite>scipy</cite> in their names. For example, to use the
+square-root of the length of an object, we would use:
+.. code-block:: json</p>
+<blockquote>
+<div><p>{&#8220;length&#8221;: {&#8220;transform&#8221;: [&#8220;numpy.sqrt&#8221;]}}</p>
+</div></blockquote>
+<p>which would take attribute <cite>length</cite> and apply <cite>numpy.sqrt</cite> to it. If multiple
+transforms are specified in the list, they will be chained, so that the result
+of the previous item in the list is past to the next transformation.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">only one of <em>slice</em> or <em>rename</em> can be specified</p>
+</div>
+</div>
+<div class="section" id="instance-method-descriptor-fields">
+<h2>Instance Method Descriptor Fields<a class="headerlink" href="#instance-method-descriptor-fields" title="Permalink to this headline">¶</a></h2>
+<p>The instance method descriptors work identically to the standard attribute
+descriptors except that instead of operating on a specific attribute of the
+object instance, they operate directly on the instance itself. The options
+above for <em>rename</em> and <em>slice</em> work exactly the same way. However, the
+<em>transform</em> option behaves differently.</p>
+<p>If the transform has <cite>self.</cite> in its name, then <cite>self</cite> is replaced by the object
+instance. These methods can also be chained and mixed with the <cite>numpy</cite>, <cite>math</cite>
+and <cite>scipy</cite> calls.</p>
+<div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;instance&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;transform&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;self.head&quot;</span><span class="p">,</span> <span class="s2">&quot;self.describe&quot;</span><span class="p">,</span> <span class="s2">&quot;self.get_values&quot;</span><span class="p">,</span>
+<span class="s2">&quot;numpy.sqrt&quot;</span><span class="p">]}}</span>
+</pre></div>
+</div>
+<p>would be equivalent to <cite>numpy.sqrt(obj.head().describe().get_values())</cite>.</p>
+</div>
+<div class="section" id="module-acorn.logging.descriptors">
+<span id="api-documentation-for-the-descriptor-machinery"></span><h2>API Documentation for the Descriptor Machinery<a class="headerlink" href="#module-acorn.logging.descriptors" title="Permalink to this headline">¶</a></h2>
+<p>Methods for describing the objects within packages that are not instantiated
+by the user in the scope of __main__.</p>
+<dl class="function">
+<dt id="acorn.logging.descriptors.describe">
+<code class="descclassname">acorn.logging.descriptors.</code><code class="descname">describe</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/descriptors.html#describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.descriptors.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes the object using developer-specified attributes specific to
+each main object type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.descriptors.json_describe">
+<code class="descclassname">acorn.logging.descriptors.</code><code class="descname">json_describe</code><span class="sig-paren">(</span><em>o</em>, <em>fqdn</em>, <em>descriptor=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/descriptors.html#json_describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.descriptors.json_describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes the specified object using the directives in the JSON
+<cite>descriptor</cite>, if available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>o</strong> &#8211; object to describe.</li>
+<li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; fully-qualified domain name of the object.</li>
+<li><strong>descriptor</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keys are attributes of <cite>o</cite>; values are transform
+functions to apply to the attribute so that only a single value is
+returned.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Notebook Database Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="decoration.html" title="Automatic Decoration of Packages"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

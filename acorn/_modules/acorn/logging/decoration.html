@@ -1,0 +1,1186 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.logging.decoration &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.logging.decoration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods for dynamically adding decorators to all the methods and</span>
+<span class="sd">classes within a module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">record</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">acorn.logging.analysis</span> <span class="k">import</span> <span class="n">analyze</span>
+<span class="kn">import</span> <span class="nn">acorn</span>
+
+<div class="viewcode-block" id="isbound"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.isbound">[docs]</a><span class="k">def</span> <span class="nf">isbound</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if the method is bounded (i.e., *requires* a</span>
+<span class="sd">    class instance to run.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">ismethod</span><span class="p">,</span> <span class="n">ismethoddescriptor</span> <span class="k">as</span> <span class="n">md</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">method</span><span class="o">.</span><span class="n">__acorn__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ismethod</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">__acorn__</span><span class="p">)</span> <span class="ow">or</span> <span class="n">md</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">__acorn__</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ismethod</span><span class="p">(</span><span class="n">method</span><span class="p">)</span> <span class="ow">or</span> <span class="n">md</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Attempts to return the module in which `o` is defined.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getmodule</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">getmodule</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1">#There is nothing we can do about this for now.</span>
+        <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">_safe_getattr</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the attribute from the specified object, taking the acorn decoration</span>
+<span class="sd">    into account.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">getattribute</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">__acornext__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">__acornext__</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">__acorn__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#Some of the functions have the original function (when it was not</span>
+            <span class="c1">#extended) in the __acorn__ attribute.</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">__acorn__</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">getattribute</span>
+
+<span class="k">def</span> <span class="nf">_update_attrs</span><span class="p">(</span><span class="n">nobj</span><span class="p">,</span> <span class="n">oobj</span><span class="p">,</span> <span class="n">exceptions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acornext</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates the attributes on `nobj` to match those of old, excluding the any</span>
+<span class="sd">    attributes in the exceptions list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">acornext</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">oobj</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">oobj</span><span class="o">.</span><span class="n">__acornext__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">oobj</span>
+        
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exceptions</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">nobj</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="c1">#Some of the built-in types have __class__ attributes (for</span>
+                <span class="c1">#example) that we can&#39;t set on a function type. This catches</span>
+                <span class="c1">#that case and any others.</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">success</span>
+
+<span class="n">name_filters</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names; values are dicts of lists. 1)</span>
+<span class="sd">:meth:`~fnmatch.fnmatch` patterns; 2) :meth:`re.match` patterns.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_decorated_packs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of package names that have had :func:`decorate` called on them.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_pack_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;ipython-input&quot;</span><span class="p">,</span> <span class="s2">&quot;matplotlib&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;scipy&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;list: of package name paths (including the path separator) so that stack</span>
+<span class="sd">entries can be filtered more quickly.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_def_stackdepth</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="sd">&quot;&quot;&quot;int: default stack depth when not specified by a config file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_get_name_filter</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;decorate&quot;</span><span class="p">,</span> <span class="n">reparse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Makes sure that the name filters for the specified package have been</span>
+<span class="sd">    loaded.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package that this method belongs to.</span>
+<span class="sd">        context (str): one of [&#39;decorate&#39;, &#39;time&#39;, &#39;analyze&#39;]; specifies which</span>
+<span class="sd">          section of the configuration settings to check.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">name_filters</span>
+    <span class="n">pkey</span> <span class="o">=</span> <span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">name_filters</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reparse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name_filters</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span>
+    
+    <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+    <span class="n">spack</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">name_filters</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># The acorn.* sections allow for global settings that affect every package</span>
+    <span class="c1"># that ever gets wrapped.</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;decorate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;tracking&quot;</span><span class="p">,</span> <span class="s2">&quot;acorn.tracking&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;timing&quot;</span><span class="p">,</span> <span class="s2">&quot;acorn.timing&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;analyze&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="s2">&quot;acorn.analysis&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+    <span class="n">filters</span><span class="p">,</span> <span class="n">rfilters</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="kn">import</span> <span class="nn">re</span>
+    <span class="k">if</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+        <span class="c1"># We are interested in the &#39;filter&#39; and &#39;rfilter&#39; options if they exist.</span>
+        <span class="n">filters</span><span class="p">,</span> <span class="n">rfilters</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">ignores</span><span class="p">,</span> <span class="n">rignores</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">[</span><span class="n">context</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">spack</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;filter&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">filters</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">r&quot;\s*\$\s*&quot;</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;filter&quot;</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="s2">&quot;rfilter&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">pfilters</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">r&quot;\s*\$\s*&quot;</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;rfilter&quot;</span><span class="p">))</span>
+                    <span class="n">rfilters</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pfilters</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s2">&quot;ignore&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">ignores</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">r&quot;\s*\$\s*&quot;</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="s2">&quot;rignore&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">pignores</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">r&quot;\s*\$\s*&quot;</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot;rignore&quot;</span><span class="p">))</span>
+                    <span class="n">rignores</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pfilters</span><span class="p">])</span>
+
+        <span class="n">name_filters</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="n">filters</span><span class="p">,</span>
+            <span class="s2">&quot;rfilters&quot;</span><span class="p">:</span> <span class="n">rfilters</span><span class="p">,</span>
+            <span class="s2">&quot;ignores&quot;</span><span class="p">:</span> <span class="n">ignores</span><span class="p">,</span>
+            <span class="s2">&quot;rignores&quot;</span><span class="p">:</span> <span class="n">rignores</span>
+            <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name_filters</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">name_filters</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span>
+
+<div class="viewcode-block" id="filter_name"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.filter_name">[docs]</a><span class="k">def</span> <span class="nf">filter_name</span><span class="p">(</span><span class="n">funcname</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;decorate&quot;</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if the specified function should be filtered (i.e., included</span>
+<span class="sd">    or excluded for use in the specified context.)</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        funcname (str): name of the method/function being called.</span>
+<span class="sd">        package (str): name of the package that the method belongs to.</span>
+<span class="sd">        context (str): one of [&#39;decorate&#39;, &#39;time&#39;, &#39;analyze&#39;]; specifies which</span>
+<span class="sd">          section of the configuration settings to check.</span>
+<span class="sd">        explicit (bool): when True, if a name is not explicitly specified for</span>
+<span class="sd">          inclusion, then the function returns False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: specifying whether the function should be decorated, timed or</span>
+<span class="sd">          analyzed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">packfilter</span> <span class="o">=</span> <span class="n">_get_name_filter</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">packfilter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># By default, if there are no rules specified, then we include</span>
+        <span class="c1"># everything.</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># First we handle the `fnmatch` filters. If something is explicitly included</span>
+    <span class="c1"># that takes precedence over the ignore filters.</span>
+    <span class="n">matched</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;filters&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;filters&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">funcname</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">matched</span>
+
+    <span class="k">if</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;rfilters&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;rfilters&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">funcname</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">matched</span>
+
+    <span class="k">if</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;ignores&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;ignores&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">funcname</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="n">matched</span>
+
+    <span class="k">if</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;rignores&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">packfilter</span><span class="p">[</span><span class="s2">&quot;rignores&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">funcname</span><span class="p">):</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="n">matched</span>
+
+    <span class="k">if</span> <span class="n">matched</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">explicit</span>
+            
+    <span class="k">return</span> <span class="n">matched</span></div>
+
+<span class="k">def</span> <span class="nf">_tracker_str</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a string representation of the tracker object for the given item.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        item: object to get tracker for.</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of the object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">tracker</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">instance</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1">#We return the uuid for each item in the list.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;uuid&quot;</span><span class="p">):</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">uuid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#Must be a simple built-in type like `int` or `float`, in which case we</span>
+        <span class="c1">#don&#39;t want to convert it to a string.</span>
+        <span class="k">return</span> <span class="n">item</span>
+    
+<span class="k">def</span> <span class="nf">_check_args</span><span class="p">(</span><span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks the specified argument lists for objects that are trackable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">argl</span><span class="p">:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;__&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_tracker_str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+           
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">argd</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_tracker_str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">args</span>
+
+<span class="k">def</span> <span class="nf">_decorated_path</span><span class="p">(</span><span class="n">spath</span><span class="p">,</span> <span class="n">ipython</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks whether the specified code path is from a package that has been</span>
+<span class="sd">    decorated by `acorn`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spath (str): path to the module code file where the function was</span>
+<span class="sd">          defined.</span>
+<span class="sd">        ipython (bool): when True, any code source paths in the stack with</span>
+<span class="sd">          &quot;ipython-input&quot; in the path are included as well.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#When multiple packages are decorated, the stacks can become interdependent;</span>
+    <span class="c1">#in that case, it isn&#39;t good enough to just check the package name from the</span>
+    <span class="c1">#fqdn of the function being called.</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">([</span><span class="n">p</span> <span class="ow">in</span> <span class="n">spath</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_pack_paths</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">_reduced_stack</span><span class="p">(</span><span class="n">istart</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">iend</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ipython</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the reduced function call stack that includes only relevant</span>
+<span class="sd">    function calls (i.e., ignores any that are not part of the specified package</span>
+<span class="sd">    or acorn.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package that the logged method belongs to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">inspect</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">istart</span><span class="p">:</span><span class="n">iend</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span> <span class="k">if</span> <span class="n">_decorated_path</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+<span class="n">_atdepth_new</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, a higher-level creation method has already determined that</span>
+<span class="sd">the stack is as deep is it needs to be; this allows subsequent method calls to</span>
+<span class="sd">exit more quickly without examining the stack.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_cstack_new</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: as constructors call ever more instance constructors, we place them on</span>
+<span class="sd">this list and pop them once they return; that way, we know when to reset the</span>
+<span class="sd">global at-depth flag.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">_pre_create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">atdepth</span><span class="p">,</span> <span class="n">stackdepth</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks whether the the logging should happen based on the specified</span>
+<span class="sd">    parameters. If it should, an initialized entry is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atdepth</span><span class="p">:</span>
+        <span class="n">rstack</span> <span class="o">=</span> <span class="n">_reduced_stack</span><span class="p">()</span>
+        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rstack</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">reduced</span> <span class="o">=</span> <span class="n">stackdepth</span> <span class="o">+</span> <span class="mi">10</span>
+
+    <span class="k">if</span> <span class="n">reduced</span> <span class="o">&lt;=</span> <span class="n">stackdepth</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">_check_args</span><span class="p">(</span><span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.__new__&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">),</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+            <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
+            <span class="s2">&quot;returns&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">atdepth</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">atdepth</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_post_create</span><span class="p">(</span><span class="n">atdepth</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finishes the entry logging if applicable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atdepth</span> <span class="ow">and</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#We need to get these results a UUID that will be saved so that any</span>
+            <span class="c1">#instance methods applied to this object has a parent to refer to.</span>
+            <span class="n">retid</span> <span class="o">=</span> <span class="n">_tracker_str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;returns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">retid</span>
+            <span class="n">ekey</span> <span class="o">=</span> <span class="n">retid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ekey</span> <span class="o">=</span> <span class="n">_tracker_str</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+            
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>    
+        
+<div class="viewcode-block" id="creationlog"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.creationlog">[docs]</a><span class="k">def</span> <span class="nf">creationlog</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">stackdepth</span><span class="o">=</span><span class="n">_def_stackdepth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator for wrapping the creation of class instances that are being logged</span>
+<span class="sd">    by acorn.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base: base class used to call __new__ for the construction.</span>
+<span class="sd">        package (str): name of (global) package the class belongs to.</span>
+<span class="sd">        stackdepth (int): if the calling stack is less than this depth, than</span>
+<span class="sd">          include the entry in the log; otherwise ignore it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>   
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">wrapnew</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_atdepth_new</span><span class="p">,</span> <span class="n">_cstack_new</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
+            <span class="n">entry</span><span class="p">,</span> <span class="n">_atdepth_new</span> <span class="o">=</span> <span class="n">_pre_create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">_atdepth_new</span><span class="p">,</span>
+                                              <span class="n">stackdepth</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+            <span class="n">_cstack_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+            
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">__old__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="c1">#This is a crazy hack! We want this to be dynamic so that it can</span>
+            <span class="c1">#work with any of the packages. If the error message suggests using</span>
+            <span class="c1">#a different constructor, we go ahead and use it.</span>
+            <span class="kn">import</span> <span class="nn">sys</span>
+            <span class="n">xcls</span><span class="p">,</span> <span class="n">xerr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">referral</span> <span class="o">=</span> <span class="n">xerr</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;.__new__()&quot;</span> <span class="ow">in</span> <span class="n">referral</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">referral</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">argl</span><span class="p">,</span> <span class="n">argd</span><span class="p">)</span>
+                <span class="k">raise</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">argl</span><span class="p">,</span> <span class="n">argd</span><span class="p">)</span>
+                <span class="k">raise</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Object creation failed for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
+            <span class="n">_cstack_new</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_cstack_new</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">_atdepth_new</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">_post_create</span><span class="p">(</span><span class="n">_atdepth_new</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+                        
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapnew</span></div>
+
+<span class="n">_atdepth_call</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, a higher-level calling method has already determined that</span>
+<span class="sd">the stack is as deep is it needs to be; this allows subsequent method calls to</span>
+<span class="sd">exit more quickly without examining the stack.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_cstack_call</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: as methods call ever more instance constructors, we place them on</span>
+<span class="sd">this list and pop them once they return; that way, we know when to reset the</span>
+<span class="sd">global at-depth flag.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">_pre_call</span><span class="p">(</span><span class="n">atdepth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">stackdepth</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks whether the logging should create an entry based on stackdepth. If</span>
+<span class="sd">    so, the entry is created.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atdepth</span><span class="p">:</span>
+        <span class="n">rstack</span> <span class="o">=</span> <span class="n">_reduced_stack</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;&lt;module&gt;&quot;</span> <span class="ow">in</span> <span class="n">rstack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">rstack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">reduced</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rstack</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">will_print</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">sstack</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rstack</span><span class="p">]</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;stack (</span><span class="si">{}</span><span class="s2">): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rstack</span><span class="p">),</span>
+                                             <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sstack</span><span class="p">)),</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">reduced</span> <span class="o">=</span> <span class="n">stackdepth</span> <span class="o">+</span> <span class="mi">10</span>
+
+    <span class="n">bound</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">reduced</span> <span class="o">&lt;=</span> <span class="n">stackdepth</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">_check_args</span><span class="p">(</span><span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        <span class="c1"># At this point, we should start the entry. If the method raises an</span>
+        <span class="c1"># exception, we should keep track of that. If this is an instance</span>
+        <span class="c1"># method, we should get its UUID, if not, then we can just store the</span>
+        <span class="c1"># entry under the full method name.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">argl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">bound</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argl</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">parent</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bound</span><span class="p">:</span>
+            <span class="c1">#For now, we use the fqdn; later, if the result is not None, we</span>
+            <span class="c1">#will rather index this entry by the returned result, since we</span>
+            <span class="c1">#can also access the fqdn in the entry details.</span>
+            <span class="n">ekey</span> <span class="o">=</span> <span class="n">fqdn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># It must have the first argument be the instance.</span>
+            <span class="n">ekey</span> <span class="o">=</span> <span class="n">_tracker_str</span><span class="p">(</span><span class="n">argl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">fqdn</span><span class="p">,</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+            <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
+            <span class="s2">&quot;returns&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">atdepth</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">ekey</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">atdepth</span><span class="p">,</span> <span class="n">reduced</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_post_call</span><span class="p">(</span><span class="n">atdepth</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finishes constructing the log and records it to the database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">atdepth</span> <span class="ow">and</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ek</span> <span class="o">=</span> <span class="n">ekey</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">retid</span> <span class="o">=</span> <span class="n">_tracker_str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">bound</span><span class="p">:</span>
+                <span class="n">ek</span> <span class="o">=</span> <span class="n">retid</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;returns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;returns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">retid</span>
+            
+        <span class="n">name</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">filter_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">):</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;elapsed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">filter_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="s2">&quot;analyze&quot;</span><span class="p">):</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyze</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ek</span><span class="p">,</span> <span class="n">entry</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Before we return the result, let&#39;s first save this call to the</span>
+        <span class="c1"># database so we have a record of it.</span>
+        <span class="n">record</span><span class="p">(</span><span class="n">ek</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ek</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>    
+
+<div class="viewcode-block" id="rt_decorate_post"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.rt_decorate_post">[docs]</a><span class="k">def</span> <span class="nf">rt_decorate_post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds logging for the post-call result of calling the method externally.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of the function being logged.</span>
+<span class="sd">        package (str): name of the package we are logging for.</span>
+<span class="sd">        result: of calling the method we are logging.</span>
+<span class="sd">        entry (dict): one of the values returned by :func:`rt_decorate_pre`.</span>
+<span class="sd">        bound (bool): true if the method is bound.</span>
+<span class="sd">        ekey (str): key under which to store the entry in the database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">_cstack_call</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
+        <span class="n">_cstack_call</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_cstack_call</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_atdepth_call</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">_post_call</span><span class="p">(</span><span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span>
+                       <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span></div>
+        
+<div class="viewcode-block" id="rt_decorate_pre"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.rt_decorate_pre">[docs]</a><span class="k">def</span> <span class="nf">rt_decorate_pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">stackdepth</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds logging for a call to the specified function that is being handled</span>
+<span class="sd">    by an external module.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of the function being logged.</span>
+<span class="sd">        parent: object that the function belongs to.</span>
+<span class="sd">        context (str): one of [&#39;pre&#39;, &#39;post&#39;]; specifies whether we are creating the</span>
+<span class="sd">          entry or completing the entry.</span>
+<span class="sd">        stackdepth (int): maximum stack depth before entries are ignored.</span>
+<span class="sd">        argl (list): positional arguments passed to the function call.</span>
+<span class="sd">        argd (dict): keyword arguments passed to the function call.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">_cstack_call</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
+        <span class="c1">#We add +1 to stackdepth because this method had to be called in</span>
+        <span class="c1">#addition to the wrapper method, so we would be off by 1.</span>
+        <span class="n">pcres</span> <span class="o">=</span> <span class="n">_pre_call</span><span class="p">(</span><span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">stackdepth</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                          <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">reduced</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">pcres</span>
+        <span class="n">_cstack_call</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fqdn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="callinglog"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.callinglog">[docs]</a><span class="k">def</span> <span class="nf">callinglog</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">stackdepth</span><span class="o">=</span><span class="n">_def_stackdepth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator for wrapping package library methods for intelligent</span>
+<span class="sd">    logging.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): fully qualified name of the method being decorated.</span>
+<span class="sd">        package (str): name of the package the `func` belongs to.</span>
+<span class="sd">        parent: class to which `func` belongs if it exists.</span>
+<span class="sd">        stackdepth (int): if the calling stack is less than this depth, than</span>
+<span class="sd">          include the entry in the log; otherwise ignore it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_atdepth_call</span><span class="p">,</span> <span class="n">_cstack_call</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">rt_decorate_pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">stackdepth</span><span class="p">,</span>
+                                             <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">in</span> <span class="n">_callwraps</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">_callwraps</span><span class="p">[</span><span class="n">fqdn</span><span class="p">](</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fqdn</span><span class="o">==</span><span class="s2">&quot;numpy.core.fromnumeric.ravel&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">argl</span><span class="p">),</span> <span class="n">func</span><span class="p">)</span>
+
+        <span class="n">rt_decorate_post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+<span class="n">_extended_objs</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are :func:`id` memory addresses of objects; values are the</span>
+<span class="sd">*extended* objects that `acorn` created.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_final_objs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of :func:`id` memory addresses of objects; these are objects marked as</span>
+<span class="sd">final that cannot be subclassed and also cannot have their attributes set.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_create_extension</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">otype</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates an extension object to represent `o` that can have attributes</span>
+<span class="sd">    set, but which behaves identically to the given object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        o: object to create an extension for; no checks are performed to see if</span>
+<span class="sd">          extension is actually required.</span>
+<span class="sd">        otype (str): object types; one of [&quot;classes&quot;, &quot;functions&quot;, &quot;methods&quot;,</span>
+<span class="sd">          &quot;modules&quot;].</span>
+<span class="sd">        fqdn (str): fully qualified name of the package that the object belongs</span>
+<span class="sd">          to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">types</span>
+    <span class="n">xdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__acornext__&quot;</span><span class="p">:</span> <span class="n">o</span><span class="p">,</span>
+             <span class="s2">&quot;__doc__&quot;</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">__doc__</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">otype</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
+        <span class="n">classname</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">in</span> <span class="n">_explicit_subclasses</span><span class="p">:</span>
+                <span class="n">xclass</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_explicit_subclasses</span><span class="p">[</span><span class="n">fqdn</span><span class="p">])</span>
+                <span class="n">xclass</span><span class="o">.</span><span class="n">__acornext__</span> <span class="o">=</span> <span class="n">o</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xclass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">classname</span><span class="p">,</span> <span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">),</span> <span class="n">xdict</span><span class="p">)</span>
+            <span class="n">xclass</span><span class="o">.</span><span class="n">__module__</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">__module__</span>
+            <span class="k">return</span> <span class="n">xclass</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="c1">#This happens when a class is final, meaning that it is not allowed</span>
+            <span class="c1">#to be subclassed.</span>
+            <span class="n">_final_objs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">o</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">otype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">,</span> <span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="s2">&quot;unknowns&quot;</span><span class="p">]</span> <span class="ow">or</span>
+          <span class="p">(</span><span class="n">otype</span> <span class="o">==</span> <span class="s2">&quot;builtins&quot;</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span><span class="p">)</span> <span class="ow">or</span>
+                                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span><span class="p">)))):</span>
+        <span class="c1">#The unknowns type is for objects that don&#39;t match any of the</span>
+        <span class="c1">#inspect.is* function calls, but still have a __call__ method (such as</span>
+        <span class="c1">#the numpy.ufunc class instances). These can still be wrapped by another</span>
+        <span class="c1">#function.</span>
+        <span class="k">def</span> <span class="nf">xwrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">o</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1">#see issue #4.</span>
+                <span class="k">pass</span>
+            
+        <span class="c1">#Set the docstring and original object attributes.</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">xdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+            
+        <span class="c1">#We want to get the members dictionary. For classes, using</span>
+        <span class="c1">#:meth:`inspect.getmembers` produces stack overflow errors. Instead, we</span>
+        <span class="c1">#reference the __dict__ directly. However, for built-in methods and</span>
+        <span class="c1">#functions, there is no __dict__, so we use `inspect.getmembers`.</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">,</span> <span class="s2">&quot;__getattribute__&quot;</span><span class="p">,</span> <span class="n">_safe_getattr</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">))</span>
+
+        <span class="c1">#We want the new function to be identical to the old except that</span>
+        <span class="c1">#it&#39;s __call__ method, which we overrode above.</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">_update_attrs</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;__call__&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">otype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;descriptors&quot;</span><span class="p">,</span> <span class="s2">&quot;unknowns&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__objclass__&quot;</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">,</span> <span class="s2">&quot;__module__&quot;</span><span class="p">,</span>
+                        <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__objclass__</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__class__&quot;</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">xwrapper</span><span class="p">,</span> <span class="s2">&quot;__module__&quot;</span><span class="p">,</span>
+                        <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">failed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">xwrapper</span>        
+
+<span class="n">_set_failures</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of :meth:`id` integer memory address values of those objects that</span>
+<span class="sd">cannot be handled in a safe way to have their attributes set without resorting</span>
+<span class="sd">to forbidden fruit.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_safe_setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Safely sets the attribute of the specified object. This includes not</span>
+<span class="sd">    setting attributes for final objects and setting __func__ for instancemethod</span>
+<span class="sd">    typed objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        obj: object to set an attribute for.</span>
+<span class="sd">        name (str): new attribute name.</span>
+<span class="sd">        value: new attribute value.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the set attribute was successful.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">okey</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">okey</span> <span class="ow">in</span> <span class="n">_set_failures</span> <span class="ow">or</span> <span class="n">okey</span> <span class="ow">in</span> <span class="n">_final_objs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="kn">import</span> <span class="nn">inspect</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__func__</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">obj</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">_set_failures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">okey</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed &#39;</span><span class="si">{}</span><span class="s2">&#39; attribute set on </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+<span class="k">def</span> <span class="nf">_extend_object</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">otype</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extends the specified object if it needs to be extended. The method</span>
+<span class="sd">    attempts to add an attribute to the object; if it fails, a new object is</span>
+<span class="sd">    created that inherits all of `o` attributes, but is now a regular object</span>
+<span class="sd">    that can have attributes set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parent: has `n` in its `__dict__` attribute.</span>
+<span class="sd">        n (str): object name attribute.</span>
+<span class="sd">        o (list): object instances to be extended.</span>
+<span class="sd">        otype (str): object types; one of [&quot;classes&quot;, &quot;functions&quot;, &quot;methods&quot;,</span>
+<span class="sd">          &quot;modules&quot;].</span>
+<span class="sd">        fqdn (str): fully qualified name of the package that the object belongs</span>
+<span class="sd">          to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#The __acornext__ attribute references the original, unextended</span>
+        <span class="c1">#object; if the object didn&#39;t need extended, then __acornext__ is</span>
+        <span class="c1">#none.</span>
+        <span class="k">if</span> <span class="n">otype</span> <span class="o">==</span> <span class="s2">&quot;methods&quot;</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__func__</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+        <span class="c1">#We have a built-in or extension type. </span>
+        <span class="n">okey</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">okey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_extended_objs</span><span class="p">:</span>
+            <span class="c1">#We need to generate an extension for this object and store it</span>
+            <span class="c1">#in the extensions dict.</span>
+            <span class="n">xobj</span> <span class="o">=</span> <span class="n">_create_extension</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">otype</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span>
+            <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">xobj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">xobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_extended_objs</span><span class="p">[</span><span class="n">okey</span><span class="p">]</span> <span class="o">=</span> <span class="n">xobj</span>
+            <span class="c1">#else: we can&#39;t handle this kind of object; it just won&#39;t be</span>
+            <span class="c1">#logged...</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">_extended_objs</span><span class="p">[</span><span class="n">okey</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">_extended_objs</span><span class="p">[</span><span class="n">okey</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Object extension failed: </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">otype</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">_get_members</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the likely members of the object by appealing to :func:`dir`</span>
+<span class="sd">    instead of using `__dict__` attribute, since that misses certain members.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;__globals__&quot;</span><span class="p">,</span> <span class="s2">&quot;func_globals&quot;</span><span class="p">]:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">n</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="n">_split_objects</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of objects that have had split called already. This allows us to handle</span>
+<span class="sd">objects that would recursively refer to parents that have already been split.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_split_object</span><span class="p">(</span><span class="n">pobj</span><span class="p">,</span> <span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits the specified object into its modules, classes, methods and</span>
+<span class="sd">    functions so that it can be decorated more easily. For extension</span>
+<span class="sd">    modules/classes that can&#39;t have attributes set, the object&#39;s dictionary is</span>
+<span class="sd">    modified to point to a derived-type version.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pobj: object instance returned from the import.</span>
+<span class="sd">        package (str): name of the package (used for filtering all the loaded</span>
+<span class="sd">          packages and methods inside the package object).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">inspect</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;classes&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;functions&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;methods&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;builtins&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;descriptors&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;unknowns&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+
+    <span class="k">global</span> <span class="n">_split_objects</span>
+    <span class="k">if</span> <span class="n">pobj</span> <span class="ow">in</span> <span class="n">_split_objects</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="n">tests</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;classes&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">,</span>
+        <span class="s2">&quot;functions&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">,</span>
+        <span class="s2">&quot;methods&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">,</span>
+        <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">,</span>
+        <span class="s2">&quot;builtins&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isbuiltin</span><span class="p">,</span>
+        <span class="s2">&quot;descriptors&quot;</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethoddescriptor</span>
+        <span class="p">}</span>
+
+    <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+    <span class="n">prepack</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="n">pms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">pobj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">complex</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+            <span class="c1">#We are looking for functions, modules and packages; sometimes</span>
+            <span class="c1">#constants are declared that we just ignore.</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">omod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1">#This may be an instance method of an object-class. In that</span>
+                <span class="c1">#case, we still want to decorate it.</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__objclass__&quot;</span><span class="p">):</span>
+                    <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__objclass__</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__class__&quot;</span><span class="p">):</span>
+                    <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+
+        <span class="c1">#Some packages define special types with __class__ = type. These are</span>
+        <span class="c1">#indistinguishable from the built-in types like `float` or `str`. So we</span>
+        <span class="c1">#force the developers to configure these manually.</span>
+        <span class="n">packok</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">confok</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">omod</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">packok</span> <span class="o">=</span> <span class="p">(</span><span class="n">prepack</span> <span class="ow">in</span> <span class="n">omod</span><span class="o">.</span><span class="n">__name__</span> <span class="ow">or</span> <span class="n">omod</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="n">package</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">packok</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__class__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">:</span>
+                <span class="n">fqdn_</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="n">incl</span> <span class="o">=</span> <span class="n">filter_name</span><span class="p">(</span><span class="n">fqdn_</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">incl</span><span class="p">:</span>
+                    <span class="n">filesrc</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getabsfile</span><span class="p">(</span><span class="n">pobj</span><span class="p">)</span>
+                    <span class="n">confok</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">{}</span><span class="s2">/&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">)</span> <span class="ow">in</span> <span class="n">filesrc</span>
+                
+        <span class="k">if</span> <span class="n">packok</span> <span class="ow">or</span> <span class="n">confok</span><span class="p">:</span>
+            <span class="n">pms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">confok</span><span class="p">))</span>                    
+            
+    <span class="k">global</span> <span class="n">_decor_count</span>
+    <span class="k">def</span> <span class="nf">oappend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">confok</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Appends the specified object to `results` if it can be extended.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            confok (bool): when True, the code has already determined previously</span>
+<span class="sd">              that this object should be decorated no matter what (the user said</span>
+<span class="sd">              so). In that case, we bypass the regular name checks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#The object was probably of type unknown and doesn&#39;t have a __name__</span>
+            <span class="c1">#attribute, so we just skip it.</span>
+            <span class="k">return</span>
+        
+        <span class="n">package</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">confok</span> <span class="ow">or</span> <span class="p">(</span><span class="n">filter_name</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">package</span><span class="p">)</span> <span class="ow">and</span> <span class="n">filter_name</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">)):</span>
+            <span class="n">xobj</span> <span class="o">=</span> <span class="n">_extend_object</span><span class="p">(</span><span class="n">pobj</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">xobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">xobj</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t extend </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">skipmsg</span> <span class="o">=</span> <span class="s2">&quot;Skipping </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> because of filter rules.&quot;</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">skipmsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">_decor_count</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">confok</span> <span class="ow">in</span> <span class="n">pms</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">tests</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">f</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                <span class="n">oappend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">confok</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
+                <span class="n">oappend</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="s2">&quot;unknowns&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">confok</span><span class="p">)</span>
+
+    <span class="n">_split_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pobj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">oset</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the fully qualified name of the object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        o (type): instance of the object&#39;s type.</span>
+<span class="sd">        otype (str): one of [&#39;classes&#39;, &#39;functions&#39;, &#39;methods&#39;, &#39;modules&#39;];</span>
+<span class="sd">          specifies which group the object belongs to.</span>
+<span class="sd">        oset (bool): when True, the fqdn will also be set on the object as attribute</span>
+<span class="sd">          `__fqdn__`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_set_failures</span> <span class="ow">or</span> <span class="n">o</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__fqdn__&quot;</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">inspect</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Skipped object </span><span class="si">{}</span><span class="s2">: no __name__ attribute.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">__acornext__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">otarget</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">__acornext__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">otarget</span> <span class="o">=</span> <span class="n">o</span>
+            
+        <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">otarget</span><span class="p">)</span>            
+        <span class="k">if</span> <span class="n">omod</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">otarget</span><span class="p">,</span> <span class="s2">&quot;__objclass__&quot;</span><span class="p">):</span>
+            <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">otarget</span><span class="o">.</span><span class="n">__objclass__</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omod</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                       <span class="n">otarget</span><span class="o">.</span><span class="n">__objclass__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                       <span class="n">otarget</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">omod</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">otarget</span><span class="p">,</span> <span class="s2">&quot;__class__&quot;</span><span class="p">):</span>
+            <span class="n">omod</span> <span class="o">=</span> <span class="n">_safe_getmodule</span><span class="p">(</span><span class="n">otarget</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omod</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                       <span class="n">otarget</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                       <span class="n">otarget</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omod</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">otarget</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">oset</span><span class="p">:</span>
+            <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__fqdn__&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__fqdn__&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">__fqdn__</span>
+
+<span class="n">_stack_config</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names, values are :type:`dict` where the keys are</span>
+<span class="sd">fqdns of package members and values are the configured stack depths.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_get_stack_depth</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">defdepth</span><span class="o">=</span><span class="n">_def_stackdepth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the stack depth settings from the config file for the specified</span>
+<span class="sd">    package.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package to get stack depth info for.</span>
+<span class="sd">        fqdn (str): fully qualified domain name of the member in the package.</span>
+<span class="sd">        defdepth (int): default depth when one has not been configured.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_stack_config</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_stack_config</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+        <span class="n">spack</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">secname</span> <span class="o">=</span> <span class="s2">&quot;logging.depth&quot;</span>
+        <span class="k">if</span> <span class="n">spack</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">secname</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ofqdn</span> <span class="ow">in</span> <span class="n">spack</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">secname</span><span class="p">):</span>
+                <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">ofqdn</span><span class="p">]</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="n">secname</span><span class="p">,</span> <span class="n">ofqdn</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">in</span> <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">fqdn</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s2">&quot;*&quot;</span> <span class="ow">in</span> <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">_stack_config</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">defdepth</span>
+
+<span class="n">_decor_count</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__builtin__&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names, values are list [decorated, skipped, na] that</span>
+<span class="sd">keeps statistics on how many of the package objects actually get decorated.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_decorated_o</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__builtin__&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names; values are dicts with keys :func:`id` values</span>
+<span class="sd">for all the objects that have been decorated already. Introduced so that classes</span>
+<span class="sd">which inherit from already decorated classes won&#39;t be skipped for already having</span>
+<span class="sd">__acorn__ on them.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="decorate_obj"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.decorate_obj">[docs]</a><span class="k">def</span> <span class="nf">decorate_obj</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">otype</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">redecorate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds the decoration for automated logging to the specified object, if it</span>
+<span class="sd">    hasn&#39;t already been done.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parent: object that `o` belongs to.</span>
+<span class="sd">        n (str): name in the parent&#39;s dictionary.</span>
+<span class="sd">        o (type): instance of the object&#39;s type.</span>
+<span class="sd">        otype (str): one of [&#39;classes&#39;, &#39;functions&#39;, &#39;methods&#39;, &#39;modules&#39;];</span>
+<span class="sd">          specifies which group the object belongs to.</span>
+<span class="sd">        recurse (bool): when True, the objects methods and functions are also</span>
+<span class="sd">          decorated recursively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_decor_count</span><span class="p">,</span> <span class="n">_decorated_o</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">isclass</span><span class="p">,</span> <span class="n">isfunction</span>
+    <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#This object didn&#39;t have a name, which means we can&#39;t extend it or</span>
+        <span class="c1">#track it anyway.</span>
+        <span class="k">return</span>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">package</span> <span class="ow">in</span> <span class="n">_decorated_o</span> <span class="ow">and</span>
+        <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_decorated_o</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="ow">or</span> <span class="n">redecorate</span><span class="p">)):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">_get_stack_depth</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span>
+        <span class="n">decor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">otype</span> <span class="o">!=</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
+            <span class="c1">#calling on class types is handled by the construction decorator</span>
+            <span class="c1">#below.</span>
+            <span class="k">if</span> <span class="n">isclass</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+                <span class="n">clog</span> <span class="o">=</span> <span class="n">callinglog</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clog</span> <span class="o">=</span> <span class="n">callinglog</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+            <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">clog</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">__call__</span><span class="p">)</span>
+            <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">clog</span><span class="p">,</span> <span class="s2">&quot;__acornext__&quot;</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">clog</span><span class="p">,</span> <span class="s2">&quot;__getattribute__&quot;</span><span class="p">,</span> <span class="n">_safe_getattr</span><span class="p">(</span><span class="n">clog</span><span class="p">))</span>
+            <span class="n">_update_attrs</span><span class="p">(</span><span class="n">clog</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="p">((</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;im_self&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">im_self</span> <span class="ow">is</span> <span class="n">parent</span><span class="p">)):</span>
+                <span class="n">clog</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">clog</span><span class="p">)</span>
+
+            <span class="n">setok</span> <span class="o">=</span> <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">clog</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">setok</span><span class="p">:</span>
+                <span class="n">decor</span> <span class="o">=</span> <span class="n">clog</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Set calling logger on </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">_decor_count</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">setok</span> <span class="o">=</span> <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">_decor_count</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">otype</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span> <span class="ow">and</span> <span class="n">setok</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__new__&quot;</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__old__&quot;</span><span class="p">,</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__new__</span><span class="p">))</span>
+                <span class="n">crelog</span> <span class="o">=</span> <span class="n">creationlog</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="n">setok</span> <span class="o">=</span> <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;__new__&quot;</span><span class="p">,</span> <span class="n">creationlog</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+                
+                <span class="k">if</span> <span class="n">setok</span><span class="p">:</span>
+                    <span class="n">decor</span> <span class="o">=</span> <span class="n">crelog</span>
+                    <span class="n">msg</span><span class="o">.</span><span class="n">gen</span><span class="p">(</span><span class="s2">&quot;Set creation logger on </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">_decor_count</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1">#else: must have only static methods and no instances.</span>
+            
+        <span class="c1">#We don&#39;t need to bother recursing for those modules/classes that</span>
+        <span class="c1">#can&#39;t have their attributes set, since their members will have the</span>
+        <span class="c1">#same restrictions.</span>
+        <span class="k">if</span> <span class="n">setok</span> <span class="ow">and</span> <span class="n">otype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="s2">&quot;modules&quot;</span><span class="p">]:</span>
+            <span class="c1">#These types can be further decorated; let&#39;s traverse their members</span>
+            <span class="c1">#and try to decorate those as well.</span>
+            <span class="n">splits</span> <span class="o">=</span> <span class="n">_split_object</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">package</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ot</span><span class="p">,</span> <span class="n">ol</span> <span class="ow">in</span> <span class="n">splits</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">nobj</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">ol</span><span class="p">:</span>
+                    <span class="n">decorate_obj</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">nobj</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">ot</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">setok</span><span class="p">:</span>
+            <span class="n">_decorated_o</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)]</span> <span class="o">=</span> <span class="n">decor</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_decorated_o</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">None</span>
+            
+    <span class="k">elif</span> <span class="n">otype</span> <span class="o">!=</span> <span class="s2">&quot;classes&quot;</span> <span class="ow">and</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">_decorated_o</span><span class="p">:</span>
+        <span class="c1">#Even though the object with that id() has been decorated, it doesn&#39;t</span>
+        <span class="c1">#mean that the parent has had its attribute overwritten to point to the</span>
+        <span class="c1">#decorated object. This happens with instance methods on different</span>
+        <span class="c1">#classes that are implemented by another generic method.</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">_decorated_o</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="nb">id</span><span class="p">(</span><span class="n">o</span><span class="p">)]</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">child</span><span class="p">:</span>
+            <span class="n">setok</span> <span class="o">=</span> <span class="n">_safe_setattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Set existing calling logger on </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">fqdn</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span></div>
+
+<span class="n">_explicit_subclasses</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are fqdns values are the fqdn to the acorn, hand-coded</span>
+<span class="sd">subclass to use instead of the automatic one.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_subclasses</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the subclass settings for the specified package so that we can</span>
+<span class="sd">    decorate the classes correctly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_explicit_subclasses</span>
+    <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+    <span class="n">spack</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">spack</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;subclass&quot;</span><span class="p">):</span>
+            <span class="n">_explicit_subclasses</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="s2">&quot;subclass&quot;</span><span class="p">)))</span>
+
+<span class="n">_callwraps</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are function fqdns; values are other function, class or method</span>
+<span class="sd">fqdns that will be called to wrap the result of the original function call</span>
+<span class="sd">before returning.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_callwraps</span><span class="p">(</span><span class="n">packname</span><span class="p">,</span> <span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the special call wrapping settings for functions in the specified</span>
+<span class="sd">    package. This allows the result of the original method call to be cast as a</span>
+<span class="sd">    different type, or passed to a different constructor before returning from</span>
+<span class="sd">    the wrapped function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        packname (str): name of the package to get config settings for.</span>
+<span class="sd">        package: actual package object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_callwraps</span>
+    <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.descriptors</span> <span class="k">import</span> <span class="n">_obj_getattr</span>
+    <span class="n">spack</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">packname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">spack</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;callwrap&quot;</span><span class="p">):</span>
+            <span class="n">wrappings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="s2">&quot;callwrap&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">wrappings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">caller</span> <span class="o">=</span> <span class="n">_obj_getattr</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="n">_callwraps</span><span class="p">[</span><span class="n">fqdn</span><span class="p">]</span> <span class="o">=</span> <span class="n">caller</span>
+
+<span class="n">decorating</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">&quot;&quot;&quot;bool: when True, the script is decorating objects; if any other objects have</span>
+<span class="sd">methods that call decorated objects, we don&#39;t want the decorations to log</span>
+<span class="sd">entries since we are still in the initialization phase.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="set_decorating"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.set_decorating">[docs]</a><span class="k">def</span> <span class="nf">set_decorating</span><span class="p">(</span><span class="n">decorating_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets whether the module is operating in decorating mode.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">decorating</span>
+    <span class="n">decorating</span> <span class="o">=</span> <span class="n">decorating_</span></div>
+                
+<div class="viewcode-block" id="decorate"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.decorate">[docs]</a><span class="k">def</span> <span class="nf">decorate</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorates all the methods in the specified package to have logging</span>
+<span class="sd">    enabled according to the configuration for the package.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">sep</span>
+    <span class="k">global</span> <span class="n">_decor_count</span><span class="p">,</span> <span class="n">_decorated_packs</span><span class="p">,</span> <span class="n">_decorated_o</span><span class="p">,</span> <span class="n">_pack_paths</span>
+    <span class="k">global</span> <span class="n">decorating</span>
+    <span class="k">if</span> <span class="s2">&quot;acorn&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_decorated_packs</span><span class="p">:</span>
+        <span class="n">_decorated_packs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;acorn&quot;</span><span class="p">)</span>
+        <span class="n">packpath</span> <span class="o">=</span> <span class="s2">&quot;acorn</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">packpath</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_pack_paths</span><span class="p">:</span>
+            <span class="c1">#We initialize _pack_paths to include common packages that people</span>
+            <span class="c1">#use without decorating. Otherwise those slow *way* down and the</span>
+            <span class="c1">#notebook becomes unusable.</span>
+            <span class="n">_pack_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">packpath</span><span class="p">)</span>
+        
+    <span class="n">npack</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="c1">#Since scipy includes numpy (for example), we don&#39;t want to run the numpy</span>
+    <span class="c1">#decoration twice if the person also chooses to import numpy. In that case,</span>
+    <span class="c1">#we just skip it; the memory references in scipy point to the same numpy</span>
+    <span class="c1">#modules and libraries.</span>
+    <span class="k">if</span> <span class="n">npack</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_decorated_packs</span><span class="p">:</span>
+        <span class="n">_decor_count</span><span class="p">[</span><span class="n">npack</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">_decorated_o</span><span class="p">[</span><span class="n">npack</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">_load_subclasses</span><span class="p">(</span><span class="n">npack</span><span class="p">)</span>
+        
+        <span class="n">packsplit</span> <span class="o">=</span> <span class="n">_split_object</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">package</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="n">decorating</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">ot</span><span class="p">,</span> <span class="n">ol</span> <span class="ow">in</span> <span class="n">packsplit</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">ol</span><span class="p">:</span>
+                <span class="n">decorate_obj</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">ot</span><span class="p">)</span>
+
+        <span class="c1">#Now that we have actually decorated all the objects, we can load the</span>
+        <span class="c1">#call wraps to point to the new decorated objects.</span>
+        <span class="n">_load_callwraps</span><span class="p">(</span><span class="n">npack</span><span class="p">,</span> <span class="n">package</span><span class="p">)</span>
+        <span class="n">decorating</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">_decorated_packs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">npack</span><span class="p">)</span>
+        <span class="n">_pack_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">npack</span><span class="p">,</span> <span class="n">sep</span><span class="p">))</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2"> (Decor/Skip/NA)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">npack</span><span class="p">,</span> <span class="n">_decor_count</span><span class="p">[</span><span class="n">npack</span><span class="p">]))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

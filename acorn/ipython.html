@@ -1,0 +1,191 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Ipython Extension Module &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="Special Sub-classes in ACORN" href="subclass.html" />
+    <link rel="prev" title="Acorn Automated Package Decoration on Import" href="importer.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="subclass.html" title="Special Sub-classes in ACORN"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="importer.html" title="Acorn Automated Package Decoration on Import"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Ipython Extension Module</a><ul>
+<li><a class="reference internal" href="#module-acorn.ipython">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="importer.html"
+                        title="previous chapter">Acorn Automated Package Decoration on Import</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="subclass.html"
+                        title="next chapter">Special Sub-classes in ACORN</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ipython.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ipython-extension-module">
+<h1>Ipython Extension Module<a class="headerlink" href="#ipython-extension-module" title="Permalink to this headline">¶</a></h1>
+<p>Although <cite>acorn</cite> works great with compiled and externally authored modules, part
+of the beauty of the ipython experimentation process is that you can create
+functions and classes in the notebook for rapid prototyping. In order for
+<cite>acorn</cite> to be useful, there needs to be a way for these to be automatically
+decorated.</p>
+<p>To solve this problem, <cite>acorn</cite> has a special ipython extension module that
+registers a callback for the <cite>post_run_cell</cite> event. After a cell is executed,
+<cite>acorn</cite> examines all the decoratable objects in the ipython user namespace and
+decorates any that haven&#8217;t already been decorated before. These objects show up
+with FQDNs like <cite>__main__.localfunction</cite> in the database log.</p>
+<div class="section" id="module-acorn.ipython">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-acorn.ipython" title="Permalink to this headline">¶</a></h2>
+<p>Methods for interacting with an ipython notebook or shell so that new
+functions defined interactively are also logged by acorn.</p>
+<dl class="class">
+<dt id="acorn.ipython.InteractiveDecorator">
+<em class="property">class </em><code class="descclassname">acorn.ipython.</code><code class="descname">InteractiveDecorator</code><span class="sig-paren">(</span><em>ip</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#InteractiveDecorator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.InteractiveDecorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for maintaining the state of functions declared interactively in
+the ipython notebook. Exposes callback functions for pre- and post- cell
+execution in ipython.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ip</strong> (<em>IPython.core.interactiveshell.InteractiveShell</em>) &#8211; ipython shell instance
+for interacting with the shell variables.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.atypes">
+<code class="descname">atypes</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.atypes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; names of types that are tracked for decoration by acorn.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.entities">
+<code class="descname">entities</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.entities" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are object types specified in <a class="reference internal" href="#acorn.ipython.InteractiveDecorator.atypes" title="acorn.ipython.InteractiveDecorator.atypes"><code class="xref py py-attr docutils literal"><span class="pre">atypes</span></code></a>; values
+are <cite>dict</cite> of variable names and values in the local user namespace.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.ipython.load_ipython_extension">
+<code class="descclassname">acorn.ipython.</code><code class="descname">load_ipython_extension</code><span class="sig-paren">(</span><em>ip</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#load_ipython_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.load_ipython_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the interacting decorator that ships with <cite>acorn</cite> into the ipython
+interactive shell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ip</strong> (<em>IPython.core.interactiveshell.InteractiveShell</em>) &#8211; ipython shell instance
+for interacting with the shell variables.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="subclass.html" title="Special Sub-classes in ACORN"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="importer.html" title="Acorn Automated Package Decoration on Import"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

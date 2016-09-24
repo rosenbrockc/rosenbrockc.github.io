@@ -1,0 +1,208 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.ipython &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.ipython</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods for interacting with an ipython notebook or shell so that new</span>
+<span class="sd">functions defined interactively are also logged by acorn.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+<div class="viewcode-block" id="InteractiveDecorator"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.InteractiveDecorator">[docs]</a><span class="k">class</span> <span class="nc">InteractiveDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for maintaining the state of functions declared interactively in</span>
+<span class="sd">    the ipython notebook. Exposes callback functions for pre- and post- cell</span>
+<span class="sd">    execution in ipython.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ip (IPython.core.interactiveshell.InteractiveShell): ipython shell instance</span>
+<span class="sd">          for interacting with the shell variables.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        atypes (list): names of types that are tracked for decoration by acorn.</span>
+<span class="sd">        entities (dict): keys are object types specified in :attr:`atypes`; values</span>
+<span class="sd">          are `dict` of variable names and values in the local user namespace.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">=</span> <span class="n">ip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="s2">&quot;classobj&quot;</span><span class="p">,</span> <span class="s2">&quot;staticmethod&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_get_decoratables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of the objects that need to be decorated in the</span>
+<span class="sd">        current user namespace based on their type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atype (str): one of the values in :attr:`atypes`. Specifies the type of</span>
+<span class="sd">              object to search.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">defmsg</span> <span class="o">=</span> <span class="s2">&quot;Skipping </span><span class="si">{}</span><span class="s2">; not decoratable or already decorated.&quot;</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">&quot;who_ls&quot;</span><span class="p">,</span> <span class="n">atype</span><span class="p">):</span>
+            <span class="n">varobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">decorate</span> <span class="o">=</span> <span class="kc">False</span>
+            
+            <span class="k">if</span> <span class="n">varobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Nothing useful can be done.</span>
+                <span class="k">continue</span>
+            
+            <span class="k">if</span> <span class="n">atype</span> <span class="o">==</span> <span class="s2">&quot;classobj&quot;</span><span class="p">:</span>
+                <span class="c1">#Classes are only relevant if they have no __file__</span>
+                <span class="c1">#attribute; all other classes should be decorated by the</span>
+                <span class="c1">#full acorn machinery.</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">varobj</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">hasattr</span><span class="p">(</span><span class="n">varobj</span><span class="p">,</span> <span class="s2">&quot;__module__&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="n">varobj</span><span class="o">.</span><span class="n">__module__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span> <span class="ow">and</span>
+                    <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">varobj</span><span class="p">,</span> <span class="s2">&quot;__file__&quot;</span><span class="p">)):</span>
+                    <span class="n">decorate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">defmsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+                    
+            <span class="k">elif</span> <span class="n">atype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="s2">&quot;staticmethod&quot;</span><span class="p">]:</span>
+                <span class="c1"># %who_ls will only return functions from the *user*</span>
+                <span class="c1"># namespace, so we don&#39;t have a lot to worry about here.</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">atype</span> <span class="o">==</span> <span class="s2">&quot;staticmethod&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">varobj</span><span class="p">,</span> <span class="s2">&quot;__func__&quot;</span><span class="p">):</span>
+                    <span class="n">func</span> <span class="o">=</span> <span class="n">varobj</span><span class="o">.</span><span class="n">__func__</span>
+                <span class="k">elif</span> <span class="n">atype</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span>
+                    <span class="n">func</span> <span class="o">=</span> <span class="n">varobj</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                    <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;__acorn__&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;__code__&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="s2">&quot;&lt;ipython-input&quot;</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="n">__code__</span><span class="o">.</span><span class="n">co_filename</span><span class="p">):</span>
+                    <span class="n">decorate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">defmsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+                    
+            <span class="k">if</span> <span class="n">decorate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">atype</span><span class="p">][</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">varobj</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">varname</span><span class="p">,</span> <span class="n">varobj</span><span class="p">))</span>
+                
+        <span class="k">return</span> <span class="n">result</span>        
+
+    <span class="k">def</span> <span class="nf">_decorate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atype</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decorates the specified object for automatic logging with acorn.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atype (str): one of the types specified in :attr:`atypes`.</span>
+<span class="sd">            varobj: object instance to decorate; no additional type checking is</span>
+<span class="sd">              performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">typemap</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;classobj&quot;</span><span class="p">:</span> <span class="s2">&quot;classes&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;staticmethod&quot;</span><span class="p">:</span> <span class="s2">&quot;methods&quot;</span><span class="p">}</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">decorate_obj</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">decorate_obj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">typemap</span><span class="p">[</span><span class="n">atype</span><span class="p">])</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Auto-decorated </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Error auto-decorating </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">))</span>
+            <span class="k">raise</span>
+            
+    <span class="k">def</span> <span class="nf">post_run_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#We just want to detect any new, decoratable objects that haven&#39;t been</span>
+        <span class="c1">#decorated yet.</span>
+        <span class="n">decorlist</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_decoratables</span><span class="p">(</span><span class="n">atype</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_decorate</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_ipython_extension"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.load_ipython_extension">[docs]</a><span class="k">def</span> <span class="nf">load_ipython_extension</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the interacting decorator that ships with `acorn` into the ipython</span>
+<span class="sd">    interactive shell.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ip (IPython.core.interactiveshell.InteractiveShell): ipython shell instance</span>
+<span class="sd">          for interacting with the shell variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">decor</span> <span class="o">=</span> <span class="n">InteractiveDecorator</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+    <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post_run_cell&#39;</span><span class="p">,</span> <span class="n">decor</span><span class="o">.</span><span class="n">post_run_cell</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

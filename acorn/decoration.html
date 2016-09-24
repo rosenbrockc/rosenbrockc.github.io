@@ -1,0 +1,362 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Automatic Decoration of Packages &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="ACORN Object Descriptor Interface" href="descriptors.html" />
+    <link rel="prev" title="Automatic Computation Research Notebook" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="descriptors.html" title="ACORN Object Descriptor Interface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Automatic Computation Research Notebook"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Automatic Decoration of Packages</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Automatic Computation Research Notebook</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="descriptors.html"
+                        title="next chapter">ACORN Object Descriptor Interface</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/decoration.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="automatic-decoration-of-packages">
+<h1>Automatic Decoration of Packages<a class="headerlink" href="#automatic-decoration-of-packages" title="Permalink to this headline">¶</a></h1>
+<p>Every package is different. Some define new built-in types, others use
+C-extension modules to optimize the code being run. In a simple world, all the
+packages would just be decoratable using standard approaches. However, this
+doesn&#8217;t always work, which is why large and complicated decoration logic was
+required to get <cite>acorn</cite> to work.</p>
+<p>The basic flow of the decoration is as follows for a new object:</p>
+<ol class="arabic simple">
+<li>Try to determine the fully-qualified domain name (FQDN) of the object, e.g.,
+<cite>numpy.core.multiarray.array</cite>. If the FQDN can be found, proceed to the next
+step; otherwise, we can&#8217;t decorate the object. This happens very seldomly
+(perhaps 1/10,000 objects).</li>
+<li>Try to set an attribute on the object. If that works, proceed to step 4;
+otherwise go to step 3.</li>
+<li>Create an extension for the object. For classes, this means automatically
+sub-classing the object (to inherit all the same attributes as the
+parent). If the object can&#8217;t be sub-classed, we treat it specially (see
+below) or set it as not-decoratable. For functions, we define a new function
+locally that calls the old one; we then copy across all the attributes of the
+function. Extended objects keep a reference to the original, unextended
+object in the <cite>__acornext__</cite> special attribute.</li>
+<li>Proceed to decorate the object. For functions and methods, we wrap the object
+using <a class="reference internal" href="#acorn.logging.decoration.callinglog" title="acorn.logging.decoration.callinglog"><code class="xref py py-func docutils literal"><span class="pre">acorn.logging.decoration.callinglog()</span></code></a> and then <em>overwrite</em> the
+attribute in the parent object to point to the new function. The original
+function is copied to the <cite>__acorn__</cite> special attribute. If the methods were
+originally static or class methods, we use <cite>staticmethod</cite> and <cite>classmethod</cite>
+to change their behavior. Attributes from the original functions (such as
+<cite>__doc__</cite>) are also copied across so that the function seems identical to the
+end user. For classes, we overwrite the <cite>__new__</cite> method with
+<a class="reference internal" href="#acorn.logging.decoration.creationlog" title="acorn.logging.decoration.creationlog"><code class="xref py py-func docutils literal"><span class="pre">acorn.logging.decoration.creationlog()</span></code></a> and copy the wrapped <cite>__new__</cite>
+to <cite>__old__</cite> on the object. Sometimes packages have multiple references to
+the same object, but located in different parts of the package as attributes
+with different names. When this is discovered, the already-decorated object
+is used in a simple re-assignment of attributes.</li>
+<li>If the object is of type <cite>classobj</cite> or <cite>module</cite>, we recursively examine each
+of the methods and attributes of the class to determine if they need to be
+decorated or not. Instance methods remain instance methods; class and static
+methods also retain their identity, but are replaced with decorated analogs.</li>
+</ol>
+<p>We use aggressive caching of the objects to try and speed things up. We don&#8217;t
+decorate any object that already has an <cite>__acorn__</cite> attribute. Once a package
+has been decorated, we don&#8217;t decorate it ever again.</p>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Most of the logic for the decoration is buried in &#8220;private&#8221; methods of the
+module. However, certain public methods are available. However, we recommend to
+not call these unless you know what you are doing. It is better to use the
+built-in <cite>acorn</cite> importer.</p>
+<span class="target" id="module-acorn.logging.decoration"></span><p>Methods for dynamically adding decorators to all the methods and
+classes within a module.</p>
+<dl class="function">
+<dt id="acorn.logging.decoration.callinglog">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">callinglog</code><span class="sig-paren">(</span><em>func</em>, <em>fqdn</em>, <em>package</em>, <em>parent</em>, <em>stackdepth=4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#callinglog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.callinglog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for wrapping package library methods for intelligent
+logging.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; fully qualified name of the method being decorated.</li>
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package the <cite>func</cite> belongs to.</li>
+<li><strong>parent</strong> &#8211; class to which <cite>func</cite> belongs if it exists.</li>
+<li><strong>stackdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; if the calling stack is less than this depth, than
+include the entry in the log; otherwise ignore it.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.creationlog">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">creationlog</code><span class="sig-paren">(</span><em>base</em>, <em>package</em>, <em>stackdepth=4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#creationlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.creationlog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for wrapping the creation of class instances that are being logged
+by acorn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>base</strong> &#8211; base class used to call __new__ for the construction.</li>
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of (global) package the class belongs to.</li>
+<li><strong>stackdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; if the calling stack is less than this depth, than
+include the entry in the log; otherwise ignore it.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.decorate">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">decorate</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#decorate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.decorate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorates all the methods in the specified package to have logging
+enabled according to the configuration for the package.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.decorate_obj">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">decorate_obj</code><span class="sig-paren">(</span><em>parent</em>, <em>n</em>, <em>o</em>, <em>otype</em>, <em>recurse=True</em>, <em>redecorate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#decorate_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.decorate_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the decoration for automated logging to the specified object, if it
+hasn&#8217;t already been done.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parent</strong> &#8211; object that <cite>o</cite> belongs to.</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name in the parent&#8217;s dictionary.</li>
+<li><strong>o</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#type" title="(in Python v2.7)"><em>type</em></a>) &#8211; instance of the object&#8217;s type.</li>
+<li><strong>otype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;classes&#8217;, &#8216;functions&#8217;, &#8216;methods&#8217;, &#8216;modules&#8217;];
+specifies which group the object belongs to.</li>
+<li><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the objects methods and functions are also
+decorated recursively.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.decoration.decorating">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">decorating</code><em class="property"> = False</em><a class="headerlink" href="#acorn.logging.decoration.decorating" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; when True, the script is decorating objects; if any other objects have
+methods that call decorated objects, we don&#8217;t want the decorations to log
+entries since we are still in the initialization phase.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.filter_name">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">filter_name</code><span class="sig-paren">(</span><em>funcname</em>, <em>package</em>, <em>context='decorate'</em>, <em>explicit=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#filter_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.filter_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the specified function should be filtered (i.e., included
+or excluded for use in the specified context.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>funcname</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the method/function being called.</li>
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package that the method belongs to.</li>
+<li><strong>context</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;decorate&#8217;, &#8216;time&#8217;, &#8216;analyze&#8217;]; specifies which
+section of the configuration settings to check.</li>
+<li><strong>explicit</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, if a name is not explicitly specified for
+inclusion, then the function returns False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>specifying whether the function should be decorated, timed or</dt>
+<dd><p class="first last">analyzed.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.isbound">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">isbound</code><span class="sig-paren">(</span><em>method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#isbound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.isbound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the method is bounded (i.e., <em>requires</em> a
+class instance to run.)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.decoration.name_filters">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">name_filters</code><em class="property"> = {}</em><a class="headerlink" href="#acorn.logging.decoration.name_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are package names; values are dicts of lists. 1)
+<code class="xref py py-meth docutils literal"><span class="pre">fnmatch()</span></code> patterns; 2) <code class="xref py py-meth docutils literal"><span class="pre">re.match()</span></code> patterns.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.rt_decorate_post">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">rt_decorate_post</code><span class="sig-paren">(</span><em>fqdn</em>, <em>package</em>, <em>result</em>, <em>entry</em>, <em>bound</em>, <em>ekey</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#rt_decorate_post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.rt_decorate_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds logging for the post-call result of calling the method externally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; fully-qualified domain name of the function being logged.</li>
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the package we are logging for.</li>
+<li><strong>result</strong> &#8211; of calling the method we are logging.</li>
+<li><strong>entry</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; one of the values returned by <a class="reference internal" href="#acorn.logging.decoration.rt_decorate_pre" title="acorn.logging.decoration.rt_decorate_pre"><code class="xref py py-func docutils literal"><span class="pre">rt_decorate_pre()</span></code></a>.</li>
+<li><strong>bound</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; true if the method is bound.</li>
+<li><strong>ekey</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; key under which to store the entry in the database.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.rt_decorate_pre">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">rt_decorate_pre</code><span class="sig-paren">(</span><em>fqdn</em>, <em>parent</em>, <em>stackdepth</em>, <em>*argl</em>, <em>**argd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#rt_decorate_pre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.rt_decorate_pre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds logging for a call to the specified function that is being handled
+by an external module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; fully-qualified domain name of the function being logged.</li>
+<li><strong>parent</strong> &#8211; object that the function belongs to.</li>
+<li><strong>context</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;pre&#8217;, &#8216;post&#8217;]; specifies whether we are creating the
+entry or completing the entry.</li>
+<li><strong>stackdepth</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum stack depth before entries are ignored.</li>
+<li><strong>argl</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; positional arguments passed to the function call.</li>
+<li><strong>argd</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keyword arguments passed to the function call.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.decoration.set_decorating">
+<code class="descclassname">acorn.logging.decoration.</code><code class="descname">set_decorating</code><span class="sig-paren">(</span><em>decorating_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/decoration.html#set_decorating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.decoration.set_decorating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets whether the module is operating in decorating mode.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="descriptors.html" title="ACORN Object Descriptor Interface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Automatic Computation Research Notebook"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

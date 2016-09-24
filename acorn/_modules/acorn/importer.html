@@ -1,0 +1,276 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.importer &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.importer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class for altering the search paths within acorn for new/undecorated packages</span>
+<span class="sd">(i.e., those that weren&#39;t checked explicitly when it was first designed.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="n">_packages</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names; values are `bool` indicating whether `acorn`</span>
+<span class="sd">should decorate the package with the loggers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_special</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="s2">&quot;sklearn&quot;</span><span class="p">,</span> <span class="s2">&quot;matplotlib&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;list: of packages that have special extensions or import behavior and cannot</span>
+<span class="sd">be deco-imported automatically by `acorn`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_removed</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names that were previously scratched from</span>
+<span class="sd">`sys.modules`. Values are the removed module names and values.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="restore"><a class="viewcode-back" href="../../importer.html#acorn.importer.restore">[docs]</a><span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Restores the modules and sub-modules to `sys.modules` that were</span>
+<span class="sd">    previously scratched.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package to restore to `sys.modules`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_removed</span><span class="p">:</span>
+        <span class="k">return</span>
+    
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">_removed</span><span class="p">[</span><span class="n">package</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1">#We just overwrite whatever is already there...</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">_removed</span><span class="p">[</span><span class="n">package</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="scratch"><a class="viewcode-back" href="../../importer.html#acorn.importer.scratch">[docs]</a><span class="k">def</span> <span class="nf">scratch</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Removes all traces of package and its sub-modules from `sys.modules`</span>
+<span class="sd">    optionally storing the removed items in the `store` dict.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package to remove from `sys.modules`.</span>
+<span class="sd">        store (bool): when specified, each module/sub-module removed will first be</span>
+<span class="sd">          appended to the global :data:`_removed` dict so it can be restored</span>
+<span class="sd">          later if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">global</span> <span class="n">_removed</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_removed</span><span class="p">:</span>
+        <span class="n">_removed</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">package</span><span class="p">)]</span> <span class="o">==</span> <span class="n">package</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="p">:</span>
+                <span class="n">_removed</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">n</span><span class="p">]</span></div>
+    
+<span class="k">def</span> <span class="nf">_load_package_config</span><span class="p">(</span><span class="n">reload_</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the package configurations from the global `acorn.cfg` file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_packages</span>
+    <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+    <span class="n">packset</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="n">reload_</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">packset</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;acorn.packages&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">package</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">packset</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="s2">&quot;acorn.packages&quot;</span><span class="p">):</span>
+            <span class="n">_packages</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span>
+
+<div class="viewcode-block" id="reload_cache"><a class="viewcode-back" href="../../importer.html#acorn.importer.reload_cache">[docs]</a><span class="k">def</span> <span class="nf">reload_cache</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Reloads the configuration file settings for which packages to decorate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_packages</span>
+    <span class="n">_packages</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_load_package_config</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<span class="n">hooks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of package names that have *already* been intercepted by our</span>
+<span class="sd">loader/decorator. This allows us to skip them the next time they are imported</span>
+<span class="sd">(by our scripts) so that we don&#39;t get into an infinite loop.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    
+<span class="kn">import</span> <span class="nn">sys</span>
+<div class="viewcode-block" id="AcornMetaImportFinder"><a class="viewcode-back" href="../../importer.html#acorn.importer.AcornMetaImportFinder">[docs]</a><span class="k">class</span> <span class="nc">AcornMetaImportFinder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Overrides the default `import` behavior of python for packages so that we</span>
+<span class="sd">    can intercept and decorate certain packages, but not others.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): prefix on import full names before they are considered</span>
+<span class="sd">          loadable by acorn. Also available as an attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;acorn&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+    
+    <span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">packpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fullname</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">fullname</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">#Acorn isn&#39;t setup to work with sub-packages.</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">global</span> <span class="n">hooks</span>
+        <span class="n">already</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">package</span> <span class="o">=</span> <span class="n">fullname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">_packages</span> <span class="ow">and</span> <span class="n">_packages</span><span class="p">[</span><span class="n">package</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hooks</span><span class="p">:</span>
+                <span class="c1">#We can import this one and decorate it using the default or</span>
+                <span class="c1">#custom tools in acorn.</span>
+                <span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Import override: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">AcornDecoratingLoader</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">already</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">already</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping import override: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">packpath</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_decorate"><a class="viewcode-back" href="../../importer.html#acorn.importer.load_decorate">[docs]</a><span class="k">def</span> <span class="nf">load_decorate</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Imports and decorates the package with the specified name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We import the decoration logic from acorn and then overwrite the sys.module</span>
+    <span class="c1"># for this package with the decorated, original pandas package.</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_decorating</span><span class="p">,</span> <span class="n">decorating</span>
+    
+    <span class="c1">#Before we do any imports, we need to set that we are decorating so that</span>
+    <span class="c1">#everything works as if `acorn` wasn&#39;t even here.</span>
+    <span class="n">origdecor</span> <span class="o">=</span> <span class="n">decorating</span>
+    <span class="n">set_decorating</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1">#If we try and import the module directly, we will get stuck in a loop; at</span>
+    <span class="c1">#some point we must invoke the built-in module loader from python. We do</span>
+    <span class="c1">#this by removing our sys.path hook.</span>
+    <span class="kn">import</span> <span class="nn">sys</span>    
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+    <span class="n">apack</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>    
+    <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">decorate</span>
+    <span class="n">decorate</span><span class="p">(</span><span class="n">apack</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s2">&quot;acorn.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">)]</span> <span class="o">=</span> <span class="n">apack</span>
+
+    <span class="c1">#Set the decoration back to what it was.</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_decorating</span>
+    <span class="n">set_decorating</span><span class="p">(</span><span class="n">origdecor</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">apack</span></div>
+    
+<div class="viewcode-block" id="AcornDecoratingLoader"><a class="viewcode-back" href="../../importer.html#acorn.importer.AcornDecoratingLoader">[docs]</a><span class="k">class</span> <span class="nc">AcornDecoratingLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads packages that need to be decorated for automatic logging by</span>
+<span class="sd">    `acorn`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package being loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">package</span> <span class="o">=</span> <span class="n">package</span>
+        
+    <span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reusing existing import for &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullname</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">fullname</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Decorating import for &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="c1">#First we import the package, then the specified sub-module that</span>
+            <span class="c1">#they asked for.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package</span> <span class="ow">in</span> <span class="n">_special</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="n">load_decorate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mod</span></div>
+    
+<span class="n">_load_package_config</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">AcornMetaImportFinder</span><span class="p">())</span>
+
+<span class="c1">#TODO: we still need to get a package manager going. When we import the modules,</span>
+<span class="c1">#we should always use the original package items. sklearn dies when numpy has</span>
+<span class="c1">#already been decorated because our subclass doesn&#39;t jive with the c-extension</span>
+<span class="c1">#modules it uses. But it is okay if it can use the original numpy class. If we</span>
+<span class="c1">#get our own special __getattr__ method for acorn, we could return the decorated</span>
+<span class="c1">#versions and still have the other imports work correctly. We lose the ability</span>
+<span class="c1">#for the user to import directly from the module later (they would always have</span>
+<span class="c1">#to go through acorn). Or perhaps we could look at the value of the global</span>
+<span class="c1">#`decorating` and then decide which of the objects to return in getattr.</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

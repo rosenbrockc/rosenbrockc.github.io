@@ -1,0 +1,284 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Global and Package Configuration in ACORN &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="prev" title="Method Call Analysis" href="analysis.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Method Call Analysis"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Global and Package Configuration in ACORN</a><ul>
+<li><a class="reference internal" href="#configuration-structure">Configuration Structure</a></li>
+<li><a class="reference internal" href="#package-configuration">Package Configuration</a></li>
+<li><a class="reference internal" href="#global-acorn-configuration">Global ACORN Configuration</a><ul>
+<li><a class="reference internal" href="#database-section"><cite>[database]</cite> Section</a></li>
+<li><a class="reference internal" href="#acorn-packages-section"><cite>[acorn.packages]</cite> Section</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-acorn.config">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="analysis.html"
+                        title="previous chapter">Method Call Analysis</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/configuration.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="global-and-package-configuration-in-acorn">
+<h1>Global and Package Configuration in ACORN<a class="headerlink" href="#global-and-package-configuration-in-acorn" title="Permalink to this headline">¶</a></h1>
+<p>Default configuration files for the following packages ship with the the python
+package as package data. If the user doesn&#8217;t set their own package directory up,
+then these will be used.</p>
+<ul class="simple">
+<li>acorn (global configuration file)</li>
+<li>numpy</li>
+<li>scipy</li>
+<li>pandas</li>
+<li>sklearn</li>
+<li>matplotlib</li>
+</ul>
+<p>To override these configuration files, the user should create a directory called
+<cite>.acorn</cite> in their user home directory. If that directory exists, then <em>only</em>
+package files in that folder will be used.</p>
+<p>JSON templates for the object descriptors (see <a class="reference internal" href="descriptors.html"><span class="doc">ACORN Object Descriptor Interface</span></a>) also ship for
+some of the packages. These can be fine-tuned by the user as well by including a
+<cite>package.json</cite> file in <cite>.acorn</cite>.</p>
+<div class="section" id="configuration-structure">
+<h2>Configuration Structure<a class="headerlink" href="#configuration-structure" title="Permalink to this headline">¶</a></h2>
+<p>There are several sets of configuration domains in <cite>acorn</cite>:</p>
+<ol class="arabic simple">
+<li>Package configuration. For each package, the logging, tracking and decoration
+behavior can be changed to fine-tune <cite>acorn</cite> behavior for a specific user&#8217;s
+workflow.</li>
+<li>Global configuration for <cite>acorn</cite>; this changes the behavior of <cite>acorn</cite> for
+<em>all</em> packages, databases, etc.</li>
+<li>Descriptor configuration. For each object type (across all packages), the way
+<cite>acorn</cite> describes the object can be configured finely. The syntax for this
+kind of configuration is described in <a class="reference internal" href="descriptors.html"><span class="doc">ACORN Object Descriptor Interface</span></a>.</li>
+</ol>
+</div>
+<div class="section" id="package-configuration">
+<h2>Package Configuration<a class="headerlink" href="#package-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Each package can have the following options sections configured:</p>
+<ul class="simple">
+<li><strong>[tracking]</strong>: exposes options for deciding which objects get decorated.</li>
+<li><strong>[timing]</strong>: exposes options for deciding which method calls should have an
+&#8220;elapsed time&#8221; stored in the database. By default, all method calls are
+timed.</li>
+<li><strong>[analysis]</strong>: exposes options for deciding which method calls should have
+their results analyzed by an additional function. All analysis is performed by
+the <a class="reference internal" href="analysis.html"><span class="doc">Method Call Analysis</span></a> machinery on a per-object basis (i.e., based on FQDN).</li>
+<li><strong>[subclass]</strong>: lists objects for which <em>special</em> sub-classes are
+available. By default, <cite>acorn</cite> will sub-class any class that cannot be
+decorated using standard machinery. When something special needs to happen,
+this is where the mapping is specified. E.g.,
+<cite>numpy.ndarray=acorn.subclass._numpy.ndarray</cite> specifies that when
+<cite>numpy.ndarray</cite> is encountered during decoration, it should be sub-classed by
+the <cite>acorn</cite> replacement.</li>
+<li><strong>[callwrap]</strong>: when a method call returns a result that should automatically
+be passed to an additional wrapper, that can be specified here. For example,
+<cite>numpy.zeros</cite> returns a regular <cite>numpy.ndarray</cite> (internally it initializes it
+in the C-extension modules). We need that to be changed to our sub-classed
+<cite>ndarray</cite> so we add <cite>numpy.core.multiarray.zeros=numpy.ndarray</cite> as an option
+to make sure that the result of <code class="xref py py-func docutils literal"><span class="pre">numpy.zeros()</span></code> is always passed through
+the constructor of our <cite>ndarray</cite> subclass.</li>
+<li><strong>[logging.depth]</strong>: specifies the FQDN of certain objects that should be
+logged at a different stack depth than the defaults configured by <cite>acorn</cite>.</li>
+</ul>
+<p>For the <cite>[tracking]</cite>, <cite>[timing]</cite> and <cite>[analysis]</cite> sections, the following
+options are available:</p>
+<ul class="simple">
+<li><strong>ignore</strong>: a &#8216;$&#8217;-separated list of <a class="reference external" href="https://docs.python.org/2/library/fnmatch.html#fnmatch.fnmatch" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">fnmatch()</span></code></a> styled FQDNs that
+should be ignored during the wrapping. E.g., <cite>matplotlib.set_*</cite> will ignore
+any object in <cite>matplotlib</cite> whose FQDN matches that pattern.</li>
+<li><strong>rignore</strong>: as for <em>ignore</em>, but uses a &#8216;$&#8217;-separated list of regular
+expression patterns to match against the names. These are compiled and then
+used with <a class="reference external" href="https://docs.python.org/2/library/re.html#re.match" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">re.match()</span></code></a>.</li>
+<li><strong>filter</strong>: as for <em>ignore</em> (also uses <a class="reference external" href="https://docs.python.org/2/library/fnmatch.html#fnmatch.fnmatch" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">fnmatch()</span></code></a> syntax), but
+specifies FQDNs that should be <em>included</em>. Inclusions are handled <em>before</em>
+exclusions and thus take a higher priority.</li>
+<li><strong>filter</strong>: as for <em>rignore</em> (also uses regular expression syntax), but
+specifies FQDNs that should be <em>included</em>. Inclusions are handled <em>before</em>
+exclusions and thus take a higher priority.</li>
+</ul>
+</div>
+<div class="section" id="global-acorn-configuration">
+<h2>Global ACORN Configuration<a class="headerlink" href="#global-acorn-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>acorn.cfg</cite> file has three section options <cite>[acorn.timing]</cite>,
+<cite>[acorn.analysis]</cite> and <cite>[acorn.tracking]</cite> that are <em>globally</em> configured for all
+packages. When a normal package&#8217;s configuration file is imported, its rules are
+augmented with those of the global <cite>acorn</cite> configuration. See the documentation
+above for those sections.</p>
+<p>Additionally, <cite>acorn</cite> has <cite>[database]</cite> and <cite>[acorn.packages]</cite> sections.</p>
+<div class="section" id="database-section">
+<h3><cite>[database]</cite> Section<a class="headerlink" href="#database-section" title="Permalink to this headline">¶</a></h3>
+<p>Configures the behavior of the database saving methods.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">We need to get the database saving to happen using a timer in a
+separate thread so that the main thread can keep going.</p>
+</div>
+<ul class="simple">
+<li><strong>folder</strong>: path to the directory where the acorn databases (JSON files)
+should be saved. See also <a class="reference internal" href="database.html"><span class="doc">Notebook Database Documentation</span></a>.</li>
+<li><strong>savefreq</strong>: specifies how long (in minutes) defore the in-memory collections
+are serialized to JSON and saved to disk. Default: <cite>2</cite>. Since the databases
+can get quite large, this prevents lag in the notebook.</li>
+</ul>
+</div>
+<div class="section" id="acorn-packages-section">
+<h3><cite>[acorn.packages]</cite> Section<a class="headerlink" href="#acorn-packages-section" title="Permalink to this headline">¶</a></h3>
+<p>This section has a simple list of package names with either a <cite>1</cite> (meaning that
+the package <em>should</em> be auto-decorated when imported from <cite>acorn</cite>) or <cite>0</cite>,
+meaning that it <em>should not</em> be auto-decorated, even if the user tries to import
+it from <cite>acorn</cite>. See <a class="reference internal" href="importer.html"><span class="doc">Acorn Automated Package Decoration on Import</span></a>. E.g., <cite>pywt=1</cite> allows a user to execute
+<cite>import acorn.pywt as pywt</cite> even though there isn&#8217;t an explicit package in
+<cite>acorn</cite> called <cite>pywt</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">By default, packages <em>cannot</em> be automatically imported unless the
+user has added the package name to this list in <cite>acorn.cfg</cite>. We may
+decide later that it should be the other way around.</p>
+</div>
+</div>
+</div>
+<div class="section" id="module-acorn.config">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-acorn.config" title="Permalink to this headline">¶</a></h2>
+<p>Config parser to get the configuration for each of the packages being wrapped
+by acorn.</p>
+<dl class="function">
+<dt id="acorn.config.descriptors">
+<code class="descclassname">acorn.config.</code><code class="descname">descriptors</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/config.html#descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.config.descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of descriptors deserialized from JSON for the
+specified package.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the python package to get settings for.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.config.packages">
+<code class="descclassname">acorn.config.</code><code class="descname">packages</code><em class="property"> = {'acorn': &lt;backports.configparser.ConfigParser object&gt;}</em><a class="headerlink" href="#acorn.config.packages" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are package names, values are ConfigParser() instances with
+configuration information for each package.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.config.settings">
+<code class="descclassname">acorn.config.</code><code class="descname">settings</code><span class="sig-paren">(</span><em>package</em>, <em>reload_=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/config.html#settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.config.settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the config settings for the specified package.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the python package to get settings for.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Method Call Analysis"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

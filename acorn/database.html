@@ -1,0 +1,451 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Notebook Database Documentation &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="next" title="Acorn Automated Package Decoration on Import" href="importer.html" />
+    <link rel="prev" title="ACORN Object Descriptor Interface" href="descriptors.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="importer.html" title="Acorn Automated Package Decoration on Import"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="descriptors.html" title="ACORN Object Descriptor Interface"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Notebook Database Documentation</a><ul>
+<li><a class="reference internal" href="#entity-entry-format">Entity Entry Format</a></li>
+<li><a class="reference internal" href="#short-representations-for-objects">Short Representations for Objects</a></li>
+<li><a class="reference internal" href="#database-naming-conventions-projects-and-tasks">Database Naming Conventions: Projects and Tasks</a></li>
+<li><a class="reference internal" href="#module-acorn.logging.database">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="descriptors.html"
+                        title="previous chapter">ACORN Object Descriptor Interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="importer.html"
+                        title="next chapter">Acorn Automated Package Decoration on Import</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/database.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="notebook-database-documentation">
+<h1>Notebook Database Documentation<a class="headerlink" href="#notebook-database-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>acorn</cite> notebook database is saved as a JSON-serialized dictionary, which we
+call a &#8220;database&#8221;. A more accurate name would be a key-value store. The database
+has the following attributes:</p>
+<ul class="simple">
+<li><strong>entities</strong>: these are method calls or object instantiation logs. The value
+of the attribute is a dictionary with UUID keys (see next point) and values
+having the &#8220;entry&#8221; format described below.</li>
+<li><strong>uuids</strong>: uses Universally Unique Identifier (UUID) strings to identify each
+of the objects that are referenced in the <em>entities</em> entries. This dictionary
+has UUID keys and values are dictionaries returned by the <a class="reference internal" href="descriptors.html"><span class="doc">ACORN Object Descriptor Interface</span></a>.</li>
+</ul>
+<div class="section" id="entity-entry-format">
+<h2>Entity Entry Format<a class="headerlink" href="#entity-entry-format" title="Permalink to this headline">¶</a></h2>
+<p>Each entry in the database can either be a method/function call, or a
+constructor call to initialize an object. For constructor calls, we log only the
+<cite>__new__</cite> methods; the <cite>__init__</cite> methods are automatically called as well, but
+they do <em>not</em> produce a log in the database. Entries are JSON dictionaries with
+the following attributes:</p>
+<ul class="simple">
+<li><strong>args</strong>: is a dictionary. It has an <cite>__</cite> attribute for the <em>positional</em>
+arguments, and then additional attributes for each keyword argument.</li>
+<li><strong>analysis</strong>: if a method call is configured to trigger analysis, this
+attribute will be a dictionary returned by <a class="reference internal" href="analysis.html"><span class="doc">Method Call Analysis</span></a> for the specific
+object type.</li>
+<li><strong>elapsed</strong>: how many ticks elapsed in order to run the method. We create the
+entry <em>before</em> calling the method and then update the <em>elapsed</em> time once the
+result has returned. For constructors, this includes the time required to call
+<cite>__init__</cite>.</li>
+<li><strong>start</strong>: time at which the method/constructor call was started.</li>
+<li><strong>returns</strong>: object representation for the result of the function call (see
+the discussion on object representations below).</li>
+<li><strong>method</strong>: the FQDN of the method being called. This can be a constructor,
+instance method, static method, class method, function, built-in, etc.</li>
+<li><strong>error</strong>: if the call to the constructor/function raised an unhandled
+exception, this is the error message of the exception. The exception is still
+raised to the main notebook thread, we just intercept it to create a log.</li>
+</ul>
+</div>
+<div class="section" id="short-representations-for-objects">
+<h2>Short Representations for Objects<a class="headerlink" href="#short-representations-for-objects" title="Permalink to this headline">¶</a></h2>
+<p>When a new object is detected that hasn&#8217;t been handled before, it gets passed to
+the <a class="reference internal" href="#acorn.logging.database.tracker" title="acorn.logging.database.tracker"><code class="xref py py-func docutils literal"><span class="pre">tracker()</span></code></a> method, which determines how best to
+represent the object.</p>
+<ul class="simple">
+<li>For simple object types (scalars), the object is returned.</li>
+<li>For collections in which <em>every item</em> is a simple scalar type, the <cite>len</cite>,
+<cite>min</cite> and <cite>max</cite> as well as the <cite>type</cite> of the collection are extracted and
+pretty-printed in a string.</li>
+<li>For collections of non-scalar types, <a class="reference internal" href="#acorn.logging.database.tracker" title="acorn.logging.database.tracker"><code class="xref py py-func docutils literal"><span class="pre">tracker()</span></code></a>
+is called for each member of the collection.</li>
+<li>If the object has type <cite>type</cite>, then it&#8217;s name is returned.</li>
+<li><cite>lambda</cite> functions (have type <code class="xref py py-class docutils literal"><span class="pre">LambdaType</span></code>) are represented by
+<cite>lambda(args...)</cite>, where the &#8220;args&#8221; list is extracted from the <cite>__code__</cite>
+special attribute. If the lambda object has a <cite>__fqdn__</cite> special attribute, it
+is used instead.</li>
+<li>For objects of type <code class="xref py py-class docutils literal"><span class="pre">FunctionType</span></code> or <code class="xref py py-class docutils literal"><span class="pre">MethodType</span></code>, the
+<cite>__name__</cite> attribute is returned.</li>
+<li><cite>numpy.ufunc</cite> instances have their FQDN returned.</li>
+<li>In all other cases, a <a class="reference internal" href="#acorn.logging.database.Instance" title="acorn.logging.database.Instance"><code class="xref py py-class docutils literal"><span class="pre">acorn.logging.database.Instance</span></code></a> object is
+initialized with the object. It is then represented by a <a class="reference external" href="https://docs.python.org/2/library/uuid.html#uuid.uuid4" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">uuid.uuid4()</span></code></a>
+value and its description is handled by <a class="reference internal" href="descriptors.html"><span class="doc">ACORN Object Descriptor Interface</span></a>.</li>
+</ul>
+</div>
+<div class="section" id="database-naming-conventions-projects-and-tasks">
+<h2>Database Naming Conventions: Projects and Tasks<a class="headerlink" href="#database-naming-conventions-projects-and-tasks" title="Permalink to this headline">¶</a></h2>
+<p><cite>acorn</cite> exposes a method <code class="xref py py-func docutils literal"><span class="pre">acorn.set_task()</span></code> that sets a project and task
+name for a live session. These values can be changed during a session to work on
+a different database. The JSON file name is <cite>project.task.json</cite> and gets stored
+in the database directory specified by the <a class="reference internal" href="configuration.html"><span class="doc">Global and Package Configuration in ACORN</span></a>. The
+database can also be set to be not writeable, in which case the entries are just
+logged in-memory. This is useful for unit-testing and debugging.</p>
+</div>
+<div class="section" id="module-acorn.logging.database">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-acorn.logging.database" title="Permalink to this headline">¶</a></h2>
+<p>Methods and classes for creating a JSON database from a tree of
+calls to methods with various objects passed as arguments.</p>
+<dl class="class">
+<dt id="acorn.logging.database.Instance">
+<em class="property">class </em><code class="descclassname">acorn.logging.database.</code><code class="descname">Instance</code><span class="sig-paren">(</span><em>pid</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#Instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.Instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a class instance in the current session which can be
+passed as an argument to method calls, or have unbound methods
+called in it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; python memory address (returned by <a class="reference external" href="https://docs.python.org/2/library/functions.html#id" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">id()</span></code></a>).</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="acorn.logging.database.Instance.uuid">
+<code class="descname">uuid</code><a class="headerlink" href="#acorn.logging.database.Instance.uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; <code class="xref py py-meth docutils literal"><span class="pre">uuid.uuid4()</span></code> for the object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.logging.database.Instance.obj">
+<code class="descname">obj</code><a class="headerlink" href="#acorn.logging.database.Instance.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>original object instance that this represents.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.logging.database.Instance.describe">
+<code class="descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#Instance.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.Instance.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary describing the object based on its type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="acorn.logging.database.TaskDB">
+<em class="property">class </em><code class="descclassname">acorn.logging.database.</code><code class="descname">TaskDB</code><span class="sig-paren">(</span><em>dbdir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#TaskDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.TaskDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the database for a single task.</p>
+<dl class="attribute">
+<dt id="acorn.logging.database.TaskDB.entities">
+<code class="descname">entities</code><a class="headerlink" href="#acorn.logging.database.TaskDB.entities" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are entity ids (fqdn or uuid); values are a list of
+entries generated for that entity during this task.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.logging.database.TaskDB.uuids">
+<code class="descname">uuids</code><a class="headerlink" href="#acorn.logging.database.TaskDB.uuids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are <cite>uuid</cite> values for class instances; values are
+dicts with attributes describing the class instance&#8217;s origin.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.logging.database.TaskDB.dbpath">
+<code class="descname">dbpath</code><a class="headerlink" href="#acorn.logging.database.TaskDB.dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; full path to the database JSON file for this task
+database.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.logging.database.TaskDB.lastsave">
+<code class="descname">lastsave</code><a class="headerlink" href="#acorn.logging.database.TaskDB.lastsave" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; timestamp since the last time the DB was saved.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.logging.database.TaskDB.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#TaskDB.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.TaskDB.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserializes the database from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.logging.database.TaskDB.record">
+<code class="descname">record</code><span class="sig-paren">(</span><em>ekey</em>, <em>entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#TaskDB.record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.TaskDB.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Records the specified entry to the key-value store under the specified
+entity key.</p>
+<p>Args:
+ekey (str): fqdn/uuid of the method/object to store the entry for.
+entry (dict): attributes and values gleaned from the execution.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.logging.database.TaskDB.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#TaskDB.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.TaskDB.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializes the database file to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>force</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the elapsed time since last save is ignored
+and the database is saved anyway (subject to global
+<a class="reference internal" href="#acorn.logging.database.writeable" title="acorn.logging.database.writeable"><code class="xref py py-data docutils literal"><span class="pre">writeable</span></code></a> setting).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.cleanup">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves all the open databases to JSON so that the kernel can be shut down
+without losing in-memory collections.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.dbdir">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">dbdir</code><em class="property"> = None</em><a class="headerlink" href="#acorn.logging.database.dbdir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; full path to the directory where the databases are being stored. If this
+is overwritten programatically, then the global settings for <cite>acorn</cite> will <em>not</em>
+be checked.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.dbs">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">dbs</code><em class="property"> = {}</em><a class="headerlink" href="#acorn.logging.database.dbs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are tuple (project, task), values are the <a class="reference internal" href="#acorn.logging.database.TaskDB" title="acorn.logging.database.TaskDB"><code class="xref py py-class docutils literal"><span class="pre">TaskDB</span></code></a>
+instances for the specified project and task.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.oids">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">oids</code><em class="property"> = {}</em><a class="headerlink" href="#acorn.logging.database.oids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are python <code class="xref py py-meth docutils literal"><span class="pre">id()</span></code> values, values are the <a class="reference internal" href="#acorn.logging.database.Instance" title="acorn.logging.database.Instance"><code class="xref py py-class docutils literal"><span class="pre">Instance</span></code></a>
+class instances from which JSON database can be constructed.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.project">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">project</code><em class="property"> = 'default'</em><a class="headerlink" href="#acorn.logging.database.project" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; currently active <em>project</em> name under which all logging is being saved.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.record">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">record</code><span class="sig-paren">(</span><em>ekey</em>, <em>entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Records the specified entry to the key-value store under the specified
+entity key.</p>
+<p>Args:
+ekey (str): fqdn/uuid of the method/object to store the entry for.
+entry (dict): attributes and values gleaned from the execution.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.set_dbdir">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">set_dbdir</code><span class="sig-paren">(</span><em>dbdir_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#set_dbdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.set_dbdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the path to the directory where the JSON files should be
+stored. Calling this method side-steps the configuration settings in the
+<cite>acorn.cfg</cite> global config file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dbdir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the dbdir; can be relative.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.set_task">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">set_task</code><span class="sig-paren">(</span><em>project_</em>, <em>task_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#set_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.set_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the active project and task. All subsequent logging will be saved to
+the database with that project and task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>project</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; active project name; a project can have multiple tasks.</li>
+<li><strong>task</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; active task name. Logging is separated at the project and task
+level.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.set_writeable">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">set_writeable</code><span class="sig-paren">(</span><em>writeable_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#set_writeable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.set_writeable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets whether the database is being written to disk, or just organized in
+memory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>writeable</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, calling <code class="xref py py-meth docutils literal"><span class="pre">acorn.database.record()</span></code> will
+eventually result in an entry being saved to disk; otherwise, records are
+organized in memory, but the disk write is disabled.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.task">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">task</code><em class="property"> = 'default'</em><a class="headerlink" href="#acorn.logging.database.task" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; currently active <em>task</em> name under which all logging is being saved.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.logging.database.tracker">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">tracker</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/database.html#tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.database.tracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Instance of the specified object if it is one that
+we track by default.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) &#8211; any python object passed as an argument to a method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>if the object is trackable, the Instance instance of</dt>
+<dd>that object; else None.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#acorn.logging.database.Instance" title="acorn.logging.database.Instance">Instance</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.uuids">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">uuids</code><em class="property"> = {}</em><a class="headerlink" href="#acorn.logging.database.uuids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are the <code class="xref py py-class docutils literal"><span class="pre">UUID</span></code> string values; values are <a class="reference internal" href="#acorn.logging.database.Instance" title="acorn.logging.database.Instance"><code class="xref py py-class docutils literal"><span class="pre">Instance</span></code></a>
+class instances (i.e., same values as <a class="reference internal" href="#acorn.logging.database.oids" title="acorn.logging.database.oids"><code class="xref py py-data docutils literal"><span class="pre">oids</span></code></a>, but keyed by <cite>uuid</cite>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.logging.database.writeable">
+<code class="descclassname">acorn.logging.database.</code><code class="descname">writeable</code><em class="property"> = True</em><a class="headerlink" href="#acorn.logging.database.writeable" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; when True, calling <a class="reference internal" href="#acorn.logging.database.record" title="acorn.logging.database.record"><code class="xref py py-meth docutils literal"><span class="pre">acorn.logging.database.record()</span></code></a> will
+eventually result in an entry being saved to disk; otherwise, records are
+organized in memory, but the disk write is disabled.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="importer.html" title="Acorn Automated Package Decoration on Import"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="descriptors.html" title="ACORN Object Descriptor Interface"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

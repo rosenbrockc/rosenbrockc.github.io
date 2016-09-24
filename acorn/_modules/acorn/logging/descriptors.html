@@ -1,0 +1,295 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>acorn.logging.descriptors &#8212; acorn 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/bizstyle.js"></script>
+    <link rel="top" title="acorn 0.0.3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for acorn.logging.descriptors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods for describing the objects within packages that are not instantiated</span>
+<span class="sd">by the user in the scope of __main__.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">_package_desc</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names, values are dictionaries with object FQDN as</span>
+<span class="sd">keys, and values being a list of attributes and transform functions needed to</span>
+<span class="sd">describe the object.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="describe"><a class="viewcode-back" href="../../../descriptors.html#acorn.logging.descriptors.describe">[docs]</a><span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describes the object using developer-specified attributes specific to</span>
+<span class="sd">    each main object type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#First, we need to determine the fqdn, so that we can lookup the format for</span>
+    <span class="c1">#this object in the config file for the package.</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getmodule</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">_fqdn</span>
+    <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#This should not have happened; if the FQDN couldn&#39;t be determined, then</span>
+        <span class="c1">#we should have never logged it.</span>
+        <span class="k">return</span> <span class="n">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)))</span>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">global</span> <span class="n">_package_desc</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_package_desc</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">descriptors</span>
+        <span class="n">spack</span> <span class="o">=</span> <span class="n">descriptors</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_package_desc</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_package_desc</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="n">spack</span>
+    
+    <span class="k">if</span> <span class="n">_package_desc</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fqdn</span> <span class="ow">in</span> <span class="n">_package_desc</span><span class="p">[</span><span class="n">package</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">_package_desc</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">fqdn</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_obj_getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the attribute specified by the fqdn list from obj.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">obj</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="n">start</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">node</span>
+    
+<span class="k">def</span> <span class="nf">_package_transform</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the specified package transform with `fqdn` to the package.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package: imported package object.</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of function in the package. If it</span>
+<span class="sd">          does not include the package name, then set `start=0`.</span>
+<span class="sd">        start (int): in the &#39;.&#39;-split list of identifiers in `fqdn`, where to start</span>
+<span class="sd">          looking in the package. E.g., `numpy.linalg.norm` has `start=1` since</span>
+<span class="sd">          `package=numpy`; however, `linalg.norm` would have `start=0`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Our only difficulty here is that package names can be chained. We ignore</span>
+    <span class="c1">#the first item since that was already checked for us by the calling</span>
+    <span class="c1">#method.</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">_obj_getattr</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+    
+    <span class="c1">#By the time this loop is finished, we should have a function to apply if</span>
+    <span class="c1">#the developer setting up the config did a good job.</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">args</span>
+
+<span class="c1">#It may seem clumsy now to separate all these package transforms out separately</span>
+<span class="c1">#when we could have handled this easily in _package_transform; however, it will</span>
+<span class="c1">#likely happen that slight changes need to be made on a per-package basis, so</span>
+<span class="c1">#separating them out now makes more sense.</span>
+<span class="k">def</span> <span class="nf">_numpy_transform</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the numpy transform with the specified `fqdn` name to value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): name of the numpy function to apply to value.</span>
+<span class="sd">        value: attribute value of the original object to apply function to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+    <span class="k">return</span> <span class="n">_package_transform</span><span class="p">(</span><span class="n">numpy</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_scipy_transform</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the scipy transform with the specified `fqdn` name to value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): name of the numpy function to apply to value.</span>
+<span class="sd">        value: attribute value of the original object to apply function to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">scipy</span>
+    <span class="k">return</span> <span class="n">_package_transform</span><span class="p">(</span><span class="n">scipy</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_math_transform</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the math transform with the specified `fqdn` name to value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): name of the numpy function to apply to value.</span>
+<span class="sd">        value: attribute value of the original object to apply function to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">math</span>
+    <span class="k">return</span> <span class="n">_package_transform</span><span class="p">(</span><span class="n">math</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_instance_transform</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies an instance method with name `fqdn` to `o`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of the object.</span>
+<span class="sd">        o: object to apply instance method to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_package_transform</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_array_convert</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts the specified value to a list if it is a :class:`numpy.ndarray`;</span>
+<span class="sd">    otherwise it is just returned as is.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndarray</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">larr</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">larr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">larr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">larr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span>
+
+<div class="viewcode-block" id="json_describe"><a class="viewcode-back" href="../../../descriptors.html#acorn.logging.descriptors.json_describe">[docs]</a><span class="k">def</span> <span class="nf">json_describe</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describes the specified object using the directives in the JSON</span>
+<span class="sd">    `descriptor`, if available.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        o: object to describe.</span>
+<span class="sd">        fqdn (str): fully-qualified domain name of the object.</span>
+<span class="sd">        descriptor (dict): keys are attributes of `o`; values are transform</span>
+<span class="sd">          functions to apply to the attribute so that only a single value is</span>
+<span class="sd">          returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fqdn&quot;</span><span class="p">:</span> <span class="n">fqdn</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fqdn&quot;</span><span class="p">:</span> <span class="n">fqdn</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;instance&quot;</span><span class="p">:</span>
+                <span class="c1">#For instance methods, we repeatedly call instance methods on</span>
+                <span class="c1">#`value`, assuming that the methods belong to `value`.</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">o</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+                    <span class="c1">#We get the chain of attribute values.</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">o</span>
+                    <span class="k">for</span> <span class="n">cattr</span> <span class="ow">in</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cattr</span><span class="p">):</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cattr</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#There is just a one-level getattr.    </span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                
+            <span class="k">if</span> <span class="s2">&quot;transform&quot;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="s2">&quot;numpy&quot;</span> <span class="o">==</span> <span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">)]:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">_numpy_transform</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;scipy&quot;</span> <span class="o">==</span> <span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">)]:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">_scipy_transform</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;math&quot;</span> <span class="o">==</span> <span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;math&quot;</span><span class="p">)]:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">_math_transform</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;self&quot;</span> <span class="ow">in</span> <span class="n">transform</span><span class="p">:</span>
+                        <span class="n">args</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;args&quot;</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">else</span> <span class="p">[]</span>
+                        <span class="n">kwds</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;kwargs&quot;</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">else</span> <span class="p">{}</span>
+                        <span class="n">method</span> <span class="o">=</span> <span class="n">transform</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;self.&quot;</span><span class="p">):]</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">_instance_transform</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+                        
+            <span class="k">if</span> <span class="s2">&quot;slice&quot;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">si</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s2">&quot;slice&quot;</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">:</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="nb">slice</span> <span class="o">=</span> <span class="n">sl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="nb">slice</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">),</span> <span class="n">sl</span>
+
+                    <span class="n">slvalue</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)):</span>
+                        <span class="n">slvalue</span> <span class="o">=</span> <span class="n">slvalue</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        
+                    <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_array_convert</span><span class="p">(</span><span class="n">slvalue</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;rename&quot;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s2">&quot;rename&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_array_convert</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">_array_convert</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>
