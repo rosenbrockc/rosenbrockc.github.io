@@ -85,9 +85,18 @@ files. There should be the same number of entries in <em>logging</em> and <em>co
 <li><strong>legends</strong> comma-separated list of legend labels for cases where more than
 one index is specified in <cite>value_index</cite>.</li>
 </ul>
-<p><strong>Note</strong>: if a <em>key</em> is not specified, then one will be auto-generated using the
-<code class="xref py py-meth docutils literal"><span class="pre">id()</span></code> of the <a class="reference internal" href="monitor.html#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><code class="xref py py-class docutils literal"><span class="pre">ComMonitorThread</span></code></a> object instance
-assigned to the port where the data originated from.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if a <em>key</em> is not specified, then one will be auto-generated using the
+<code class="xref py py-meth docutils literal"><span class="pre">id()</span></code> of the <a class="reference internal" href="monitor.html#liveserial.monitor.ComMonitorThread" title="liveserial.monitor.ComMonitorThread"><code class="xref py py-class docutils literal"><span class="pre">ComMonitorThread</span></code></a> object
+instance assigned to the port where the data originated from.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">for the <em>value_index</em> and <em>logging</em> options, they are
+zero-based. However, the zero index is <strong>reserved</strong> for the timestamp of the
+local computer. You can reference it in these options using <cite>0</cite>.</p>
+</div>
 <p>Since the config file format is extensible, it is easy to add additional options
 later on. The default <a class="reference external" href="https://docs.python.org/2/library/configparser.html#ConfigParser.ConfigParser" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></code></a> is used to extract the
 sections (sensors) and their options.</p>
@@ -155,6 +164,27 @@ seen by executing <cite>livemon.py -h</cite>.</p>
 <a class="reference external" href="https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument" title="(in Python v2.7)"><code class="xref py py-meth docutils literal"><span class="pre">argparse.ArgumentParser.add_argument()</span></code></a> keyword arguments.</p>
 </dd></dl>
 
+<ul class="simple">
+<li><strong>refresh</strong>: How often (in milliseconds) to plot new data obtained from the serial port. Default: 100 (int).</li>
+<li><strong>method</strong>: Specifies how buffered data is aggregated each time it is read from the serial port. Default: average (str).Must be one of [&#8216;last&#8217;, &#8216;average&#8217;]</li>
+<li><strong>maxpts</strong>: Maximum number of values to keep in the plot for each sensor Default: 100 (int).</li>
+<li><strong>config</strong>: Specify a configuration file to get sensor setup information from. Default: None (str).</li>
+<li><strong>sensors</strong>: Filter the list of sensors being logged/plotted. Default: all (str).</li>
+<li><strong>noplot</strong>: Don&#8217;t plot the data; only log it. Default: None (bool).</li>
+<li><strong>parity</strong>: Serial communication parameter. Default: N (str).Must be one of [&#8216;N&#8217;, &#8216;E&#8217;, &#8216;O&#8217;, &#8216;M&#8217;, &#8216;S&#8217;]</li>
+<li><strong>buffertime</strong>: How often (in milliseconds) to query buffered data obtained from the serial port. Default: 25 (float).</li>
+<li><strong>ort</strong>: Name of the port(s) to plot/log. Default: None (str).</li>
+<li><strong>wait</strong>: Number of seconds to wait before failing because no data is present on the stream for plotting. Default: 1.0 (float).</li>
+<li><strong>timeout</strong>: The timeout used for reading the COM port. If this value is low, the thread will return data in finer grained chunks, with more accurate timestamps, but it will also consume more CPU. Default: 0.01 (float).</li>
+<li><strong>listen</strong>: Prints the raw output from the serial port instead of plotting and logging it. Useful for debugging port connection issues. Default: None (bool).</li>
+<li><strong>autoconf</strong>: Runs in automatic mode by loading a configuration file in the current directory called &#8216;sensors.cfg&#8217;. Default: None (bool).</li>
+<li><strong>stopbits</strong>: Serial communication parameter. Default: 1.0 (float).Must be one of [1, 1.5, 2]</li>
+<li><strong>baudrate</strong>: Rate at which information is transferred in a communication channel (in bits/second). Default: 9600 (int).</li>
+<li><strong>logdir</strong>: Path to the directory where sensor data will be logged. Default: None (str).</li>
+<li><strong>window</strong>: Width of window in time units. Default: 20.0 (float).</li>
+<li><strong>logfreq</strong>: How often (in <em>seconds</em>) to save the buffered data points to CSV. Default: 10 (float).</li>
+<li><strong>virtual</strong>: Specifies that the port being connected to is virtual (e.g., with <cite>socat</cite>), which changes the parameters for connection. Default: None (bool).</li>
+</ul>
 </div>
 <div class="section" id="plotting-configuration-options">
 <h2>Plotting Configuration Options<a class="headerlink" href="#plotting-configuration-options" title="Permalink to this headline">¶</a></h2>
