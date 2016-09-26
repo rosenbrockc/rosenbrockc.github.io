@@ -187,7 +187,7 @@
         <span class="k">else</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">return</span> <span class="n">default</span></div>
                         
-<div class="viewcode-block" id="Logger.ready"><a class="viewcode-back" href="../../logging.html#liveserial.log.Logger.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Logger.ready"><a class="viewcode-back" href="../../logging.html#liveserial.log.Logger.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns True once we have accumulated a few timer calls of data. This</span>
 <span class="sd">        ensures that we know how many sensors are running on the same COM port.</span>
 
@@ -203,8 +203,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">datapoints</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csvdata</span><span class="p">)</span>
             <span class="n">havepts</span> <span class="o">=</span> <span class="n">datapoints</span> <span class="o">&gt;</span> <span class="mi">2</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timer_calls</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">havepts</span><span class="p">)</span></div>
+            
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timer_calls</span> <span class="o">&gt;</span> <span class="n">wait</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">havepts</span><span class="p">))</span></div>
         
 <div class="viewcode-block" id="Logger.start"><a class="viewcode-back" href="../../logging.html#liveserial.log.Logger.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Starts a new timer for the configured interval to gather data from</span>
