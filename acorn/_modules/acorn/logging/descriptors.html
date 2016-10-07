@@ -69,7 +69,7 @@
             
   <h1>Source code for acorn.logging.descriptors</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Methods for describing the objects within packages that are not instantiated</span>
-<span class="sd">by the user in the scope of __main__.</span>
+<span class="sd">by the user in the scope of `__main__`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">_package_desc</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="sd">&quot;&quot;&quot;dict: keys are package names, values are dictionaries with object FQDN as</span>
@@ -80,12 +80,18 @@
 <div class="viewcode-block" id="describe"><a class="viewcode-back" href="../../../descriptors.html#acorn.logging.descriptors.describe">[docs]</a><span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Describes the object using developer-specified attributes specific to</span>
 <span class="sd">    each main object type.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: keys are specific attributes tailored to the specific object type,</span>
+<span class="sd">        though `fqdn` is common to all descriptions; values are the corresponding</span>
+<span class="sd">        attribute values which are *simple* types that can easily be serialized to</span>
+<span class="sd">        JSON.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#First, we need to determine the fqdn, so that we can lookup the format for</span>
     <span class="c1">#this object in the config file for the package.</span>
     <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getmodule</span>
     <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">_fqdn</span>
-    <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fqdn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1">#This should not have happened; if the FQDN couldn&#39;t be determined, then</span>
         <span class="c1">#we should have never logged it.</span>
@@ -211,6 +217,12 @@
 <span class="sd">        descriptor (dict): keys are attributes of `o`; values are transform</span>
 <span class="sd">          functions to apply to the attribute so that only a single value is</span>
 <span class="sd">          returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: keys are specific attributes tailored to the specific object type,</span>
+<span class="sd">        though `fqdn` is common to all descriptions; values are the corresponding</span>
+<span class="sd">        attribute values which are *simple* types that can easily be serialized to</span>
+<span class="sd">        JSON.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">descriptor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fqdn&quot;</span><span class="p">:</span> <span class="n">fqdn</span><span class="p">}</span>

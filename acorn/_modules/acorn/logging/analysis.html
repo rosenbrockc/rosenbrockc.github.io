@@ -71,13 +71,49 @@
 <span></span><span class="sd">&quot;&quot;&quot;Methods for analyzing the results of various calls, specific to each package</span>
 <span class="sd">and its methods/classes.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="analyze"><a class="viewcode-back" href="../../../analysis.html#acorn.logging.analysis.analyze">[docs]</a><span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="n">_methods</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are package names; values are a dict of `fqdn: method` that shows</span>
+<span class="sd">which method to use to analyze the result of calling the object with `fqdn`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_load_methods</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the mappings from method call result to analysis.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        package (str): name of the package to load for.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_methods</span>
+    <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.descriptors</span> <span class="k">import</span> <span class="n">_obj_getattr</span>
+    <span class="n">spack</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">spack</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;analysis.methods&quot;</span><span class="p">):</span>
+            <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            
+            <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+            <span class="n">mappings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="s2">&quot;analysis.methods&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">fqdn</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">mappings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">rootname</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">root</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">rootname</span><span class="p">)</span>
+                <span class="n">caller</span> <span class="o">=</span> <span class="n">_obj_getattr</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">fqdn</span><span class="p">]</span> <span class="o">=</span> <span class="n">caller</span>
+
+<div class="viewcode-block" id="analyze"><a class="viewcode-back" href="../../../analysis.html#acorn.logging.analysis.analyze">[docs]</a><span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">argl</span><span class="p">,</span> <span class="n">argd</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Analyzes the result from calling the method with the specified FQDN.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fqdn (str): full-qualified name of the method that was called.</span>
+<span class="sd">        result: result of calling the method with `fqdn`.</span>
+<span class="sd">        argl (tuple): positional arguments passed to the method call.</span>
+<span class="sd">        argd (dict): keyword arguments passed to the method call.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_methods</span><span class="p">:</span>
+        <span class="n">_load_methods</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fqdn</span> <span class="ow">in</span> <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">_methods</span><span class="p">[</span><span class="n">package</span><span class="p">][</span><span class="n">fqdn</span><span class="p">](</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">*</span><span class="n">argl</span><span class="p">,</span> <span class="o">**</span><span class="n">argd</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

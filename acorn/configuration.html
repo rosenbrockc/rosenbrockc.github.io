@@ -152,9 +152,34 @@ in the C-extension modules). We need that to be changed to our sub-classed
 <cite>ndarray</cite> so we add <cite>numpy.core.multiarray.zeros=numpy.ndarray</cite> as an option
 to make sure that the result of <code class="xref py py-func docutils literal"><span class="pre">numpy.zeros()</span></code> is always passed through
 the constructor of our <cite>ndarray</cite> subclass.</li>
+<li><strong>[logging]</strong>: it is possible for an object to be tracked, but <em>not</em>
+logged. This makes streamlining work for some methods so that common
+operations can be accelerated without producing log entries. Options are FQDNs
+with a <cite>0</cite> or <cite>1</cite> specifying whether it should be logged or not.</li>
 <li><strong>[logging.depth]</strong>: specifies the FQDN of certain objects that should be
 logged at a different stack depth than the defaults configured by <cite>acorn</cite>.</li>
+<li><strong>[streamline]</strong>: options are FQDN with either <cite>0</cite> or <cite>1</cite> as the value. When
+an object is streamlined, acorn logging functionality is disabled for <em>all</em>
+sub-calls that are invoked by the top-level call. This makes it almost as fast
+as if <cite>acorn</cite> was never there. However, we still have one extra call for every
+decorated method, so there is a slight performance hit. Streamlining is most
+useful for plotting routines that typically need thousands of method calls,
+many to public, <cite>acorn</cite>-decorated methods.</li>
 </ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In order for an object to be streamlined, it <em>must</em> be included in the
+<cite>[tracking]</cite> rules, or <cite>acorn</cite> can never intercept it. To prevent log entries
+from being created, but with streamlining enabled, allow the object to be
+tracked, then add it to <cite>[streamline]</cite> <em>and</em> <cite>[logging]</cite> (with a value of
+<cite>0</cite>).</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Even if a FQDN is specified in <cite>[logging]</cite>, it may still not produced log
+entries if the rules in <cite>[tracking]</cite> prevent it from being decorated in the
+first place.</p>
+</div>
 <p>For the <cite>[tracking]</cite>, <cite>[timing]</cite> and <cite>[analysis]</cite> sections, the following
 options are available:</p>
 <ul class="simple">
@@ -216,6 +241,19 @@ decide later that it should be the other way around.</p>
 <span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-acorn.config" title="Permalink to this headline">¶</a></h2>
 <p>Config parser to get the configuration for each of the packages being wrapped
 by acorn.</p>
+<dl class="class">
+<dt id="acorn.config.CaseConfigParser">
+<em class="property">class </em><code class="descclassname">acorn.config.</code><code class="descname">CaseConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/config.html#CaseConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.config.CaseConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Case-sensitive configuration parser; we need to preseve the
+case-sensitive names of FQDNs in the option strings.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.config.config_dir">
+<code class="descclassname">acorn.config.</code><code class="descname">config_dir</code><span class="sig-paren">(</span><em>mkcustom=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/config.html#config_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.config.config_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the configuration directory for custom package settings.</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="acorn.config.descriptors">
 <code class="descclassname">acorn.config.</code><code class="descname">descriptors</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/config.html#descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.config.descriptors" title="Permalink to this definition">¶</a></dt>
@@ -233,7 +271,7 @@ specified package.</p>
 
 <dl class="data">
 <dt id="acorn.config.packages">
-<code class="descclassname">acorn.config.</code><code class="descname">packages</code><em class="property"> = {'acorn': &lt;backports.configparser.ConfigParser object&gt;}</em><a class="headerlink" href="#acorn.config.packages" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">acorn.config.</code><code class="descname">packages</code><em class="property"> = {'acorn': &lt;acorn.config.CaseConfigParser instance&gt;}</em><a class="headerlink" href="#acorn.config.packages" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; keys are package names, values are ConfigParser() instances with
 configuration information for each package.</p>
 </dd></dl>

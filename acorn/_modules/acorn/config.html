@@ -75,6 +75,28 @@
 <span class="sd">&quot;&quot;&quot;dict: keys are package names, values are ConfigParser() instances with</span>
 <span class="sd">configuration information for each package.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">six.moves.configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+<div class="viewcode-block" id="CaseConfigParser"><a class="viewcode-back" href="../../configuration.html#acorn.config.CaseConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CaseConfigParser</span><span class="p">(</span><span class="n">ConfigParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Case-sensitive configuration parser; we need to preseve the</span>
+<span class="sd">    case-sensitive names of FQDNs in the option strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">optionxform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optionstr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">optionstr</span></div>
+    
+<div class="viewcode-block" id="config_dir"><a class="viewcode-back" href="../../configuration.html#acorn.config.config_dir">[docs]</a><span class="k">def</span> <span class="nf">config_dir</span><span class="p">(</span><span class="n">mkcustom</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the configuration directory for custom package settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
+    <span class="kn">from</span> <span class="nn">acorn.base</span> <span class="k">import</span> <span class="n">testmode</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="n">alternate</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)),</span> <span class="s2">&quot;.acorn&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">testmode</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">alternate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mkcustom</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mkcustom</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="n">alternate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alternate</span></div>
 
 <span class="k">def</span> <span class="nf">_package_path</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the full path to the default package configuration file.</span>
@@ -82,9 +104,9 @@
 <span class="sd">    Args:</span>
 <span class="sd">    package (str): name of the python package to return a path for.    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
     <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
-    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.cfg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
+    <span class="n">confdir</span> <span class="o">=</span> <span class="n">config_dir</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">confdir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.cfg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">_read_single</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Reads a single config file into the parser, silently failing if the file</span>
@@ -108,13 +130,7 @@
     <span class="k">global</span> <span class="n">packages</span>
     <span class="k">if</span> <span class="n">package</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages</span> <span class="ow">or</span> <span class="n">reload_</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="c1">#py3 rename of the module to lower case.</span>
-            <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
-            
-        <span class="n">result</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">CaseConfigParser</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">package</span> <span class="o">!=</span> <span class="s2">&quot;acorn&quot;</span><span class="p">:</span>
             <span class="n">confpath</span> <span class="o">=</span> <span class="n">_package_path</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
             <span class="n">_read_single</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">confpath</span><span class="p">)</span>
@@ -129,9 +145,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">    package (str): name of the python package to return a path for.    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
     <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
-    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_dir</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package</span><span class="p">))</span>
 
 <div class="viewcode-block" id="descriptors"><a class="viewcode-back" href="../../configuration.html#acorn.config.descriptors">[docs]</a><span class="k">def</span> <span class="nf">descriptors</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a dictionary of descriptors deserialized from JSON for the</span>

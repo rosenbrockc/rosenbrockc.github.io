@@ -176,12 +176,25 @@ and <cite>scipy</cite> calls.</p>
 <div class="section" id="module-acorn.logging.descriptors">
 <span id="api-documentation-for-the-descriptor-machinery"></span><h2>API Documentation for the Descriptor Machinery<a class="headerlink" href="#module-acorn.logging.descriptors" title="Permalink to this headline">¶</a></h2>
 <p>Methods for describing the objects within packages that are not instantiated
-by the user in the scope of __main__.</p>
+by the user in the scope of <cite>__main__</cite>.</p>
 <dl class="function">
 <dt id="acorn.logging.descriptors.describe">
 <code class="descclassname">acorn.logging.descriptors.</code><code class="descname">describe</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/descriptors.html#describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.descriptors.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Describes the object using developer-specified attributes specific to
 each main object type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are specific attributes tailored to the specific object type,
+though <cite>fqdn</cite> is common to all descriptions; values are the corresponding
+attribute values which are <em>simple</em> types that can easily be serialized to
+JSON.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -193,13 +206,22 @@ each main object type.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>o</strong> &#8211; object to describe.</li>
 <li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; fully-qualified domain name of the object.</li>
 <li><strong>descriptor</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keys are attributes of <cite>o</cite>; values are transform
 functions to apply to the attribute so that only a single value is
 returned.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">keys are specific attributes tailored to the specific object type,
+though <cite>fqdn</cite> is common to all descriptions; values are the corresponding
+attribute values which are <em>simple</em> types that can easily be serialized to
+JSON.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
 </td>
 </tr>
 </tbody>

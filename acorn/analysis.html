@@ -99,13 +99,19 @@ package&#8217;s configuration file (see <a class="reference internal" href="conf
 and its methods/classes.</p>
 <dl class="function">
 <dt id="acorn.logging.analysis.analyze">
-<code class="descclassname">acorn.logging.analysis.</code><code class="descname">analyze</code><span class="sig-paren">(</span><em>fqdn</em>, <em>result</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/analysis.html#analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.analysis.analyze" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">acorn.logging.analysis.</code><code class="descname">analyze</code><span class="sig-paren">(</span><em>fqdn</em>, <em>result</em>, <em>argl</em>, <em>argd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/logging/analysis.html#analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.logging.analysis.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Analyzes the result from calling the method with the specified FQDN.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; full-qualified name of the method that was called.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fqdn</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; full-qualified name of the method that was called.</li>
+<li><strong>result</strong> &#8211; result of calling the method with <cite>fqdn</cite>.</li>
+<li><strong>argl</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; positional arguments passed to the method call.</li>
+<li><strong>argd</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keyword arguments passed to the method call.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

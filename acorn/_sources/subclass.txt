@@ -8,7 +8,7 @@ to be sub-classed using `numpy` specific method calls and syntax (such as
 `__arraywrap__`). For cases such as these, `acorn` allows a developer to create
 a special module in :module:`acorn.subclass._package`, for a special
 package. Thus, `acorn` has a special :class:`numpy.ndarray` subclass in
-:module:`acorn.subclass._numpy`. Subclasses are specified in the `acorn` global
+:module:`acorn.subclass._numpy`. Subclasses are specified in the `acorn`
 :doc:`configuration` file so that they can be automatically incorporated by the
 decoration machinery.
 

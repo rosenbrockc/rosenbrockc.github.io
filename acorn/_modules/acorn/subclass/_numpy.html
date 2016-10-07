@@ -74,13 +74,48 @@
 <span class="sd">http://docs.scipy.org/doc/numpy/user/basics.subclassing.html.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">decorating</span><span class="p">,</span> <span class="n">streamlining</span>
+<span class="k">def</span> <span class="nf">_get_acorn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets either a slice or an item from an array. Used for the __getitem__</span>
+<span class="sd">    and __getslice__ special methods of the sub-classed array.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        method (str): on of [&#39;slice&#39;, &#39;item&#39;].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#IMPORTANT!! I lost two hours because the ndarray becomes unstable if you</span>
+    <span class="c1">#don&#39;t call the original method first. Somehow passing the array instance to</span>
+    <span class="c1">#other methods changed its internal representation and made it unusable by</span>
+    <span class="c1">#the original numpy functions. Putting them first makes it work.</span>
+    
+    <span class="c1"># Because we had to subclass numpy.ndarray, the original methods get</span>
+    <span class="c1"># stuck in an infinite loop (max. recursion depth exceeded errors). So,</span>
+    <span class="c1"># we instead grab the reference to the original ndarray object.</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;slice&quot;</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">__acornext__</span><span class="o">.</span><span class="n">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">__acornext__</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">decorating</span> <span class="ow">or</span> <span class="n">streamlining</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">_fqdn</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;slice&quot;</span><span class="p">:</span>
+            <span class="n">fqdn</span> <span class="o">=</span> <span class="s2">&quot;numpy.ndarray.__getslice__&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fqdn</span> <span class="o">=</span> <span class="s2">&quot;numpy.ndarray.__getitem__&quot;</span>
+        <span class="n">preres</span> <span class="o">=</span> <span class="n">pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">preres</span>
+        <span class="c1"># This method can trick acorn into thinking that it is a bound</span>
+        <span class="c1"># method. We want it to behave like it&#39;s not.</span>
+        <span class="n">post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span> 
+
 <div class="viewcode-block" id="ndarray"><a class="viewcode-back" href="../../../subclass.html#acorn.subclass._numpy.ndarray">[docs]</a><span class="k">class</span> <span class="nc">ndarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sub-class of :class:`numpy.ndarray` so that we can implement logging for</span>
 <span class="sd">    the instance method and special method calls of array objects.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">input_array</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_decorating</span><span class="p">,</span> <span class="n">decorating</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_decorating</span>
         <span class="n">odecor</span> <span class="o">=</span> <span class="n">decorating</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">decorating</span><span class="p">:</span>
             <span class="n">set_decorating</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -105,25 +140,13 @@
         <span class="n">obj</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">__doc__</span>
         <span class="k">return</span> <span class="n">obj</span>
 
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_get_acorn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
+    
     <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
         <span class="c1">#Unfortunately, we have to implement the slicing here since it does not</span>
-        <span class="c1">#call any other methods that get decorated. We know that a slice is</span>
-        <span class="c1">#happening when the type of `self` and `obj` are the same and are equal</span>
-        <span class="c1">#to acorn.subclass_numpy.ndarray (instead of the regular numpy.ndarray).</span>
-        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="p">(</span><span class="n">rt_decorate_pre</span><span class="p">,</span>
-                                              <span class="n">rt_decorate_post</span><span class="p">,</span>
-                                              <span class="n">_fqdn</span><span class="p">)</span>
-        <span class="n">fqdn</span> <span class="o">=</span> <span class="s2">&quot;numpy.ndarray.__getslice__&quot;</span>
-        <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">rt_decorate_pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="o">*</span><span class="p">((</span><span class="bp">self</span><span class="p">,)</span> <span class="o">+</span> <span class="n">items</span><span class="p">))</span>
-        
-        <span class="c1"># Because we had to subclass numpy.ndarray, the original methods get</span>
-        <span class="c1"># stuck in an infinite loop (max. recursion depth exceeded errors). So,</span>
-        <span class="c1"># we instead grab the reference to the original ndarray object.</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">__acornext__</span><span class="o">.</span><span class="n">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
-        <span class="c1"># This method can trick acorn into thinking that it is a bound</span>
-        <span class="c1"># method. We want it to behave like it&#39;s not.</span>
-        <span class="n">rt_decorate_post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>        
+        <span class="c1">#call any other methods that get decorated.</span>
+        <span class="k">return</span> <span class="n">_get_acorn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;slice&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span>
@@ -131,11 +154,10 @@
 
     <span class="k">def</span> <span class="nf">__array_wrap__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outarr</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="p">(</span><span class="n">rt_decorate_pre</span><span class="p">,</span>
-                                                  <span class="n">rt_decorate_post</span><span class="p">,</span>
-                                                  <span class="n">_fqdn</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">_fqdn</span><span class="p">,</span>
+                                                  <span class="n">_def_stackdepth</span><span class="p">)</span>
             <span class="n">fqdn</span> <span class="o">=</span> <span class="n">_fqdn</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">rt_decorate_pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="o">*</span><span class="n">context</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span> <span class="o">=</span> <span class="n">pre</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">_def_stackdepth</span><span class="p">,</span> <span class="o">*</span><span class="n">context</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># Because we had to subclass numpy.ndarray, the original methods get</span>
         <span class="c1"># stuck in an infinite loop (max. recursion depth exceeded errors). So,</span>
@@ -150,7 +172,7 @@
                 <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">__array_wrap__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outarr</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
             
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">rt_decorate_post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">)</span>
+            <span class="n">post</span><span class="p">(</span><span class="n">fqdn</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">ekey</span><span class="p">,</span> <span class="o">*</span><span class="n">context</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">r</span></div>
 </pre></div>
