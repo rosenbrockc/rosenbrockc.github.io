@@ -36,6 +36,6 @@ $(window).resize(function(){
         $("li.nav-item-0 a").text("Top");
     }
     else {
-        $("li.nav-item-0 a").text("acorn 0.0.3 documentation");
+        $("li.nav-item-0 a").text("acorn 0.0.13 documentation");
     }
 });
