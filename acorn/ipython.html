@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Ipython Extension Module &#8212; acorn 0.0.3 documentation</title>
+    <title>Ipython Extension Module &#8212; acorn 0.0.13 documentation</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.3',
+        VERSION:     '0.0.13',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
-    <link rel="top" title="acorn 0.0.3 documentation" href="index.html" />
+    <link rel="top" title="acorn 0.0.13 documentation" href="index.html" />
     <link rel="next" title="Special Sub-classes in ACORN" href="subclass.html" />
     <link rel="prev" title="Acorn Automated Package Decoration on Import" href="importer.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -50,11 +50,14 @@
         <li class="right" >
           <a href="importer.html" title="Acorn Automated Package Decoration on Import"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/acorn-sm.png" alt="Logo"/>
+            </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Ipython Extension Module</a><ul>
@@ -111,6 +114,68 @@ with FQDNs like <cite>__main__.localfunction</cite> in the database log.</p>
 <p>Methods for interacting with an ipython notebook or shell so that new
 functions defined interactively are also logged by acorn.</p>
 <dl class="class">
+<dt id="acorn.ipython.AcornHistoryManager">
+<em class="property">class </em><code class="descclassname">acorn.ipython.</code><code class="descname">AcornHistoryManager</code><span class="sig-paren">(</span><em>existing</em>, <em>decorator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#AcornHistoryManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.AcornHistoryManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub-class for overriding the input storing during cell execution to allow
+acorn to detect loops and other problematic code <em>before</em> it
+executes. Necessary because the ipython hooks that we can register functions
+to <em>don&#8217;t</em> have access to the raw cell code that we need to parse.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>existing</strong> (<em>IPython.core.HistoryManager</em>) &#8211; existing instance that possible
+has some history entries already. This instance&#8217;s __dict__ overwrites
+the new sub-class instance&#8217;s one.</li>
+<li><strong>decorator</strong> (<a class="reference internal" href="#acorn.ipython.InteractiveDecorator" title="acorn.ipython.InteractiveDecorator"><em>InteractiveDecorator</em></a>) &#8211; acorn ipython decorator for
+intercepting code execution and logging behavior.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="acorn.ipython.AcornHistoryManager.store_inputs">
+<code class="descname">store_inputs</code><span class="sig-paren">(</span><em>line_num</em>, <em>source</em>, <em>source_raw=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#AcornHistoryManager.store_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.AcornHistoryManager.store_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store source and raw input in history and create input cache
+variables <code class="docutils literal"><span class="pre">_i*</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>line_num</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The prompt number of this input.</li>
+<li><strong>source</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Python input.</li>
+<li><strong>source_raw</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; If given, this is the raw input without any
+IPython transformations applied to it.  If not given, <code class="docutils literal"><span class="pre">source</span></code>
+is used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="acorn.ipython.AcornJPEGFormatter">
+<em class="property">class </em><code class="descclassname">acorn.ipython.</code><code class="descname">AcornJPEGFormatter</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#AcornJPEGFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.AcornJPEGFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the default display formatter for the ipython notebooks that
+handles JPEG images. This allows thumbnails of plots to be generated as part
+of the notebook flow.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="acorn.ipython.AcornPNGFormatter">
+<em class="property">class </em><code class="descclassname">acorn.ipython.</code><code class="descname">AcornPNGFormatter</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#AcornPNGFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.AcornPNGFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the default display formatter for the ipython notebooks that
+handles PNG images. This allows thumbnails of plots to be generated as part
+of the notebook flow.</p>
+</dd></dl>
+
+<dl class="class">
 <dt id="acorn.ipython.InteractiveDecorator">
 <em class="property">class </em><code class="descclassname">acorn.ipython.</code><code class="descname">InteractiveDecorator</code><span class="sig-paren">(</span><em>ip</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#InteractiveDecorator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.InteractiveDecorator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for maintaining the state of functions declared interactively in
@@ -126,6 +191,13 @@ for interacting with the shell variables.</td>
 </tbody>
 </table>
 <dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.shell">
+<code class="descname">shell</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.shell" title="Permalink to this definition">¶</a></dt>
+<dd><p>(IPython.core.interactiveshell.InteractiveShell): ipython shell
+instance for interacting with the shell variables.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="acorn.ipython.InteractiveDecorator.atypes">
 <code class="descname">atypes</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.atypes" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>list</em> &#8211; names of types that are tracked for decoration by acorn.</p>
@@ -138,6 +210,82 @@ for interacting with the shell variables.</td>
 are <cite>dict</cite> of variable names and values in the local user namespace.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.who">
+<code class="descname">who</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.who" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are user variable names; values are the <cite>id()</cite> memory
+addresses. Used to keep track of variables whose values change between
+executions of cells in ipython.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.pre">
+<code class="descname">pre</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.pre" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; pre-execution database entry that will be updated with
+results after execution has been performed by ipython.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.cellids">
+<code class="descname">cellids</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.cellids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are <em>original</em> cell ids in the ipython notebook cell
+that was intercepted because it contained loops or other problematic
+code (from the viewpoint of the acorn database). Values are the
+<em>latest</em> version of the code. When a loop intercepted cell is run
+again, we search for a cell with most (at least 50%) overlap in
+contents and then treat that as a re-execute, after which the contents
+are overwritten by the most recent version.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="acorn.ipython.InteractiveDecorator.cellid">
+<code class="descname">cellid</code><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.cellid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; id of the <em>most recently</em> loop-intercepted cell in the
+ipython notebook.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.ipython.InteractiveDecorator.post_run_cell">
+<code class="descname">post_run_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#InteractiveDecorator.post_run_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.post_run_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs after the user-entered code in a cell has been executed. It
+detects any new, decoratable objects that haven&#8217;t been decorated yet and
+then decorates them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="acorn.ipython.InteractiveDecorator.pre_run_cell">
+<code class="descname">pre_run_cell</code><span class="sig-paren">(</span><em>cellno</em>, <em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#InteractiveDecorator.pre_run_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.InteractiveDecorator.pre_run_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes before the user-entered code in <cite>ipython</cite> is run. This
+intercepts loops and other problematic code that would produce lots of
+database entries and streamlines it to produce only a single entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cellno</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the cell number that is about to be executed.</li>
+<li><strong>code</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; python source code that is about to be executed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.ipython.findloop">
+<code class="descclassname">acorn.ipython.</code><code class="descname">findloop</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#findloop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.findloop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the specified member of <cite>_ast</cite> contains any for or while loops
+in its body definition.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.ipython.inspectors">
+<code class="descclassname">acorn.ipython.</code><code class="descname">inspectors</code><em class="property"> = ['isclass', 'isfunction', 'ismethod', 'ismodule']</em><a class="headerlink" href="#acorn.ipython.inspectors" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of functions in <a class="reference external" href="https://docs.python.org/2/library/inspect.html#module-inspect" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">inspect</span></code></a> that will be <em>ignored</em> by the
+automatic variable tracking after cell execution.</p>
 </dd></dl>
 
 <dl class="function">
@@ -154,6 +302,29 @@ for interacting with the shell variables.</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="acorn.ipython.record_markdown">
+<code class="descclassname">acorn.ipython.</code><code class="descname">record_markdown</code><span class="sig-paren">(</span><em>text</em>, <em>cellid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/acorn/ipython.html#record_markdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#acorn.ipython.record_markdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Records the specified markdown text to the acorn database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; the <em>raw</em> markdown text entered into the cell in the ipython
+notebook.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="acorn.ipython.thumb_uuid">
+<code class="descclassname">acorn.ipython.</code><code class="descname">thumb_uuid</code><em class="property"> = None</em><a class="headerlink" href="#acorn.ipython.thumb_uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; uuid of the image file that was most recently generated from a plot. The
+post-execution hook of the cell checks this variable to see if an image should
+be associated with the cell&#8217;s output.</p>
 </dd></dl>
 
 </div>
@@ -180,7 +351,7 @@ for interacting with the shell variables.</td>
         <li class="right" >
           <a href="importer.html" title="Acorn Automated Package Decoration on Import"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">acorn 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

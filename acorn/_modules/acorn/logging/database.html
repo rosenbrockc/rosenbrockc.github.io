@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>acorn.logging.database &#8212; acorn 0.0.3 documentation</title>
+    <title>acorn.logging.database &#8212; acorn 0.0.13 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.0.3',
+        VERSION:     '0.0.13',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/bizstyle.js"></script>
-    <link rel="top" title="acorn 0.0.3 documentation" href="../../../index.html" />
+    <link rel="top" title="acorn 0.0.13 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -43,12 +43,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/acorn-sm.png" alt="Logo"/>
+            </a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
@@ -115,6 +118,37 @@
     <span class="k">global</span> <span class="n">dbdir</span>
     <span class="n">dbdir</span> <span class="o">=</span> <span class="n">dbdir_</span></div>
 
+<div class="viewcode-block" id="list_tasks"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.list_tasks">[docs]</a><span class="k">def</span> <span class="nf">list_tasks</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of all the projects and tasks available in the `acorn`</span>
+<span class="sd">    database directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target (str): directory to list the projects for. Defaults to the configured</span>
+<span class="sd">          database directory.    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: keys are project names; values are lists of tasks associated with the</span>
+<span class="sd">          project.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span>
+    <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+    <span class="n">original</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">_dbdir</span><span class="p">()</span>
+        
+    <span class="n">chdir</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.*.json&quot;</span><span class="p">):</span>
+        <span class="n">project</span><span class="p">,</span> <span class="n">task</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">project</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">project</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+    <span class="c1">#Set the working directory back to what it was.</span>
+    <span class="n">chdir</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">result</span></div>
+    
 <div class="viewcode-block" id="set_task"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.set_task">[docs]</a><span class="k">def</span> <span class="nf">set_task</span><span class="p">(</span><span class="n">project_</span><span class="p">,</span> <span class="n">task_</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sets the active project and task. All subsequent logging will be saved to</span>
 <span class="sd">    the database with that project and task.</span>
@@ -166,7 +200,7 @@
                 <span class="n">prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="tracker"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.tracker">[docs]</a><span class="k">def</span> <span class="nf">tracker</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the Instance of the specified object if it is one that</span>
+    <span class="sd">&quot;&quot;&quot;Returns the :class:`Instance` of the specified object if it is one that</span>
 <span class="sd">    we track by default.</span>
 
 <span class="sd">    Args:</span>
@@ -177,7 +211,6 @@
 <span class="sd">          that object; else None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">typ</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">anp</span>
     <span class="k">global</span> <span class="n">oids</span><span class="p">,</span> <span class="n">uuids</span>
     <span class="kn">import</span> <span class="nn">six</span>
     <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">isclass</span>
@@ -225,8 +258,6 @@
             <span class="k">return</span> <span class="s2">&quot;lambda (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_code</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">))</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">typ</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">MethodType</span><span class="p">]:</span> <span class="c1"># pragma: no cover</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__name__</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">anp</span><span class="o">.</span><span class="n">ufunc</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;numpy.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">untracked</span><span class="p">):</span>
         <span class="c1">#For many of the numpy/scipy methods, the result is a tuple of numpy</span>
         <span class="c1">#arrays. In that case, we should maintain the tuple structure for</span>
@@ -246,7 +277,7 @@
     <span class="sd">&quot;&quot;&quot;Returns the path to the directory where acorn DBs are stored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">dbdir</span>
-    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span><span class="p">,</span> <span class="n">path</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span>
     
     <span class="k">if</span> <span class="n">dbdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">acorn.config</span> <span class="k">import</span> <span class="n">settings</span>
@@ -258,9 +289,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The folder to save DBs in must be configured&quot;</span>
                              <span class="s2">&quot;  in &#39;acorn.cfg&#39;&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">dbdir</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="c1">#It is possible to specify the database path relative to the repository</span>
+    <span class="c1">#root. path.abspath will map it correctly if we are in the root directory.</span>
+    <span class="kn">from</span> <span class="nn">acorn.utility</span> <span class="k">import</span> <span class="n">abspath</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">dbdir</span><span class="p">):</span>
         <span class="c1">#We want absolute paths to make it easier to port this to other OS.</span>
-        <span class="n">dbdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">dbdir</span><span class="p">))</span>
+        <span class="n">dbdir</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">dbdir</span><span class="p">)</span>
         
     <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dbdir</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
         <span class="n">mkdir</span><span class="p">(</span><span class="n">dbdir</span><span class="p">)</span>
@@ -292,13 +326,33 @@
 
     <span class="k">return</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">compkeys</span><span class="p">)</span>
 
-<div class="viewcode-block" id="record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.record">[docs]</a><span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Records the specified entry to the key-value store under the specified</span>
-<span class="sd">    entity key.</span>
+<div class="viewcode-block" id="save_image"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.save_image">[docs]</a><span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="n">byteio</span><span class="p">,</span> <span class="n">imgfmt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves the specified image to disk.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
-<span class="sd">    entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">        byteio (bytes): image bytes to save to disk.</span>
+<span class="sd">        imgfmt (str): used as the extension of the saved file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: a uuid for the saved image that can be added to the database entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">mkdir</span>
+    <span class="n">ptdir</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+    <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+
+    <span class="c1">#Save the image within the project/task specific folder.</span>
+    <span class="n">idir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dbdir</span><span class="p">,</span> <span class="n">ptdir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">idir</span><span class="p">):</span>
+        <span class="n">mkdir</span><span class="p">(</span><span class="n">idir</span><span class="p">)</span>
+        
+    <span class="n">ipath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">idir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">imgfmt</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ipath</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">byteio</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">uuid</span></div>
+
+<div class="viewcode-block" id="active_db"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.active_db">[docs]</a><span class="k">def</span> <span class="nf">active_db</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the active :class:`TaskDB` for the current project and task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">dbs</span>
     <span class="c1"># The task database is encapsulated in a class for easier serialization to</span>
@@ -310,12 +364,26 @@
         <span class="n">taskdb</span> <span class="o">=</span> <span class="n">TaskDB</span><span class="p">()</span>
         <span class="n">dbs</span><span class="p">[</span><span class="n">dbkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">taskdb</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="s2">&quot;Initialized JSON database for </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">dbkey</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
-    
-    <span class="n">taskdb</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">taskdb</span></div>
+
+<div class="viewcode-block" id="record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.record">[docs]</a><span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Records the specified entry to the key-value store under the specified</span>
+<span class="sd">    entity key.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
+<span class="sd">        entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">        diff (bool): when True, the &quot;c&quot; element of `entry` will be diffed</span>
+<span class="sd">          against previous entries under the same `ekey` if their method</span>
+<span class="sd">          (attribute &quot;m&quot;) matches.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">taskdb</span> <span class="o">=</span> <span class="n">active_db</span><span class="p">()</span>
+    <span class="n">taskdb</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
     <span class="c1"># The task database save method makes sure that we only save as often as</span>
     <span class="c1"># specified in the configuration file.</span>
     <span class="n">taskdb</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
-    
+
 <div class="viewcode-block" id="TaskDB"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB">[docs]</a><span class="k">class</span> <span class="nc">TaskDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Represents the database for a single task.</span>
 
@@ -343,7 +411,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lastsave</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_log_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskDB.log_uuid"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.log_uuid">[docs]</a>    <span class="k">def</span> <span class="nf">log_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Logs the object with the specified `uuid` to `self.uuids` if</span>
 <span class="sd">        possible.</span>
 
@@ -354,20 +422,34 @@
         <span class="c1">#We only need to try and describe an object once; if it is already in</span>
         <span class="c1">#our database, then just move along.</span>
         <span class="k">if</span> <span class="n">uuid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span> <span class="ow">and</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">uuids</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuids</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="TaskDB.record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskDB.record"><a class="viewcode-back" href="../../../database.html#acorn.logging.database.TaskDB.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Records the specified entry to the key-value store under the specified</span>
 <span class="sd">        entity key.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">        ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
-<span class="sd">        entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">            ekey (str): fqdn/uuid of the method/object to store the entry for.</span>
+<span class="sd">            entry (dict): attributes and values gleaned from the execution.</span>
+<span class="sd">            diff (bool): when True, the &quot;c&quot; element of `entry` will be diffed</span>
+<span class="sd">              against previous entries under the same `ekey` if their method</span>
+<span class="sd">              (attribute &quot;m&quot;) matches.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">ekey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ekey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            
+        <span class="c1">#See if we need to diff the code to compress it.</span>
+        <span class="k">if</span> <span class="n">diff</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#Compress the code element of the current entry that we are saving.</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.diff</span> <span class="k">import</span> <span class="n">cascade</span><span class="p">,</span> <span class="n">compress</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;m&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;m&quot;</span><span class="p">]]</span>
+            <span class="n">original</span> <span class="o">=</span> <span class="n">cascade</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+            <span class="n">difference</span> <span class="o">=</span> <span class="n">compress</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+            <span class="c1">#Now, overwrite the entry with the compressed version.</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">difference</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">ekey</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
 
         <span class="c1">#We also need to make sure we have uuids and origin information stored</span>
         <span class="c1">#for any uuids present in the parameter string.</span>
@@ -384,8 +466,13 @@
                 <span class="k">pass</span>
 
         <span class="k">if</span> <span class="n">uid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
 
+        <span class="c1">#For the markdown and function definitions, we don&#39;t have any arguments,</span>
+        <span class="c1">#so we set that to None to save space.</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+                    
         <span class="k">for</span> <span class="n">larg</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">][</span><span class="s2">&quot;_&quot;</span><span class="p">]:</span>
             <span class="c1">#We use the constructor to determine if the format of the argument</span>
             <span class="c1">#is a valid UUID; if it isn&#39;t then we catch the error and keep</span>
@@ -395,7 +482,7 @@
             
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">(</span><span class="n">larg</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="c1">#This was obviously not a UUID, we don&#39;t need to worry about it,</span>
                 <span class="c1">#it has a user-readable string instead.</span>
@@ -408,7 +495,7 @@
                 <span class="k">continue</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">UUID</span><span class="p">(</span><span class="n">karg</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_uuid</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">pass</span>            </div>
 
@@ -536,7 +623,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">acorn 0.0.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
