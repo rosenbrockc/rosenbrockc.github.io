@@ -26,8 +26,11 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+<<<<<<< HEAD
+=======
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+>>>>>>> 783b8fd76157c85bfaa6765e74e3596c0ed6f88c
     <link rel="top" title="acorn 0.0.13 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -98,7 +101,9 @@
     <span class="k">if</span> <span class="n">testmode</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">alternate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mkcustom</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;acorn&quot;</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">mkcustom</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mkcustom</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+            <span class="c1">#This never gets reached when we are in testmode because we don&#39;t</span>
+            <span class="c1">#want to clobber the user&#39;s local config cache.</span>
             <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
             <span class="n">mkdir</span><span class="p">(</span><span class="n">alternate</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">alternate</span></div>

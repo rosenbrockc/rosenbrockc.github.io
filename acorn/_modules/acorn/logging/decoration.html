@@ -26,8 +26,11 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/bizstyle.js"></script>
+<<<<<<< HEAD
+=======
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+>>>>>>> 783b8fd76157c85bfaa6765e74e3596c0ed6f88c
     <link rel="top" title="acorn 0.0.13 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -769,6 +772,11 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">testmode</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">decorating</span> <span class="ow">or</span> <span class="n">streamlining</span><span class="p">):</span>
                     <span class="kn">import</span> <span class="nn">sys</span>
                     <span class="n">xt</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">xm</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+                        <span class="c1">#If the arguments list is scalar, we get an exception</span>
+                        <span class="c1">#here, so we change it to be a list.</span>
+                        <span class="n">xm</span> <span class="o">=</span> <span class="p">[</span><span class="n">xm</span><span class="p">]</span>
+                        
                     <span class="n">error</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(&#39;</span><span class="si">{}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xt</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xm</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span>
@@ -913,7 +921,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span><span class="c1"># pragma: no cover</span>
         <span class="n">_set_failures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">okey</span><span class="p">)</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed </span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2"> attribute set on </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -1435,7 +1443,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">decorating</span>
     <span class="n">decorating</span> <span class="o">=</span> <span class="n">decorating_</span></div>
-                
+
+<div class="viewcode-block" id="set_streamlining"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.set_streamlining">[docs]</a><span class="k">def</span> <span class="nf">set_streamlining</span><span class="p">(</span><span class="n">streamline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets whether `acorn` logging logic should be disabled temporarily.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">streamlining</span>
+    <span class="n">streamlining</span> <span class="o">=</span> <span class="n">streamline</span></div>
+    
 <div class="viewcode-block" id="decorate"><a class="viewcode-back" href="../../../decoration.html#acorn.logging.decoration.decorate">[docs]</a><span class="k">def</span> <span class="nf">decorate</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decorates all the methods in the specified package to have logging</span>
 <span class="sd">    enabled according to the configuration for the package.</span>

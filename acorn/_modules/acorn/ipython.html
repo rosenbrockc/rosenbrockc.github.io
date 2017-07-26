@@ -26,8 +26,11 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+<<<<<<< HEAD
+=======
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+>>>>>>> 783b8fd76157c85bfaa6765e74e3596c0ed6f88c
     <link rel="top" title="acorn 0.0.13 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -77,6 +80,111 @@
 <span class="sd">functions defined interactively are also logged by acorn.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">from</span> <span class="nn">IPython.core.formatters</span> <span class="k">import</span> <span class="n">PNGFormatter</span><span class="p">,</span> <span class="n">JPEGFormatter</span>
+
+<span class="n">thumb_uuid</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;str: uuid of the image file that was most recently generated from a plot. The</span>
+<span class="sd">post-execution hook of the cell checks this variable to see if an image should</span>
+<span class="sd">be associated with the cell&#39;s output.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">inspectors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;isclass&quot;</span><span class="p">,</span> <span class="s2">&quot;isfunction&quot;</span><span class="p">,</span> <span class="s2">&quot;ismethod&quot;</span><span class="p">,</span> <span class="s2">&quot;ismodule&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;list: of functions in :mod:`inspect` that will be *ignored* by the</span>
+<span class="sd">automatic variable tracking after cell execution.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AcornPNGFormatter"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.AcornPNGFormatter">[docs]</a><span class="k">class</span> <span class="nc">AcornPNGFormatter</span><span class="p">(</span><span class="n">PNGFormatter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replaces the default display formatter for the ipython notebooks that</span>
+<span class="sd">    handles PNG images. This allows thumbnails of plots to be generated as part</span>
+<span class="sd">    of the notebook flow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">thumb_uuid</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PNGFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#We have a PNG image that could be written to file now. First, we</span>
+            <span class="c1">#create the image file, then we save the image UUID to the global</span>
+            <span class="c1">#variable so that the database machinery can grab it.</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">save_image</span>
+            <span class="n">uuid</span> <span class="o">=</span> <span class="n">save_image</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">thumb_uuid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">thumb_uuid</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">thumb_uuid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="AcornJPEGFormatter"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.AcornJPEGFormatter">[docs]</a><span class="k">class</span> <span class="nc">AcornJPEGFormatter</span><span class="p">(</span><span class="n">JPEGFormatter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replaces the default display formatter for the ipython notebooks that</span>
+<span class="sd">    handles JPEG images. This allows thumbnails of plots to be generated as part</span>
+<span class="sd">    of the notebook flow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">thumb_uuid</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">JPEGFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#We have a PNG image that could be written to file now. First, we</span>
+            <span class="c1">#create the image file, then we save the image UUID to the global</span>
+            <span class="c1">#variable so that the database machinery can grab it.</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">save_image</span>
+            <span class="n">uuid</span> <span class="o">=</span> <span class="n">save_image</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">thumb_uuid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">thumb_uuid</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">thumb_uuid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<span class="kn">from</span> <span class="nn">IPython.core.history</span> <span class="k">import</span> <span class="n">HistoryManager</span>
+<div class="viewcode-block" id="AcornHistoryManager"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.AcornHistoryManager">[docs]</a><span class="k">class</span> <span class="nc">AcornHistoryManager</span><span class="p">(</span><span class="n">HistoryManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sub-class for overriding the input storing during cell execution to allow</span>
+<span class="sd">    acorn to detect loops and other problematic code *before* it</span>
+<span class="sd">    executes. Necessary because the ipython hooks that we can register functions</span>
+<span class="sd">    to *don&#39;t* have access to the raw cell code that we need to parse.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        existing (IPython.core.HistoryManager): existing instance that possible</span>
+<span class="sd">          has some history entries already. This instance&#39;s __dict__ overwrites</span>
+<span class="sd">          the new sub-class instance&#39;s one.</span>
+<span class="sd">        decorator (InteractiveDecorator): acorn ipython decorator for</span>
+<span class="sd">          intercepting code execution and logging behavior.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">existing</span><span class="p">,</span> <span class="n">decorator</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AcornHistoryManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">shell</span><span class="o">=</span><span class="n">existing</span><span class="o">.</span><span class="n">shell</span><span class="p">,</span>
+                                                  <span class="n">parent</span><span class="o">=</span><span class="n">existing</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old</span> <span class="o">=</span> <span class="n">existing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decorator</span> <span class="o">=</span> <span class="n">decorator</span>
+
+        <span class="c1">#These are the history related items that we want to copy over. We tried</span>
+        <span class="c1">#a simple __dict__.update() but it screwed up the pointers etc. and the</span>
+        <span class="c1">#history didn&#39;t work properly. This way, we preserve the important</span>
+        <span class="c1">#functionality.</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;input_hist_parsed&quot;</span><span class="p">,</span> <span class="s2">&quot;input_hist_raw&quot;</span><span class="p">,</span> <span class="s2">&quot;dir_hist&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;output_hist&quot;</span><span class="p">,</span> <span class="s2">&quot;output_hist_reprs&quot;</span><span class="p">,</span> <span class="s2">&quot;session_number&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;session_number&quot;</span><span class="p">,</span> <span class="s2">&quot;db_input_cache&quot;</span><span class="p">,</span> <span class="s2">&quot;db_output_cache&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_i00&quot;</span><span class="p">,</span> <span class="s2">&quot;_i&quot;</span><span class="p">,</span> <span class="s2">&quot;_ii&quot;</span><span class="p">,</span> <span class="s2">&quot;_iii&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">existing</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+
+    <span class="c1"># def __getattr__(self, attr):</span>
+    <span class="c1">#     if hasattr(self.old, attr):</span>
+    <span class="c1">#         return getattr(self.old, attr)</span>
+            
+<div class="viewcode-block" id="AcornHistoryManager.store_inputs"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.AcornHistoryManager.store_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">store_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_num</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">source_raw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store source and raw input in history and create input cache</span>
+<span class="sd">        variables ``_i*``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_num (int): The prompt number of this input.</span>
+<span class="sd">            source (str): Python input.</span>
+<span class="sd">            source_raw (str): If given, this is the raw input without any</span>
+<span class="sd">              IPython transformations applied to it.  If not given, ``source``</span>
+<span class="sd">              is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old</span><span class="o">.</span><span class="n">store_inputs</span><span class="p">(</span><span class="n">line_num</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">source_raw</span><span class="p">)</span>
+        <span class="c1">#Now that the input has been stored correctly, intercept the</span>
+        <span class="c1">#pre-execution and create logs accordingly.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decorator</span><span class="o">.</span><span class="n">pre_run_cell</span><span class="p">(</span><span class="n">line_num</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span></div></div>
+    
 <div class="viewcode-block" id="InteractiveDecorator"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.InteractiveDecorator">[docs]</a><span class="k">class</span> <span class="nc">InteractiveDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for maintaining the state of functions declared interactively in</span>
 <span class="sd">    the ipython notebook. Exposes callback functions for pre- and post- cell</span>
@@ -87,14 +195,34 @@
 <span class="sd">          for interacting with the shell variables.</span>
 
 <span class="sd">    Attributes:</span>
+<span class="sd">        shell: (IPython.core.interactiveshell.InteractiveShell): ipython shell</span>
+<span class="sd">          instance for interacting with the shell variables.</span>
 <span class="sd">        atypes (list): names of types that are tracked for decoration by acorn.</span>
 <span class="sd">        entities (dict): keys are object types specified in :attr:`atypes`; values</span>
 <span class="sd">          are `dict` of variable names and values in the local user namespace.</span>
+<span class="sd">        who (dict): keys are user variable names; values are the `id()` memory</span>
+<span class="sd">          addresses. Used to keep track of variables whose values change between</span>
+<span class="sd">          executions of cells in ipython.</span>
+<span class="sd">        pre (dict): pre-execution database entry that will be updated with</span>
+<span class="sd">          results after execution has been performed by ipython.</span>
+<span class="sd">        cellids (dict): keys are *original* cell ids in the ipython notebook cell</span>
+<span class="sd">          that was intercepted because it contained loops or other problematic</span>
+<span class="sd">          code (from the viewpoint of the acorn database). Values are the</span>
+<span class="sd">          *latest* version of the code. When a loop intercepted cell is run</span>
+<span class="sd">          again, we search for a cell with most (at least 50%) overlap in</span>
+<span class="sd">          contents and then treat that as a re-execute, after which the contents</span>
+<span class="sd">          are overwritten by the most recent version.</span>
+<span class="sd">        cellid (int): id of the *most recently* loop-intercepted cell in the</span>
+<span class="sd">          ipython notebook.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">=</span> <span class="n">ip</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="s2">&quot;classobj&quot;</span><span class="p">,</span> <span class="s2">&quot;staticmethod&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">who</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellids</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellid</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_get_decoratables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a list of the objects that need to be decorated in the</span>
@@ -194,16 +322,15 @@
         <span class="c1">#events at the same time.</span>
         <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
         <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">record</span>
-        <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">_tracker_str</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span>
-            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+            <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="s2">&quot;def&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
             <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
-        <span class="n">record</span><span class="p">(</span><span class="s2">&quot;def&quot;</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="n">record</span><span class="p">(</span><span class="s2">&quot;__main__.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         
     <span class="k">def</span> <span class="nf">_decorate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atype</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
@@ -230,14 +357,259 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Error auto-decorating </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">))</span>
             <span class="k">raise</span>
-            
-    <span class="k">def</span> <span class="nf">post_run_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_find_cellid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines the most similar cell (if any) to the specified code. It</span>
+<span class="sd">        must have at least 50% overlap ratio and have been a loop-intercepted</span>
+<span class="sd">        cell previously.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            code (str): contents of the code cell that were executed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">difflib</span> <span class="k">import</span> <span class="n">SequenceMatcher</span>
+        <span class="n">maxvalue</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">maxid</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="k">for</span> <span class="n">cellid</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">matcher</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">code</span><span class="p">)</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">quick_ratio</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="n">maxvalue</span> <span class="ow">and</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">maxid</span><span class="p">,</span> <span class="n">maxvalue</span> <span class="o">=</span> <span class="n">cellid</span><span class="p">,</span> <span class="n">ratio</span>
+
+        <span class="k">return</span> <span class="n">maxid</span>
+
+    <span class="k">def</span> <span class="nf">_log_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates database logs for all the image file names in the global</span>
+<span class="sd">        variable :data:`thumb_uuid`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">record</span>        
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="s2">&quot;plot&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
+            <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="n">thumb_uuid</span><span class="p">,</span>
+        <span class="p">}</span>
+        
+        <span class="c1">#See if we can match the executed cell&#39;s code up with one that we</span>
+        <span class="c1">#intercepted in the past..</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;i_</span><span class="si">{0:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cellid</span><span class="p">))</span>
+        <span class="n">cellid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_cellid</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cellid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cellid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellid</span>
+        <span class="c1">#Store the contents of the cell so they are up to date for next time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellids</span><span class="p">[</span><span class="n">cellid</span><span class="p">]</span> <span class="o">=</span> <span class="n">code</span>
+
+        <span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+        <span class="n">record</span><span class="p">(</span><span class="s2">&quot;__main__.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cellid</span><span class="p">),</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="InteractiveDecorator.post_run_cell"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.InteractiveDecorator.post_run_cell">[docs]</a>    <span class="k">def</span> <span class="nf">post_run_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs after the user-entered code in a cell has been executed. It</span>
+<span class="sd">        detects any new, decoratable objects that haven&#39;t been decorated yet and</span>
+<span class="sd">        then decorates them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#We just want to detect any new, decoratable objects that haven&#39;t been</span>
         <span class="c1">#decorated yet.</span>
         <span class="n">decorlist</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">atype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atypes</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_decoratables</span><span class="p">(</span><span class="n">atype</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_decorate</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_decorate</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+        <span class="c1">#Next, check whether we have an outstanding &quot;loop intercept&quot; that we</span>
+        <span class="c1">#&quot;wrapped&quot; with respect to acorn by enabling streamlining.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#Re-enable the acorn logging systems so that it gets back to normal.</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_streamlining</span>
+            <span class="n">set_streamlining</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="kn">from</span> <span class="nn">acorn</span> <span class="k">import</span> <span class="n">msg</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">record</span>
+            <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+
+            <span class="c1">#Determine the elapsed time for the execution of the entire cell.</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;e&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;s&quot;</span><span class="p">]</span>
+            <span class="c1">#See if we can match the executed cell&#39;s code up with one that we</span>
+            <span class="c1">#intercepted in the past..</span>
+            <span class="n">cellid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_cellid</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">cellid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cellid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellid</span>
+
+            <span class="c1">#Store the contents of the cell *before* they get overwritten by a</span>
+            <span class="c1">#diff.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cellids</span><span class="p">[</span><span class="n">cellid</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
+                        
+            <span class="n">record</span><span class="p">(</span><span class="s2">&quot;__main__.</span><span class="si">{0:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cellid</span><span class="p">),</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#Finally, check whether any new variables have shown up, or have had</span>
+        <span class="c1">#their values changed.</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">active_db</span><span class="p">,</span> <span class="n">Instance</span>
+        <span class="n">varchange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_changes</span><span class="p">()</span>
+        <span class="n">taskdb</span> <span class="o">=</span> <span class="n">active_db</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">varchange</span><span class="p">:</span>
+            <span class="n">otrack</span> <span class="o">=</span> <span class="n">tracker</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">otrack</span><span class="p">,</span> <span class="n">Instance</span><span class="p">):</span>
+                <span class="n">taskdb</span><span class="o">.</span><span class="n">log_uuid</span><span class="p">(</span><span class="n">otrack</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+
+        <span class="k">global</span> <span class="n">thumb_uuid</span>
+        <span class="k">if</span> <span class="n">thumb_uuid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_images</span><span class="p">()</span>
+            <span class="c1">#Reset the image tracker list so that we don&#39;t save these images</span>
+            <span class="c1">#again next cell execution.</span>
+            <span class="n">thumb_uuid</span> <span class="o">=</span> <span class="kc">None</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellid</span> <span class="o">=</span> <span class="kc">None</span></div>
+        
+    <span class="k">def</span> <span class="nf">_var_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines the list of variables whose values have changed since the</span>
+<span class="sd">        last cell execution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>       
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">&quot;who_ls&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="kn">import</span> <span class="nn">inspect</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="n">varobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">user_ns</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">varobj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1">#We need to make sure that the objects have types that make</span>
+            <span class="c1">#sense. We auto-decorate all classes and functions; also modules and</span>
+            <span class="c1">#other programming constructs are not variables.</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">ifunc</span> <span class="ow">in</span> <span class="n">inspectors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">inspect</span><span class="p">,</span> <span class="n">ifunc</span><span class="p">)(</span><span class="n">varobj</span><span class="p">):</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">keep</span> <span class="o">=</span> <span class="kc">True</span>    
+
+            <span class="k">if</span> <span class="n">keep</span><span class="p">:</span>
+                <span class="n">whoid</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">varobj</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">varname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">who</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">who</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">!=</span> <span class="n">whoid</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">varname</span><span class="p">,</span> <span class="n">varobj</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">who</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">whoid</span>
+        <span class="k">return</span> <span class="n">result</span>
+                
+<div class="viewcode-block" id="InteractiveDecorator.pre_run_cell"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.InteractiveDecorator.pre_run_cell">[docs]</a>    <span class="k">def</span> <span class="nf">pre_run_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cellno</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Executes before the user-entered code in `ipython` is run. This</span>
+<span class="sd">        intercepts loops and other problematic code that would produce lots of</span>
+<span class="sd">        database entries and streamlines it to produce only a single entry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cellno (int): the cell number that is about to be executed.</span>
+<span class="sd">            code (str): python source code that is about to be executed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#First, we look for loops and list/dict comprehensions in the code. Find</span>
+        <span class="c1">#the id of the latest cell that was executed.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellid</span> <span class="o">=</span> <span class="n">cellno</span>
+        
+        <span class="c1">#If there is a loop somewhere in the code, it could generate millions of</span>
+        <span class="c1">#database entries and make the notebook unusable.</span>
+        <span class="kn">import</span> <span class="nn">ast</span>
+        <span class="k">if</span> <span class="n">findloop</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">code</span><span class="p">)):</span>
+            <span class="c1">#Disable the acorn logging systems so that we don&#39;t pollute the</span>
+            <span class="c1">#database.</span>
+            <span class="kn">from</span> <span class="nn">acorn.logging.decoration</span> <span class="k">import</span> <span class="n">set_streamlining</span>
+            <span class="n">set_streamlining</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1">#Create the pre-execute entry for the database.</span>
+            <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="s2">&quot;loop&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
+                <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span>
+            <span class="p">}</span></div></div>
+
+<div class="viewcode-block" id="findloop"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.findloop">[docs]</a><span class="k">def</span> <span class="nf">findloop</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Determines if the specified member of `_ast` contains any for or while loops</span>
+<span class="sd">    in its body definition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">_ast</span> <span class="k">import</span> <span class="n">For</span><span class="p">,</span> <span class="n">While</span><span class="p">,</span> <span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ClassDef</span><span class="p">,</span> <span class="n">ListComp</span>    
+    <span class="kn">from</span> <span class="nn">_ast</span> <span class="k">import</span> <span class="n">DictComp</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">ClassDef</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">For</span><span class="p">,</span> <span class="n">While</span><span class="p">,</span> <span class="n">ListComp</span><span class="p">,</span> <span class="n">DictComp</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">findloop</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sm</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="n">findloop</span><span class="p">(</span><span class="n">sm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">present</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">present</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;orelse&quot;</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">findloop</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">orelse</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;orelse&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">findloop</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">orelse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">body</span> <span class="ow">or</span> <span class="n">orelse</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+    
+<span class="n">_cellid_map</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are string UUIDs from the ipython notebook for the *current*</span>
+<span class="sd">session; values are the `ekey` from the acorn database of the *previous*</span>
+<span class="sd">session. When a cell is rendered, if its `ekey` doesn&#39;t exist in the database,</span>
+<span class="sd">we first try and decide quickly if it is similar to a cell from a previous</span>
+<span class="sd">session. If it is, then we use UUID instead.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="record_markdown"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.record_markdown">[docs]</a><span class="k">def</span> <span class="nf">record_markdown</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">cellid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Records the specified markdown text to the acorn database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text (str): the *raw* markdown text entered into the cell in the ipython</span>
+<span class="sd">          notebook.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">record</span>
+    <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+    <span class="n">ekey</span> <span class="o">=</span> <span class="s2">&quot;nb-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cellid</span><span class="p">)</span>
+    
+    <span class="k">global</span> <span class="n">_cellid_map</span>
+    <span class="k">if</span> <span class="n">cellid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_cellid_map</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.database</span> <span class="k">import</span> <span class="n">active_db</span>
+        <span class="kn">from</span> <span class="nn">difflib</span> <span class="k">import</span> <span class="n">SequenceMatcher</span>
+        <span class="kn">from</span> <span class="nn">acorn.logging.diff</span> <span class="k">import</span> <span class="n">cascade</span>
+        <span class="n">taskdb</span> <span class="o">=</span> <span class="n">active_db</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">ekey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">taskdb</span><span class="o">.</span><span class="n">entities</span><span class="p">:</span>
+            <span class="c1">#Compute a new ekey if possible with the most similar markdown cell</span>
+            <span class="c1">#in the database.</span>
+            <span class="n">possible</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">taskdb</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nb-&quot;</span><span class="p">]</span>
+            <span class="n">maxkey</span><span class="p">,</span> <span class="n">maxvalue</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.</span>
+            <span class="k">for</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">possible</span><span class="p">:</span>
+                <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">taskdb</span><span class="o">.</span><span class="n">entities</span><span class="p">[</span><span class="n">pkey</span><span class="p">]]</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cascade</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span>
+                <span class="n">matcher</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">ratio</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">quick_ratio</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="n">maxvalue</span> <span class="ow">and</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                    <span class="n">maxkey</span><span class="p">,</span> <span class="n">maxvalue</span> <span class="o">=</span> <span class="n">pkey</span><span class="p">,</span> <span class="n">ratio</span>
+
+            <span class="c1">#We expect the similarity to be at least 0.5; otherwise we decide</span>
+            <span class="c1">#that it is a new cell.</span>
+            <span class="k">if</span> <span class="n">maxkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ekey</span> <span class="o">=</span> <span class="n">pkey</span>
+                            
+        <span class="n">_cellid_map</span><span class="p">[</span><span class="n">cellid</span><span class="p">]</span> <span class="o">=</span> <span class="n">ekey</span>
+        
+    <span class="n">ekey</span> <span class="o">=</span> <span class="n">_cellid_map</span><span class="p">[</span><span class="n">cellid</span><span class="p">]</span>        
+    <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">(),</span>
+        <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">record</span><span class="p">(</span><span class="n">ekey</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="load_ipython_extension"><a class="viewcode-back" href="../../ipython.html#acorn.ipython.load_ipython_extension">[docs]</a><span class="k">def</span> <span class="nf">load_ipython_extension</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Loads the interacting decorator that ships with `acorn` into the ipython</span>
@@ -248,7 +620,15 @@
 <span class="sd">          for interacting with the shell variables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">decor</span> <span class="o">=</span> <span class="n">InteractiveDecorator</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
-    <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post_run_cell&#39;</span><span class="p">,</span> <span class="n">decor</span><span class="o">.</span><span class="n">post_run_cell</span><span class="p">)</span></div>
+    <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post_run_cell&#39;</span><span class="p">,</span> <span class="n">decor</span><span class="o">.</span><span class="n">post_run_cell</span><span class="p">)</span>
+
+    <span class="c1">#Unfortunately, the built-in &quot;pre-execute&quot; and &quot;pre-run&quot; methods are</span>
+    <span class="c1">#triggered *before* the input from the cell has been stored to</span>
+    <span class="c1">#history. Thus, we don&#39;t have access to the actual code that is about to be</span>
+    <span class="c1">#executed. Instead, we use our own :class:`HistoryManager` that overrides</span>
+    <span class="c1">#the :meth:`store_inputs` so we can handle the loop detection.</span>
+    <span class="n">newhist</span> <span class="o">=</span> <span class="n">AcornHistoryManager</span><span class="p">(</span><span class="n">ip</span><span class="o">.</span><span class="n">history_manager</span><span class="p">,</span> <span class="n">decor</span><span class="p">)</span>
+    <span class="n">ip</span><span class="o">.</span><span class="n">history_manager</span> <span class="o">=</span> <span class="n">newhist</span></div>
 </pre></div>
 
           </div>
