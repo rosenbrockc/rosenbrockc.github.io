@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AFLOW Custom Deserializers &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code Templating Generators" href="generators.html" />
+    <link rel="prev" title="AFLOW Database Entries" href="entries.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="generators.html" title="Code Templating Generators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="entries.html" title="AFLOW Database Entries"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aflow-custom-deserializers">
+<h1><cite>AFLOW</cite> Custom Deserializers<a class="headerlink" href="#aflow-custom-deserializers" title="Permalink to this headline">¶</a></h1>
+<p>Unfortunately, the AFLOW library uses a custom-built serialization
+language for its keywords. This means that it isn&#8217;t possible to
+standardize the deserialization across all <a class="reference internal" href="keywords.html"><span class="doc">AFLOW Database Keywords</span></a>. Instead,
+we have to implement custom deserialization for some of the keyword
+types.</p>
+<span class="target" id="module-aflow.caster"></span><p>Functions for casting AFLOW type names to valid python objects. This also
+creates <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.13)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a> for vector or tensor-valued properties.</p>
+<dl class="function">
+<dt id="aflow.caster.cast">
+<code class="descclassname">aflow.caster.</code><code class="descname">cast</code><span class="sig-paren">(</span><em>atype</em>, <em>keyword</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/caster.html#cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.caster.cast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Casts the specified value to a python type, using the AFLOW type as a
+reference.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unfortunately, some of the AFLOW type names are not descriptive or
+unique enough to make general rule casting possible. Instead, we have to
+encode some exceptions directly in this module.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the AFLOW type.</li>
+<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the keyword that the value is associated with.</li>
+<li><strong>value</strong> &#8211; object (usually a string) to cast into python types.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="aflow.caster.docstrings">
+<code class="descclassname">aflow.caster.</code><code class="descname">docstrings</code><em class="property"> = {'kpoints': &quot;dict: with keys ['relaxation', 'static', 'points', 'nsamples']\ndescribing the cells for the relaxation and static calculations, the\nk-space symmetry points of the structure and the number of samples.&quot;}</em><a class="headerlink" href="#aflow.caster.docstrings" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; key-value pairs for custom docstrings describing the return
+value of keywords with complex structure.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="aflow.caster.exceptions">
+<code class="descclassname">aflow.caster.</code><code class="descname">exceptions</code><em class="property"> = ['forces', 'kpoints', 'positions_cartesian', 'positions_fractional', 'spind', 'stoich']</em><a class="headerlink" href="#aflow.caster.exceptions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of AFLOW keywords for which the casting has to be handled in a special
+way.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="aflow.caster.ptype">
+<code class="descclassname">aflow.caster.</code><code class="descname">ptype</code><span class="sig-paren">(</span><em>atype</em>, <em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/caster.html#ptype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.caster.ptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <cite>str</cite> representing the <em>python</em> type for the
+specified AFLOW type and keyword.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the AFLOW type.</li>
+<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the keyword that the value is associated with.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="entries.html"
+                        title="previous chapter"><cite>AFLOW</cite> Database Entries</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="generators.html"
+                        title="next chapter">Code Templating Generators</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/caster.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="generators.html" title="Code Templating Generators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="entries.html" title="AFLOW Database Entries"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

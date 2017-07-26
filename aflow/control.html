@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Query Constructor &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AFLOW Database Keywords" href="keywords.html" />
+    <link rel="prev" title="Example Queries with aflow" href="examples.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="keywords.html" title="AFLOW Database Keywords"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Example Queries with aflow"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="query-constructor">
+<h1>Query Constructor<a class="headerlink" href="#query-constructor" title="Permalink to this headline">¶</a></h1>
+<p>The AFLUX requests are compiled by a <a class="reference internal" href="#aflow.control.Query" title="aflow.control.Query"><code class="xref py py-class docutils literal"><span class="pre">Query</span></code></a>
+class that is accessed via the <a class="reference internal" href="#aflow.control.search" title="aflow.control.search"><code class="xref py py-func docutils literal"><span class="pre">search()</span></code></a> function. It
+supports chaining of methods to construct the relevant query. Each of
+the methods is described below, though we recommend looking at
+<a class="reference internal" href="examples.html"><span class="doc">Example Queries with aflow</span></a>.</p>
+<span class="target" id="module-aflow.control"></span><p>Functions for controlling high-level search functionality for the
+AFLOW database.</p>
+<dl class="class">
+<dt id="aflow.control.Query">
+<em class="property">class </em><code class="descclassname">aflow.control.</code><code class="descname">Query</code><span class="sig-paren">(</span><em>catalog=None</em>, <em>batch_size=100</em>, <em>step=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a search againts the AFLUX API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
+&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</li>
+<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of data entries to return per HTTP request.</li>
+<li><strong>step</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; step size over entries.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="aflow.control.Query.filters">
+<code class="descname">filters</code><a class="headerlink" href="#aflow.control.Query.filters" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of <cite>str</cite> filter arguments to pass to the matchbook
+section of the API request.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.select">
+<code class="descname">select</code><a class="reference internal" href="_modules/aflow/control.html#Query.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.select" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>include</em> in the request.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.excludes">
+<code class="descname">excludes</code><a class="headerlink" href="#aflow.control.Query.excludes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>exclude</em> in the request.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.orderby">
+<code class="descname">orderby</code><a class="reference internal" href="_modules/aflow/control.html#Query.orderby"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.orderby" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; name of the keyword to order by. AFLUX only supports a
+single order-by parameter for now.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.catalog">
+<code class="descname">catalog</code><a class="headerlink" href="#aflow.control.Query.catalog" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
+&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.N">
+<code class="descname">N</code><a class="headerlink" href="#aflow.control.Query.N" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of results in the current search query.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.reverse">
+<code class="descname">reverse</code><a class="headerlink" href="#aflow.control.Query.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; when True, reverse the order of the results in the
+query.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.k">
+<code class="descname">k</code><a class="headerlink" href="#aflow.control.Query.k" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of datasets per page for the current iterator. Can be
+controlled by <cite>batch_size</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.responses">
+<code class="descname">responses</code><a class="headerlink" href="#aflow.control.Query.responses" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; keys are (n,k) tuples from the pagination; values are
+the corresponding JSON dictionaries.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.step">
+<code class="descname">step</code><a class="headerlink" href="#aflow.control.Query.step" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; step size over entries.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.exclude">
+<code class="descname">exclude</code><span class="sig-paren">(</span><em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a keyword to be <em>excluded</em> from the response.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+request language logic.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a search term to the current filter list. Calling <a class="reference internal" href="#aflow.control.Query.filter" title="aflow.control.Query.filter"><code class="xref py py-meth docutils literal"><span class="pre">filter()</span></code></a>
+multiple times will join the final filters together using logical <em>and</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+request language logic.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalizes the current state of the query. This means that the request URL
+will be saved, but the individual keyword objects will be
+<em>reset</em>. Re-executing the search query will reconstruct the same object
+and request, but any cached responses will be lost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.matchbook">
+<code class="descname">matchbook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.matchbook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.matchbook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the matchbook portion of the query.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.max_N">
+<code class="descname">max_N</code><a class="headerlink" href="#aflow.control.Query.max_N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum integer index that will be reached by this query.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.control.Query.n">
+<code class="descname">n</code><a class="headerlink" href="#aflow.control.Query.n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current page number for the iterator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields a generator over AFLUX API request results.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">orderby</code><span class="sig-paren">(</span><em>keyword</em>, <em>reverse=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.orderby"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Sets a keyword to be the one by which</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+request language logic.</li>
+<li><strong>reverse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, reverse the ordering.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="aflow.control.Query.reset_iter">
+<code class="descname">reset_iter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.reset_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.reset_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the iterator back to zero so that the collection can be
+iterated over again <em>without</em> needing to request the data from the
+server again.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">select</code><span class="sig-paren">(</span><em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#Query.select"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Adds a keyword to the list of properties to return for each material
+in the request.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+request language logic.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="aflow.control.search">
+<code class="descclassname">aflow.control.</code><code class="descname">search</code><span class="sig-paren">(</span><em>catalog=None</em>, <em>batch_size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/control.html#search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#aflow.control.Query" title="aflow.control.Query"><code class="xref py py-class docutils literal"><span class="pre">aflow.control.Query</span></code></a> to help construct the search
+query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
+&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</li>
+<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of data entries to return per HTTP request.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="aflow.control.server">
+<code class="descclassname">aflow.control.</code><code class="descname">server</code><em class="property"> = 'http://aflowlib.duke.edu/search/API/?'</em><a class="headerlink" href="#aflow.control.server" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; API server address over HTTP.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">Example Queries with <cite>aflow</cite></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="keywords.html"
+                        title="next chapter"><cite>AFLOW</cite> Database Keywords</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/control.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="keywords.html" title="AFLOW Database Keywords"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Example Queries with aflow"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,2868 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AFLOW Database Entries &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AFLOW Custom Deserializers" href="caster.html" />
+    <link rel="prev" title="AFLOW Database Keywords" href="keywords.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caster.html" title="AFLOW Custom Deserializers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="keywords.html" title="AFLOW Database Keywords"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aflow-database-entries">
+<h1><cite>AFLOW</cite> Database Entries<a class="headerlink" href="#aflow-database-entries" title="Permalink to this headline">¶</a></h1>
+<p>Once an initial search has been performed using <cite>aflow</cite>, the results
+are setup as a python generator that returns
+<a class="reference internal" href="#aflow.entries.Entry" title="aflow.entries.Entry"><code class="xref py py-class docutils literal"><span class="pre">Entry</span></code></a> objects. These provide immediate access
+to properties specified in the search query, and lazy access to all
+other properties that are available for the given material entry.</p>
+<span class="target" id="module-aflow.entries"></span><p>Provides class and methods for abstracting the data from AFLOW into
+python.</p>
+<dl class="class">
+<dt id="aflow.entries.Entry">
+<em class="property">class </em><code class="descclassname">aflow.entries.</code><code class="descname">Entry</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#Entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.Entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encapsulates the result of a single material entry in the AFLOW
+database.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Additional keyword values will be loaded lazily as
+requested (using additional HTTP requests). For optimization, it
+is recommended to request <em>all</em> known keywords up front.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; of key-value pairs obtained from the initial
+AFLUX request.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="aflow.entries.Entry.attributes">
+<code class="descname">attributes</code><a class="headerlink" href="#aflow.entries.Entry.attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; of key-value pairs requested for the given
+material. This will only be identical to the passed in the
+keyword arguments if no additional property requests have been
+made.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.raw">
+<code class="descname">raw</code><a class="headerlink" href="#aflow.entries.Entry.raw" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; original response dictionary (without any cast
+values).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Bravais_lattice_orig">
+<code class="descname">Bravais_lattice_orig</code><a class="headerlink" href="#aflow.entries.Entry.Bravais_lattice_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>original bravais lattice (<cite>optional</cite>). Units &#8211; <a href="#id1"><span class="problematic" id="id2">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Bravais lattice of the original unrelaxed structure before the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Bravais_lattice_orig=MCLC</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Bravais_lattice_relax">
+<code class="descname">Bravais_lattice_relax</code><a class="headerlink" href="#aflow.entries.Entry.Bravais_lattice_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed bravais lattice (<cite>optional</cite>). Units &#8211; <a href="#id3"><span class="problematic" id="id4">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Bravais lattice of the original relaxed structure after the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Bravais_lattice_relax=MCLC</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Egap">
+<code class="descname">Egap</code><a class="headerlink" href="#aflow.entries.Entry.Egap" title="Permalink to this definition">¶</a></dt>
+<dd><p>energy gap (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Band gap calculated with the approximations and pseudopotentials described by other keywords.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Egap=2.5</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Egap_fit">
+<code class="descname">Egap_fit</code><a class="headerlink" href="#aflow.entries.Entry.Egap_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>fitted band gap (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Simple cross-validated correction (fit) of Egap.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Egap_fit=3.5</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Egap_type">
+<code class="descname">Egap_type</code><a class="headerlink" href="#aflow.entries.Entry.Egap_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>band gap type (<cite>mandatory</cite>). Units &#8211; <a href="#id5"><span class="problematic" id="id6">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Given a band gap, this keyword describes if the system is a metal, a semi-metal, an insulator with direct or indirect band gap.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Egap_type=insulator_direct</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.PV_atom">
+<code class="descname">PV_atom</code><a class="headerlink" href="#aflow.entries.Entry.PV_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic pressure*volume (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Pressure multiplied by volume of the atom.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>PV_atom=12.13</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.PV_cell">
+<code class="descname">PV_cell</code><a class="headerlink" href="#aflow.entries.Entry.PV_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell pressure*volume (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Pressure multiplied by volume of the unit cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>PV_cell=12.13</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Pearson_symbol_orig">
+<code class="descname">Pearson_symbol_orig</code><a class="headerlink" href="#aflow.entries.Entry.Pearson_symbol_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>original pearson symbol (<cite>mandatory</cite>). Units &#8211; <a href="#id7"><span class="problematic" id="id8">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Pearson symbol of the original-unrelaxed structure before the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Pearson_symbol_orig=mS32</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Pearson_symbol_relax">
+<code class="descname">Pearson_symbol_relax</code><a class="headerlink" href="#aflow.entries.Entry.Pearson_symbol_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed pearson symbol (<cite>mandatory</cite>). Units &#8211; <a href="#id9"><span class="problematic" id="id10">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Pearson symbol of the relaxed structure after the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Pearson_symbol_relax=mS32</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Pulay_stress">
+<code class="descname">Pulay_stress</code><a class="headerlink" href="#aflow.entries.Entry.Pulay_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pulay Stress (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns a metric of the basis set inconsistency for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>pulay_stress=10.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.Pullay_stress">
+<code class="descname">Pullay_stress</code><a class="headerlink" href="#aflow.entries.Entry.Pullay_stress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pulay Stress (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns a metric of the basis set inconsistency for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>Pullay_stress=10.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_bulk_modulus_reuss">
+<code class="descname">ael_bulk_modulus_reuss</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_reuss" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL Reuss bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the bulk modulus as calculated using the Reuss method with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_bulk_modulus_reuss=105.315</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_bulk_modulus_voigt">
+<code class="descname">ael_bulk_modulus_voigt</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_voigt" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL Voigt bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the bulk modulus as calculated using the Voigt method with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_bulk_modulus_voiht=105.315</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_bulk_modulus_vrh">
+<code class="descname">ael_bulk_modulus_vrh</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_vrh" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL VRH bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the bulk modulus as calculated using the Voigt-Reuss-Hill average with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_bulk_modulus_vrh=105.315</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_elastic_anistropy">
+<code class="descname">ael_elastic_anistropy</code><a class="headerlink" href="#aflow.entries.Entry.ael_elastic_anistropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL elastic anistropy (<cite>optional</cite>). Units &#8211; <a href="#id11"><span class="problematic" id="id12">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the elastic anistropy as calculated with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_elastic_anistropy=0.0008165</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_poisson_ratio">
+<code class="descname">ael_poisson_ratio</code><a class="headerlink" href="#aflow.entries.Entry.ael_poisson_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL Poisson ratio (<cite>optional</cite>). Units &#8211; <a href="#id13"><span class="problematic" id="id14">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the istropic Poisson ratio as calculated with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_poisson_ratio=0.216</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_shear_modulus_reuss">
+<code class="descname">ael_shear_modulus_reuss</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_reuss" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL Reuss shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the shear modulus as calculated using the Reuss method with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_shear_modulus_reuss=73.787</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_shear_modulus_voigt">
+<code class="descname">ael_shear_modulus_voigt</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_voigt" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL Voigt shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the shear modulus as calculated using the Voigt method with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_shear_modulus_voigt=73.799</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ael_shear_modulus_vrh">
+<code class="descname">ael_shear_modulus_vrh</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_vrh" title="Permalink to this definition">¶</a></dt>
+<dd><p>AEL VRH shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the shear modulus as calculated using the Voigt-Reuss-Hill average with AEL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ael_shear_modulus_vrh=73.793</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aflow_version">
+<code class="descname">aflow_version</code><a class="headerlink" href="#aflow.entries.Entry.aflow_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>aflow version (<cite>optional</cite>). Units &#8211; <a href="#id15"><span class="problematic" id="id16">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the version number of AFLOW used to perform the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aflow_version=aflow30641</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aflowlib_date">
+<code class="descname">aflowlib_date</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>material generation date (<cite>optional</cite>). Units &#8211; <a href="#id17"><span class="problematic" id="id18">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the date of the AFLOW post-processor which generated the entry for the library.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aflowlib_date=20140204_13:10:39_GMT-5</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aflowlib_entries">
+<code class="descname">aflowlib_entries</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>aflowlib entries (<cite>conditional</cite>). Units &#8211; <a href="#id19"><span class="problematic" id="id20">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For projects and set-layer entries, aflowlib_entries lists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aflowlib_entries=AgAl,AgAs,AgAu,AgB_h,AgBa_sv,AgBe_sv,AgBi_d,AgBr,AgCa_sv,...</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aflowlib_entries_number">
+<code class="descname">aflowlib_entries_number</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_entries_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>aflowlib entry count (<cite>conditional</cite>). Units &#8211; <a href="#id21"><span class="problematic" id="id22">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For projects and set-layer entries, aflowlib_entrieslists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aflowlib_entries_number=654</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aflowlib_version">
+<code class="descname">aflowlib_version</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>aflowlib version (<cite>optional</cite>). Units &#8211; <a href="#id23"><span class="problematic" id="id24">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the version of the AFLOW post-processor which generated the entry for the library.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aflowlib_version=3.1.103</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_acoustic_debye">
+<code class="descname">agl_acoustic_debye</code><a class="headerlink" href="#aflow.entries.Entry.agl_acoustic_debye" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL acoustic Debye temperature (<cite>optional</cite>). Units &#8211; <cite>K</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the acoustic Debye temperature as calculated with AGL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_acoustic_debye=492</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_bulk_modulus_isothermal_300K">
+<code class="descname">agl_bulk_modulus_isothermal_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_bulk_modulus_isothermal_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL isothermal bulk modulus 300K (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the isothermal bulk modulus at 300K as calculated with AGL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_bulk_modulus_isothermal_300K=96.6</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_bulk_modulus_static_300K">
+<code class="descname">agl_bulk_modulus_static_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_bulk_modulus_static_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL static bulk modulus 300K (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the static bulk modulus at 300K as calculated with AGL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_bulk_modulus_static_300K=99.6</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_debye">
+<code class="descname">agl_debye</code><a class="headerlink" href="#aflow.entries.Entry.agl_debye" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL Debye temperature (<cite>optional</cite>). Units &#8211; <cite>K</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Debye temperature as calculated with AGL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_debye=620</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_gruneisen">
+<code class="descname">agl_gruneisen</code><a class="headerlink" href="#aflow.entries.Entry.agl_gruneisen" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL Gruneisen parameter (<cite>optional</cite>). Units &#8211; <a href="#id25"><span class="problematic" id="id26">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the Gruneisen parameter as calculated with AGL.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_gruneisen=2.06</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_heat_capacity_Cp_300K">
+<code class="descname">agl_heat_capacity_Cp_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_heat_capacity_Cp_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL heat capacity Cp (<cite>optional</cite>). Units &#8211; <cite>kB/cell</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the heat capacity at constant pressure as calculated with AGL at 300K.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_heat_capacity_Cp_300K=5.502</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_heat_capacity_Cv_300K">
+<code class="descname">agl_heat_capacity_Cv_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_heat_capacity_Cv_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL heat capacity Cv (<cite>optional</cite>). Units &#8211; <cite>kB/cell</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the heat capacity at constant volume as calculated with AGL at 300K.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_heat_capacity_Cv_300K=4.901</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_thermal_conductivity_300K">
+<code class="descname">agl_thermal_conductivity_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_thermal_conductivity_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL thermal conductivity (<cite>optional</cite>). Units &#8211; <cite>W/m*K</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the thermal conductivity as calculated with AGL at 300K.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_thermal_conductivity_300K=24.41</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.agl_thermal_expansion_300K">
+<code class="descname">agl_thermal_expansion_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_thermal_expansion_300K" title="Permalink to this definition">¶</a></dt>
+<dd><p>AGL thermal expansion (<cite>optional</cite>). Units &#8211; <cite>1/K</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the thermal expansion as calculated with AGL at 300K.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>agl_thermal_expansion_300K=4.997e-05</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.auid">
+<code class="descname">auid</code><a class="headerlink" href="#aflow.entries.Entry.auid" title="Permalink to this definition">¶</a></dt>
+<dd><p>AFLOWLIB Unique Identifier (<cite>mandatory</cite>). Units &#8211; <a href="#id27"><span class="problematic" id="id28">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AFLOWLIB Unique Identifier for the entry, AUID, which can be used as a publishable object identifier.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>auid=aflow:e9c6d914c4b8d9ca</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.aurl">
+<code class="descname">aurl</code><a class="headerlink" href="#aflow.entries.Entry.aurl" title="Permalink to this definition">¶</a></dt>
+<dd><p>AFLOWLIB Uniform Resource Locator (<cite>mandatory</cite>). Units &#8211; <a href="#id29"><span class="problematic" id="id30">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AFLOWLIB Uniform Resource Locator returns the AURL of the entry.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>aurl=aflowlib.duke.edu:AFLOWDATA/LIB3_RAW/Bi_dRh_pvTi_sv/T0003.ABC:LDAU2</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.author">
+<code class="descname">author</code><a class="headerlink" href="#aflow.entries.Entry.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>author (<cite>optional</cite>). Units &#8211; <a href="#id31"><span class="problematic" id="id32">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the name (not necessarily an individual) and affiliation associated with authorship of the data.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>author=Marco_Buongiorno_Nardelli,Ohad_Levy,Jesus_Carrete</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.bader_atomic_volumes">
+<code class="descname">bader_atomic_volumes</code><a class="headerlink" href="#aflow.entries.Entry.bader_atomic_volumes" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic volume per atom (<cite>optional</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the volume of each atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis. This volume encapsulates the electron density associated with each atom above a threshold of 0.0001 electrons.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>bader_atomic_volumes=15.235,12.581,13.009</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.bader_net_charges">
+<code class="descname">bader_net_charges</code><a class="headerlink" href="#aflow.entries.Entry.bader_net_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>partial charge per atom (<cite>optional</cite>). Units &#8211; <cite>electrons</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns a comma delimited set of partial charges per atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>bader_net_charges=0.125,0.125,-0.25</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.calculation_cores">
+<code class="descname">calculation_cores</code><a class="headerlink" href="#aflow.entries.Entry.calculation_cores" title="Permalink to this definition">¶</a></dt>
+<dd><p>used CPU cores (<cite>optional</cite>). Units &#8211; <a href="#id33"><span class="problematic" id="id34">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Number of processors/cores used for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>calculation_cores=32</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.calculation_memory">
+<code class="descname">calculation_memory</code><a class="headerlink" href="#aflow.entries.Entry.calculation_memory" title="Permalink to this definition">¶</a></dt>
+<dd><p>used RAM (<cite>optional</cite>). Units &#8211; <cite>Megabytes</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The maximum memory used for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>calculation_memory=32</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.calculation_time">
+<code class="descname">calculation_time</code><a class="headerlink" href="#aflow.entries.Entry.calculation_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>used time (<cite>optional</cite>). Units &#8211; <cite>seconds</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Total time taken for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>calculation_time=32</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.catalog">
+<code class="descname">catalog</code><a class="headerlink" href="#aflow.entries.Entry.catalog" title="Permalink to this definition">¶</a></dt>
+<dd><p>catalog (<cite>optional</cite>). Units &#8211; <a href="#id35"><span class="problematic" id="id36">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the context set for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>catalog=icsd</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.code">
+<code class="descname">code</code><a class="headerlink" href="#aflow.entries.Entry.code" title="Permalink to this definition">¶</a></dt>
+<dd><p>ab initio code (<cite>optional</cite>). Units &#8211; <a href="#id37"><span class="problematic" id="id38">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the software name and version used to perform the simulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>code=vasp.4.6.35</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.composition">
+<code class="descname">composition</code><a class="headerlink" href="#aflow.entries.Entry.composition" title="Permalink to this definition">¶</a></dt>
+<dd><p>composition (<cite>optional</cite>). Units &#8211; <a href="#id39"><span class="problematic" id="id40">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns a comma delimited composition description of the structure entry in the calculated cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>composition=2,6,6</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.compound">
+<code class="descname">compound</code><a class="headerlink" href="#aflow.entries.Entry.compound" title="Permalink to this definition">¶</a></dt>
+<dd><p>chemical formula (<cite>mandatory</cite>). Units &#8211; <a href="#id41"><span class="problematic" id="id42">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the composition description of the compound in the calculated cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>compound=Co2Er6Si6</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.corresponding">
+<code class="descname">corresponding</code><a class="headerlink" href="#aflow.entries.Entry.corresponding" title="Permalink to this definition">¶</a></dt>
+<dd><p>coresponding (<cite>optional</cite>). Units &#8211; <a href="#id43"><span class="problematic" id="id44">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the name (not necessarily an individual) and affiliation associated with the data origin concerning correspondence about data.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>corresponding=M_Buongiorno_Nardelli_mbn&#64;unt.edu</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.data_api">
+<code class="descname">data_api</code><a class="headerlink" href="#aflow.entries.Entry.data_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>REST API version (<cite>mandatory</cite>). Units &#8211; <a href="#id45"><span class="problematic" id="id46">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AFLOWLIB version of the entry, API.}</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>data_api=aapi1.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.data_language">
+<code class="descname">data_language</code><a class="headerlink" href="#aflow.entries.Entry.data_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>data language (<cite>optional</cite>). Units &#8211; <a href="#id47"><span class="problematic" id="id48">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Gives the language of the data in AFLOWLIB.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>data_language=aflowlib</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.data_source">
+<code class="descname">data_source</code><a class="headerlink" href="#aflow.entries.Entry.data_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>data source (<cite>optional</cite>). Units &#8211; <a href="#id49"><span class="problematic" id="id50">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Gives the source of the data in AFLOWLIB.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>data_source=aflowlib</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.delta_electronic_energy_convergence">
+<code class="descname">delta_electronic_energy_convergence</code><a class="headerlink" href="#aflow.entries.Entry.delta_electronic_energy_convergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Electronic Energy of Convergence Step (<cite>optional</cite>). Units &#8211; <a href="#id51"><span class="problematic" id="id52">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the change in energy from the last step of the convergence iteration.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>delta_electronic_energy_convergence=6.09588e-05</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.delta_electronic_energy_threshold">
+<code class="descname">delta_electronic_energy_threshold</code><a class="headerlink" href="#aflow.entries.Entry.delta_electronic_energy_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Electronic Energy of Convergence Threshold (<cite>optional</cite>). Units &#8211; <a href="#id53"><span class="problematic" id="id54">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the maximimum change in energy required for the convergence iteration.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>delta_electronic_energy_threshold=0.0001</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.density">
+<code class="descname">density</code><a class="headerlink" href="#aflow.entries.Entry.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass density (<cite>optional</cite>). Units &#8211; <cite>grams/cm&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the mass density in grams/cm3.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>density=7.76665</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.dft_type">
+<code class="descname">dft_type</code><a class="headerlink" href="#aflow.entries.Entry.dft_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>DFT type (<cite>optional</cite>). Units &#8211; <a href="#id55"><span class="problematic" id="id56">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns information about the pseudopotential type, the exchange correlation functional used (normal or hybrid) and use of GW.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>dft_type=PAW_PBE,HSE06</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.eentropy_atom">
+<code class="descname">eentropy_atom</code><a class="headerlink" href="#aflow.entries.Entry.eentropy_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomistic electronic entropy (<cite>optional</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the electronic entropy of the atom used to converge the ab initio calculation (smearing).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>eentropy_atom=0.0011</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.eentropy_cell">
+<code class="descname">eentropy_cell</code><a class="headerlink" href="#aflow.entries.Entry.eentropy_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell electronic entropy (<cite>optional</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the electronic entropy of the unit cell used to converge the ab initio calculation (smearing).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>eentropy_cell=0.0011</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.energy_atom">
+<code class="descname">energy_atom</code><a class="headerlink" href="#aflow.entries.Entry.energy_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic energy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the total ab initio energy per atom- the value of energy_cell/$N$).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>energy_atom=-82.1656</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.energy_cell">
+<code class="descname">energy_cell</code><a class="headerlink" href="#aflow.entries.Entry.energy_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell energy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the total ab initio energy of the unit cell, E. At T=0K and p=0, this is the internal energy of the system (per unit cell).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>energy_cell=-82.1656</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.energy_cutoff">
+<code class="descname">energy_cutoff</code><a class="headerlink" href="#aflow.entries.Entry.energy_cutoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>energy cutoff (<cite>optional</cite>). Units &#8211; <cite>eV</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Set of energy cut-offs used during the various steps of the calculations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>energy_cutoff=384.1,384.1,384.1</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.enthalpy_atom">
+<code class="descname">enthalpy_atom</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the enthalpy per atom- the value of enthalpy_cell/N).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>enthalpy_atom=-82.1656</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.enthalpy_cell">
+<code class="descname">enthalpy_cell</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the enthalpy of the system of the unit cell, H = E + PV.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>enthalpy_cell=-82.1656</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.enthalpy_formation_atom">
+<code class="descname">enthalpy_formation_atom</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_formation_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic formation enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the formation enthalpy DeltaHFatomic per atom).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>enthalpy_formation_atom=-33.1587</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.enthalpy_formation_cell">
+<code class="descname">enthalpy_formation_cell</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_formation_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell formation enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the formation enthalpy DeltaHF per unit cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>enthalpy_formation_cell=-33.1587</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.entropic_temperature">
+<code class="descname">entropic_temperature</code><a class="headerlink" href="#aflow.entries.Entry.entropic_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>entropic temperature (<cite>mandatory</cite>). Units &#8211; <cite>Kelvin</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the entropic temperature for the structure.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>entropic_temperature=1072.1</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.files">
+<code class="descname">files</code><a class="headerlink" href="#aflow.entries.Entry.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>I/O files (<cite>conditional</cite>). Units &#8211; <a href="#id57"><span class="problematic" id="id58">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Provides access to the input and output files used in the simulation (provenance data).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>files=Bi_dRh_pv.33.cif,Bi_dRh_pv.33.png,CONTCAR.relax,CONTCAR.relax1,</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.forces">
+<code class="descname">forces</code><a class="headerlink" href="#aflow.entries.Entry.forces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quantum Forces (<cite>optional</cite>). Units &#8211; <cite>eV/&amp;Aring;</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Final quantum mechanical forces (Fi,Fj,Fk) in the notation of the code.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.13)">numpy.ndarray</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>forces=0,-0.023928,0.000197;0,0.023928,-0.000197;...</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.geometry">
+<code class="descname">geometry</code><a class="headerlink" href="#aflow.entries.Entry.geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell basis (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns geometrical data describing the unit cell in the usual a,b,c,alpha,beta,gamma notation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>geometry=18.82,18.82,18.82,32.41,32.41,32.41</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.keywords">
+<code class="descname">keywords</code><a class="headerlink" href="#aflow.entries.Entry.keywords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Title (<cite>mandatory</cite>). Units &#8211; <a href="#id59"><span class="problematic" id="id60">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This includes the list of keywords available in the entry, separated by commas.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>keywords=aurl,auid,loop,code,compound,prototype,nspecies,natoms,...</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.kpoints">
+<code class="descname">kpoints</code><a class="headerlink" href="#aflow.entries.Entry.kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>K-point mesh (<cite>optional</cite>). Units &#8211; <a href="#id61"><span class="problematic" id="id62">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Set of k-point meshes uniquely identifying the various steps of the calculations, e.g. relaxation, static and electronic band structure (specifying the k-space symmetry points of the structure).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>kpoints=10,10,10;16,16,16;G-X-W-K-G-L-U-W-L-K+U-X</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.lattice_system_orig">
+<code class="descname">lattice_system_orig</code><a class="headerlink" href="#aflow.entries.Entry.lattice_system_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>original lattice system (<cite>mandatory</cite>). Units &#8211; <a href="#id63"><span class="problematic" id="id64">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>lattice_system_orig=rhombohedral</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.lattice_system_relax">
+<code class="descname">lattice_system_relax</code><a class="headerlink" href="#aflow.entries.Entry.lattice_system_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed lattice system (<cite>mandatory</cite>). Units &#8211; <a href="#id65"><span class="problematic" id="id66">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>lattice_system_relax=rhombohedral</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.lattice_variation_orig">
+<code class="descname">lattice_variation_orig</code><a class="headerlink" href="#aflow.entries.Entry.lattice_variation_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>original lattice variation (<cite>mandatory</cite>). Units &#8211; <a href="#id67"><span class="problematic" id="id68">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>lattice_variation_orig=rhombohedral</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.lattice_variation_relax">
+<code class="descname">lattice_variation_relax</code><a class="headerlink" href="#aflow.entries.Entry.lattice_variation_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed lattice variation (<cite>mandatory</cite>). Units &#8211; <a href="#id69"><span class="problematic" id="id70">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>lattice_variation_relax=rhombohedral</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.ldau_TLUJ">
+<code class="descname">ldau_TLUJ</code><a class="headerlink" href="#aflow.entries.Entry.ldau_TLUJ" title="Permalink to this definition">¶</a></dt>
+<dd><p>on site coulomb interaction (<cite>mandatory</cite>). Units &#8211; <a href="#id71"><span class="problematic" id="id72">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This vector of numbers contains the parameters of the DFT+U calculations, based on a corrective functional inspired by the Hubbard model.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>ldau_TLUJ=2;2,0,0;5,0,0;0,0,0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.loop">
+<code class="descname">loop</code><a class="headerlink" href="#aflow.entries.Entry.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>process category (<cite>optional</cite>). Units &#8211; <a href="#id73"><span class="problematic" id="id74">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Informs the user of the type of post-processing that was performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>loop=thermodynamics,bands,magnetic</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.natoms">
+<code class="descname">natoms</code><a class="headerlink" href="#aflow.entries.Entry.natoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell atom count (<cite>mandatory</cite>). Units &#8211; <a href="#id75"><span class="problematic" id="id76">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the number of atoms in the unit cell of the structure entry. The number can be non integer if partial occupation is considered within appropriate approximations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>natoms=12</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.nbondxx">
+<code class="descname">nbondxx</code><a class="headerlink" href="#aflow.entries.Entry.nbondxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nearest neighbors bond lengths (<cite>optional</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nearest neighbors bond lengths of the relaxed structure per ordered set of species Ai,Aj greater than or equal to i.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>nbondxx=1.2599,1.0911,1.0911,1.7818,1.2599,1.7818</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.node_CPU_Cores">
+<code class="descname">node_CPU_Cores</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_Cores" title="Permalink to this definition">¶</a></dt>
+<dd><p>available CPU cores (<cite>optional</cite>). Units &#8211; <a href="#id77"><span class="problematic" id="id78">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Information about the number of cores in the node/cluster where the calculation was performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>node_CPU_Cores=12</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.node_CPU_MHz">
+<code class="descname">node_CPU_MHz</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_MHz" title="Permalink to this definition">¶</a></dt>
+<dd><p>CPU rate (<cite>optional</cite>). Units &#8211; <cite>Megahertz</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Information about the CPU speed in the node/cluster where the calculation was performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>node_CPU_MHz=12</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.node_CPU_Model">
+<code class="descname">node_CPU_Model</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>CPU model (<cite>optional</cite>). Units &#8211; <a href="#id79"><span class="problematic" id="id80">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Information about the CPU model in the node/cluster where the calculation was performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>node_CPU_Model=12</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.node_RAM_GB">
+<code class="descname">node_RAM_GB</code><a class="headerlink" href="#aflow.entries.Entry.node_RAM_GB" title="Permalink to this definition">¶</a></dt>
+<dd><p>available RAM (<cite>optional</cite>). Units &#8211; <cite>Gigabytes</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Information about the RAM in the node/cluster where the calculation was performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>node_RAM_GB=12</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.nspecies">
+<code class="descname">nspecies</code><a class="headerlink" href="#aflow.entries.Entry.nspecies" title="Permalink to this definition">¶</a></dt>
+<dd><p>species count (<cite>mandatory</cite>). Units &#8211; <a href="#id81"><span class="problematic" id="id82">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the number of species in the system (e.g., binary = 2, ternary = 3, etc.).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>nspecies=3</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.positions_cartesian">
+<code class="descname">positions_cartesian</code><a class="headerlink" href="#aflow.entries.Entry.positions_cartesian" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed absolute positions (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Final Cartesian positions (xi,xj,xk) in the notation of the code.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.13)">numpy.ndarray</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>positions_cartesian=0,0,0;18.18438,0,2.85027;...</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.positions_fractional">
+<code class="descname">positions_fractional</code><a class="headerlink" href="#aflow.entries.Entry.positions_fractional" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed relative positions (<cite>mandatory</cite>). Units &#8211; <a href="#id83"><span class="problematic" id="id84">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Final fractional positions (xi,xj,xk) with respect to the unit cell as specified in $geometry.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.13)">numpy.ndarray</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>positions_fractional=0,0,0;0.25,0.25,0.25;...</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.pressure">
+<code class="descname">pressure</code><a class="headerlink" href="#aflow.entries.Entry.pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>external pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the target pressure selected for the simulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>pressure=10.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.pressure_final">
+<code class="descname">pressure_final</code><a class="headerlink" href="#aflow.entries.Entry.pressure_final" title="Permalink to this definition">¶</a></dt>
+<dd><p>resulting pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the external pressure achieved by the simulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>pressure_final=10.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.pressure_residual">
+<code class="descname">pressure_residual</code><a class="headerlink" href="#aflow.entries.Entry.pressure_residual" title="Permalink to this definition">¶</a></dt>
+<dd><p>residual pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the external pressure achieved by the simulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>pressure_residual=10.0</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.prototype">
+<code class="descname">prototype</code><a class="headerlink" href="#aflow.entries.Entry.prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>original prototype (<cite>mandatory</cite>). Units &#8211; <a href="#id85"><span class="problematic" id="id86">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the AFLOW unrelaxed prototype which was used for the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>prototype=T0001.A2BC</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.scintillation_attenuation_length">
+<code class="descname">scintillation_attenuation_length</code><a class="headerlink" href="#aflow.entries.Entry.scintillation_attenuation_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>attenuation length (<cite>mandatory</cite>). Units &#8211; <cite>cm</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the scintillation attenuation length of the compound in cm.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>scintillation_attenuation_length=2.21895</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.sg">
+<code class="descname">sg</code><a class="headerlink" href="#aflow.entries.Entry.sg" title="Permalink to this definition">¶</a></dt>
+<dd><p>compound space group (<cite>mandatory</cite>). Units &#8211; <a href="#id87"><span class="problematic" id="id88">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>sg=Fm-3m#225,Fm-3m#225,Fm-3m#225</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.sg2">
+<code class="descname">sg2</code><a class="headerlink" href="#aflow.entries.Entry.sg2" title="Permalink to this definition">¶</a></dt>
+<dd><p>refined compound space group (<cite>mandatory</cite>). Units &#8211; <a href="#id89"><span class="problematic" id="id90">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>sg2=Fm-3m#225,Fm-3m#225,Fm-3m#225</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spacegroup_orig">
+<code class="descname">spacegroup_orig</code><a class="headerlink" href="#aflow.entries.Entry.spacegroup_orig" title="Permalink to this definition">¶</a></dt>
+<dd><p>original space group number (<cite>mandatory</cite>). Units &#8211; <a href="#id91"><span class="problematic" id="id92">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the spacegroup number of the original-unrelaxed structure before the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spacegroup_orig=225</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spacegroup_relax">
+<code class="descname">spacegroup_relax</code><a class="headerlink" href="#aflow.entries.Entry.spacegroup_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>relaxed space group number (<cite>mandatory</cite>). Units &#8211; <a href="#id93"><span class="problematic" id="id94">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the spacegroup number of the relaxed structure after the calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spacegroup_relax=225</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.species">
+<code class="descname">species</code><a class="headerlink" href="#aflow.entries.Entry.species" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic species (<cite>mandatory</cite>). Units &#8211; <a href="#id95"><span class="problematic" id="id96">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Species of the atoms in this material.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>species=Y,Zn,Zr</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.species_pp">
+<code class="descname">species_pp</code><a class="headerlink" href="#aflow.entries.Entry.species_pp" title="Permalink to this definition">¶</a></dt>
+<dd><p>species pseudopotential(s) (<cite>mandatory</cite>). Units &#8211; <a href="#id97"><span class="problematic" id="id98">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Pseudopotentials of the atomic species.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>species_pp=Y,Zn,Zr</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.species_pp_ZVAL">
+<code class="descname">species_pp_ZVAL</code><a class="headerlink" href="#aflow.entries.Entry.species_pp_ZVAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>valence atoms per species (<cite>optional</cite>). Units &#8211; <cite>electrons</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the number of valence electrons of the atomic species.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>species_pp_ZVAL=3</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.species_pp_version">
+<code class="descname">species_pp_version</code><a class="headerlink" href="#aflow.entries.Entry.species_pp_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>pseudopotential species/version (<cite>mandatory</cite>). Units &#8211; <a href="#id99"><span class="problematic" id="id100">``</span></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Species of the atoms, pseudopotentials species, and pseudopotential versions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>species_pp_version=Y,Zn,Zr</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spinD">
+<code class="descname">spinD</code><a class="headerlink" href="#aflow.entries.Entry.spinD" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic spin decomposition (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For spin polarized calculations, the spin decomposition over the atoms of the cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spinD=0.236,0.236,-0.023,1.005</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spinF">
+<code class="descname">spinF</code><a class="headerlink" href="#aflow.entries.Entry.spinF" title="Permalink to this definition">¶</a></dt>
+<dd><p>fermi level spin decomposition (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For spin polarized calculations, the magnetization of the cell at the Fermi level.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spinF=0.410879</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spin_atom">
+<code class="descname">spin_atom</code><a class="headerlink" href="#aflow.entries.Entry.spin_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic spin polarization (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For spin polarized calculations, the magnetization per atom.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spin_atom=2.16419</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.spin_cell">
+<code class="descname">spin_cell</code><a class="headerlink" href="#aflow.entries.Entry.spin_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell spin polarization (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For spin polarized calculations, the total magnetization of the cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>spin_cell=2.16419</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.sponsor">
+<code class="descname">sponsor</code><a class="headerlink" href="#aflow.entries.Entry.sponsor" title="Permalink to this definition">¶</a></dt>
+<dd><p>sponsor (<cite>optional</cite>). Units &#8211; <a href="#id101"><span class="problematic" id="id102">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns information about funding agencies and other sponsors for the data.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>sponsor=DOD_N000141310635,NIST_70NANB12H163</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.stoich">
+<code class="descname">stoich</code><a class="headerlink" href="#aflow.entries.Entry.stoich" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell stoichiometry (<cite>optional</cite>). Units &#8211; <a href="#id103"><span class="problematic" id="id104">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>stoichiometry=0.5,0.25,0.25</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.stoichiometry">
+<code class="descname">stoichiometry</code><a class="headerlink" href="#aflow.entries.Entry.stoichiometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell stoichiometry (<cite>mandatory</cite>). Units &#8211; <a href="#id105"><span class="problematic" id="id106">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>stoichiometry=0.5,0.25,0.25</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.stress_tensor">
+<code class="descname">stress_tensor</code><a class="headerlink" href="#aflow.entries.Entry.stress_tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stress Tensor (<cite>mandatory</cite>). Units &#8211; <a href="#id107"><span class="problematic" id="id108">``</span></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This keyword is still listed as development level. Use it
+knowing that it is subject to change or removal.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the stress tensor of the completed calculation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>stress_tensor=-0.96,-0,-0,-0,-0.96,-0,-0,-0,-0.96</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.valence_cell_iupac">
+<code class="descname">valence_cell_iupac</code><a class="headerlink" href="#aflow.entries.Entry.valence_cell_iupac" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell IUPAC valence (<cite>mandatory</cite>). Units &#8211; <a href="#id109"><span class="problematic" id="id110">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns IUPAC valence, the maximum number of univalent atoms that may combine with the atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>valence_cell_iupac=22</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.valence_cell_std">
+<code class="descname">valence_cell_std</code><a class="headerlink" href="#aflow.entries.Entry.valence_cell_std" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell standard valence (<cite>mandatory</cite>). Units &#8211; <a href="#id111"><span class="problematic" id="id112">``</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns standard valence, the maximum number of univalent atoms that may combine with the atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>valence_cell_std=22</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.volume_atom">
+<code class="descname">volume_atom</code><a class="headerlink" href="#aflow.entries.Entry.volume_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>atomic volume (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;/atom</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the volume per atom in the unit cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>volume_atom=100.984</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.entries.Entry.volume_cell">
+<code class="descname">volume_cell</code><a class="headerlink" href="#aflow.entries.Entry.volume_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>unit cell volume (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The following verifications are available for this
+keyword. They are exposed as additional methods on this object.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#aflow.entries.Entry.energy_cutoff" title="aflow.entries.Entry.energy_cutoff"><code class="xref py py-meth docutils literal"><span class="pre">energy_cutoff()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.forces" title="aflow.entries.Entry.forces"><code class="xref py py-meth docutils literal"><span class="pre">forces()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.kpoints" title="aflow.entries.Entry.kpoints"><code class="xref py py-meth docutils literal"><span class="pre">kpoints()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.pressure_residual" title="aflow.entries.Entry.pressure_residual"><code class="xref py py-meth docutils literal"><span class="pre">pressure_residual()</span></code></a></li>
+<li><a class="reference internal" href="#aflow.entries.Entry.stress_tensor" title="aflow.entries.Entry.stress_tensor"><code class="xref py py-meth docutils literal"><span class="pre">stress_tensor()</span></code></a></li>
+</ul>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the volume of the unit cell.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>You can expect the <em>content</em> of the result to be something like:</p>
+<p><cite>volume_cell=100.984</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="keywords.html"
+                        title="previous chapter"><cite>AFLOW</cite> Database Keywords</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="caster.html"
+                        title="next chapter"><cite>AFLOW</cite> Custom Deserializers</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/entries.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="caster.html" title="AFLOW Custom Deserializers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="keywords.html" title="AFLOW Database Keywords"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

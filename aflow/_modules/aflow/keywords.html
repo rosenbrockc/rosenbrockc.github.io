@@ -1,0 +1,1901 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aflow.keywords &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aflow.keywords</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implements classes to represent each keyword with overloaded</span>
+<span class="sd">operators to make querying with AFLUX intuitive.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">string_types</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="n">_all_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">&quot;&quot;&quot;list: of `str` keyword names for which class instances exist within</span>
+<span class="sd">this module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../keywords.html#aflow.keywords.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads all keywords into the specified target dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>    
+    <span class="n">_find_all</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">_all_keywords</span><span class="p">:</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">target</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span></div>
+
+<span class="k">def</span> <span class="nf">_find_all</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Finds the names of all keywords supported in this module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Get a reference to the module and its global keyword cache.</span>
+    <span class="k">global</span> <span class="n">_all_keywords</span>    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_all_keywords</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="kn">import</span> <span class="nn">inspect</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Keyword</span><span class="p">):</span>
+                <span class="n">_all_keywords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>    
+
+<div class="viewcode-block" id="reset"><a class="viewcode-back" href="../../keywords.html#aflow.keywords.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Resets all the keyword instances internal states so that they</span>
+<span class="sd">    can be re-used for a new query.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
+    <span class="n">_find_all</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">_all_keywords</span><span class="p">:</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Keyword"><a class="viewcode-back" href="../../keywords.html#aflow.keywords.Keyword">[docs]</a><span class="k">class</span> <span class="nc">Keyword</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents an abstract keyword that can be sub-classed for a</span>
+<span class="sd">    specific material attribute. This class also represents logical</span>
+<span class="sd">    operators that define search queries. The combination of two</span>
+<span class="sd">    keywords with a logical operator produces one more keyword, but</span>
+<span class="sd">    which has its :attr:`state` altered.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (str): current query state of this keyword (combination).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        state (list): of `str` *composite* queries for this keyword (combination).</span>
+<span class="sd">        ptype (type): python type that values for this keyword will have.</span>
+<span class="sd">        name (str): keyword name to use in the AFLUX request.</span>
+<span class="sd">        cache (list): of `str` *simple* operator comparisons.</span>
+<span class="sd">        classes (set): of `str` keyword names that have been combined into the</span>
+<span class="sd">          current keyword.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(*&#39;</span><span class="si">{1}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(*</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+            
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(&#39;</span><span class="si">{1}</span><span class="s2">&#39;*)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(</span><span class="si">{1}</span><span class="s2">*)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(*&#39;</span><span class="si">{1}</span><span class="s2">&#39;*)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(&#39;</span><span class="si">{1}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_generic_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="c1">#We need to do some special handling. We shouldn&#39;t have</span>
+            <span class="c1">#more than two entries in state; otherwise something went</span>
+            <span class="c1">#wrong.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">(</span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;(</span><span class="si">{0}</span><span class="s2">)</span><span class="si">{1}</span><span class="s2">(</span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inconsistent operators; check your parenthesis.&quot;</span><span class="p">)</span>
+                
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#Just combine the two together into a new keyword that has</span>
+            <span class="c1">#the combined state.</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;,&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                
+            <span class="n">o</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">o</span> <span class="ow">or</span> <span class="s1">&#39;,&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">assert</span> <span class="n">o</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>            
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Keyword</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">o</span><span class="p">)])</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">|</span> <span class="n">other</span><span class="o">.</span><span class="n">classes</span>
+            <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="k">def</span> <span class="nf">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generic_combine</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generic_combine</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;!&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s2">&quot;(!&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;!&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s2">&quot;(!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>    </div>
+    
+    
+<span class="k">class</span> <span class="nc">_Bravais_lattice_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original bravais lattice (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the Bravais lattice of the original unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Bravais_lattice_orig&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">Bravais_lattice_orig</span> <span class="o">=</span> <span class="n">_Bravais_lattice_orig</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Bravais_lattice_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed bravais lattice (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the Bravais lattice of the original relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Bravais_lattice_relax&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">Bravais_lattice_relax</span> <span class="o">=</span> <span class="n">_Bravais_lattice_relax</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Egap</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;energy gap (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Band gap calculated with the approximations and pseudopotentials described by other keywords.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Egap&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">Egap</span> <span class="o">=</span> <span class="n">_Egap</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Egap_fit</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;fitted band gap (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Simple cross-validated correction (fit) of Egap.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Egap_fit&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">Egap_fit</span> <span class="o">=</span> <span class="n">_Egap_fit</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Egap_type</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;band gap type (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Given a band gap, this keyword describes if the system is a metal, a semi-metal, an insulator with direct or indirect band gap.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Egap_type&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">Egap_type</span> <span class="o">=</span> <span class="n">_Egap_type</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_PV_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic pressure*volume (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Pressure multiplied by volume of the atom.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;PV_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">PV_atom</span> <span class="o">=</span> <span class="n">_PV_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_PV_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell pressure*volume (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Pressure multiplied by volume of the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;PV_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">PV_cell</span> <span class="o">=</span> <span class="n">_PV_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Pearson_symbol_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original pearson symbol (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the Pearson symbol of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Pearson_symbol_orig&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">Pearson_symbol_orig</span> <span class="o">=</span> <span class="n">_Pearson_symbol_orig</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Pearson_symbol_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed pearson symbol (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the Pearson symbol of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Pearson_symbol_relax&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">Pearson_symbol_relax</span> <span class="o">=</span> <span class="n">_Pearson_symbol_relax</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Pulay_stress</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pulay Stress (`mandatory`). Units: `kbar`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns a metric of the basis set inconsistency for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Pulay_stress&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">Pulay_stress</span> <span class="o">=</span> <span class="n">_Pulay_stress</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_Pullay_stress</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pulay Stress (`mandatory`). Units: `kbar`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns a metric of the basis set inconsistency for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Pullay_stress&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">Pullay_stress</span> <span class="o">=</span> <span class="n">_Pullay_stress</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_bulk_modulus_reuss</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL Reuss bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the bulk modulus as calculated using the Reuss method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_bulk_modulus_reuss&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_bulk_modulus_reuss</span> <span class="o">=</span> <span class="n">_ael_bulk_modulus_reuss</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_bulk_modulus_voigt</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL Voigt bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the bulk modulus as calculated using the Voigt method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_bulk_modulus_voigt&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_bulk_modulus_voigt</span> <span class="o">=</span> <span class="n">_ael_bulk_modulus_voigt</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_bulk_modulus_vrh</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL VRH bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the bulk modulus as calculated using the Voigt-Reuss-Hill average with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_bulk_modulus_vrh&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_bulk_modulus_vrh</span> <span class="o">=</span> <span class="n">_ael_bulk_modulus_vrh</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_elastic_anistropy</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL elastic anistropy (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the elastic anistropy as calculated with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_elastic_anistropy&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_elastic_anistropy</span> <span class="o">=</span> <span class="n">_ael_elastic_anistropy</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_poisson_ratio</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL Poisson ratio (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the istropic Poisson ratio as calculated with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_poisson_ratio&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_poisson_ratio</span> <span class="o">=</span> <span class="n">_ael_poisson_ratio</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_shear_modulus_reuss</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL Reuss shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the shear modulus as calculated using the Reuss method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_shear_modulus_reuss&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_shear_modulus_reuss</span> <span class="o">=</span> <span class="n">_ael_shear_modulus_reuss</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_shear_modulus_voigt</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL Voigt shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the shear modulus as calculated using the Voigt method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_shear_modulus_voigt&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_shear_modulus_voigt</span> <span class="o">=</span> <span class="n">_ael_shear_modulus_voigt</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ael_shear_modulus_vrh</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AEL VRH shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the shear modulus as calculated using the Voigt-Reuss-Hill average with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ael_shear_modulus_vrh&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">ael_shear_modulus_vrh</span> <span class="o">=</span> <span class="n">_ael_shear_modulus_vrh</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aflow_version</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;aflow version (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the version number of AFLOW used to perform the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aflow_version&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">aflow_version</span> <span class="o">=</span> <span class="n">_aflow_version</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aflowlib_date</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;material generation date (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the date of the AFLOW post-processor which generated the entry for the library.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aflowlib_date&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">aflowlib_date</span> <span class="o">=</span> <span class="n">_aflowlib_date</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aflowlib_entries</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;aflowlib entries (`conditional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: For projects and set-layer entries, aflowlib_entries lists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aflowlib_entries&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">aflowlib_entries</span> <span class="o">=</span> <span class="n">_aflowlib_entries</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aflowlib_entries_number</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;aflowlib entry count (`conditional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: For projects and set-layer entries, aflowlib_entrieslists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aflowlib_entries_number&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">aflowlib_entries_number</span> <span class="o">=</span> <span class="n">_aflowlib_entries_number</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aflowlib_version</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;aflowlib version (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the version of the AFLOW post-processor which generated the entry for the library.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aflowlib_version&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">aflowlib_version</span> <span class="o">=</span> <span class="n">_aflowlib_version</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_acoustic_debye</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL acoustic Debye temperature (`optional`). Units: `K`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the acoustic Debye temperature as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_acoustic_debye&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_acoustic_debye</span> <span class="o">=</span> <span class="n">_agl_acoustic_debye</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_bulk_modulus_isothermal_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL isothermal bulk modulus 300K (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the isothermal bulk modulus at 300K as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_bulk_modulus_isothermal_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_bulk_modulus_isothermal_300K</span> <span class="o">=</span> <span class="n">_agl_bulk_modulus_isothermal_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_bulk_modulus_static_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL static bulk modulus 300K (`optional`). Units: `GPa`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the static bulk modulus at 300K as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_bulk_modulus_static_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_bulk_modulus_static_300K</span> <span class="o">=</span> <span class="n">_agl_bulk_modulus_static_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_debye</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL Debye temperature (`optional`). Units: `K`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the Debye temperature as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_debye&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_debye</span> <span class="o">=</span> <span class="n">_agl_debye</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_gruneisen</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL Gruneisen parameter (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the Gruneisen parameter as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_gruneisen&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_gruneisen</span> <span class="o">=</span> <span class="n">_agl_gruneisen</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_heat_capacity_Cp_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL heat capacity Cp (`optional`). Units: `kB/cell`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the heat capacity at constant pressure as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_heat_capacity_Cp_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_heat_capacity_Cp_300K</span> <span class="o">=</span> <span class="n">_agl_heat_capacity_Cp_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_heat_capacity_Cv_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL heat capacity Cv (`optional`). Units: `kB/cell`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the heat capacity at constant volume as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_heat_capacity_Cv_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_heat_capacity_Cv_300K</span> <span class="o">=</span> <span class="n">_agl_heat_capacity_Cv_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_thermal_conductivity_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL thermal conductivity (`optional`). Units: `W/m*K`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the thermal conductivity as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_thermal_conductivity_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_thermal_conductivity_300K</span> <span class="o">=</span> <span class="n">_agl_thermal_conductivity_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_agl_thermal_expansion_300K</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AGL thermal expansion (`optional`). Units: `1/K`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the thermal expansion as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;agl_thermal_expansion_300K&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">agl_thermal_expansion_300K</span> <span class="o">=</span> <span class="n">_agl_thermal_expansion_300K</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_auid</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AFLOWLIB Unique Identifier (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: AFLOWLIB Unique Identifier for the entry, AUID, which can be used as a publishable object identifier.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;auid&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">auid</span> <span class="o">=</span> <span class="n">_auid</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_aurl</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AFLOWLIB Uniform Resource Locator (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: AFLOWLIB Uniform Resource Locator returns the AURL of the entry.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;aurl&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">aurl</span> <span class="o">=</span> <span class="n">_aurl</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_author</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;author (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns the name (not necessarily an individual) and affiliation associated with authorship of the data.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;author&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">author</span> <span class="o">=</span> <span class="n">_author</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_bader_atomic_volumes</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic volume per atom (`optional`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns the volume of each atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis. This volume encapsulates the electron density associated with each atom above a threshold of 0.0001 electrons.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bader_atomic_volumes&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">bader_atomic_volumes</span> <span class="o">=</span> <span class="n">_bader_atomic_volumes</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_bader_net_charges</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;partial charge per atom (`optional`). Units: `electrons`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns a comma delimited set of partial charges per atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bader_net_charges&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">bader_net_charges</span> <span class="o">=</span> <span class="n">_bader_net_charges</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_calculation_cores</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;used CPU cores (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Number of processors/cores used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;calculation_cores&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">calculation_cores</span> <span class="o">=</span> <span class="n">_calculation_cores</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_calculation_memory</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;used RAM (`optional`). Units: `Megabytes`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The maximum memory used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;calculation_memory&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">calculation_memory</span> <span class="o">=</span> <span class="n">_calculation_memory</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_calculation_time</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;used time (`optional`). Units: `seconds`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Total time taken for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;calculation_time&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">calculation_time</span> <span class="o">=</span> <span class="n">_calculation_time</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_catalog</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;catalog (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the context set for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;catalog&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">_catalog</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_code</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;ab initio code (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the software name and version used to perform the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;code&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="n">_code</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_composition</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;composition (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns a comma delimited composition description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;composition&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">composition</span> <span class="o">=</span> <span class="n">_composition</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_compound</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;chemical formula (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the composition description of the compound in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;compound&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">compound</span> <span class="o">=</span> <span class="n">_compound</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_corresponding</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;coresponding (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns the name (not necessarily an individual) and affiliation associated with the data origin concerning correspondence about data.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;corresponding&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">corresponding</span> <span class="o">=</span> <span class="n">_corresponding</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_data_api</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;REST API version (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: AFLOWLIB version of the entry, API.}</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;data_api&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">data_api</span> <span class="o">=</span> <span class="n">_data_api</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_data_language</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;data language (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Gives the language of the data in AFLOWLIB.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;data_language&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">data_language</span> <span class="o">=</span> <span class="n">_data_language</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_data_source</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;data source (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Gives the source of the data in AFLOWLIB.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;data_source&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">data_source</span> <span class="o">=</span> <span class="n">_data_source</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_delta_electronic_energy_convergence</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Electronic Energy of Convergence Step (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the change in energy from the last step of the convergence iteration.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;delta_electronic_energy_convergence&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">delta_electronic_energy_convergence</span> <span class="o">=</span> <span class="n">_delta_electronic_energy_convergence</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_delta_electronic_energy_threshold</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Electronic Energy of Convergence Threshold (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the maximimum change in energy required for the convergence iteration.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;delta_electronic_energy_threshold&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">delta_electronic_energy_threshold</span> <span class="o">=</span> <span class="n">_delta_electronic_energy_threshold</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_density</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;mass density (`optional`). Units: `grams/cm&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the mass density in grams/cm3.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;density&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">density</span> <span class="o">=</span> <span class="n">_density</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_dft_type</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DFT type (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns information about the pseudopotential type, the exchange correlation functional used (normal or hybrid) and use of GW.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;dft_type&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">dft_type</span> <span class="o">=</span> <span class="n">_dft_type</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_eentropy_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomistic electronic entropy (`optional`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the electronic entropy of the atom used to converge the ab initio calculation (smearing).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;eentropy_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">eentropy_atom</span> <span class="o">=</span> <span class="n">_eentropy_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_eentropy_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell electronic entropy (`optional`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the electronic entropy of the unit cell used to converge the ab initio calculation (smearing).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;eentropy_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">eentropy_cell</span> <span class="o">=</span> <span class="n">_eentropy_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_energy_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic energy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the total ab initio energy per atom- the value of energy_cell/$N$).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;energy_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">energy_atom</span> <span class="o">=</span> <span class="n">_energy_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_energy_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell energy (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the total ab initio energy of the unit cell, E. At T=0K and p=0, this is the internal energy of the system (per unit cell).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;energy_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">energy_cell</span> <span class="o">=</span> <span class="n">_energy_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_energy_cutoff</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;energy cutoff (`optional`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Set of energy cut-offs used during the various steps of the calculations.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;energy_cutoff&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">energy_cutoff</span> <span class="o">=</span> <span class="n">_energy_cutoff</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_enthalpy_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic enthalpy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the enthalpy per atom- the value of enthalpy_cell/N).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;enthalpy_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">enthalpy_atom</span> <span class="o">=</span> <span class="n">_enthalpy_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_enthalpy_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell enthalpy (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the enthalpy of the system of the unit cell, H = E + PV.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;enthalpy_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">enthalpy_cell</span> <span class="o">=</span> <span class="n">_enthalpy_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_enthalpy_formation_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic formation enthalpy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the formation enthalpy DeltaHFatomic per atom).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;enthalpy_formation_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">enthalpy_formation_atom</span> <span class="o">=</span> <span class="n">_enthalpy_formation_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_enthalpy_formation_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell formation enthalpy (`mandatory`). Units: `eV`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the formation enthalpy DeltaHF per unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;enthalpy_formation_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">enthalpy_formation_cell</span> <span class="o">=</span> <span class="n">_enthalpy_formation_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_entropic_temperature</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;entropic temperature (`mandatory`). Units: `Kelvin`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the entropic temperature for the structure.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;entropic_temperature&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">entropic_temperature</span> <span class="o">=</span> <span class="n">_entropic_temperature</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_files</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;I/O files (`conditional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Provides access to the input and output files used in the simulation (provenance data).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;files&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="n">_files</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_forces</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Quantum Forces (`optional`). Units: `eV/&amp;Aring;`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Final quantum mechanical forces (Fi,Fj,Fk) in the notation of the code.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;forces&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">forces</span> <span class="o">=</span> <span class="n">_forces</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_geometry</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell basis (`mandatory`). Units: `&amp;Aring;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns geometrical data describing the unit cell in the usual a,b,c,alpha,beta,gamma notation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;geometry&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">geometry</span> <span class="o">=</span> <span class="n">_geometry</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_keywords</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Title (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: This includes the list of keywords available in the entry, separated by commas.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;keywords&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">keywords</span> <span class="o">=</span> <span class="n">_keywords</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_kpoints</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;K-point mesh (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: with keys [&#39;relaxation&#39;, &#39;static&#39;, &#39;points&#39;, &#39;nsamples&#39;]</span>
+<span class="sd">            describing the cells for the relaxation and static calculations, the</span>
+<span class="sd">            k-space symmetry points of the structure and the number of samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;kpoints&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">dict</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">kpoints</span> <span class="o">=</span> <span class="n">_kpoints</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_lattice_system_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original lattice system (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;lattice_system_orig&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">lattice_system_orig</span> <span class="o">=</span> <span class="n">_lattice_system_orig</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_lattice_system_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed lattice system (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;lattice_system_relax&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">lattice_system_relax</span> <span class="o">=</span> <span class="n">_lattice_system_relax</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_lattice_variation_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original lattice variation (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;lattice_variation_orig&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">lattice_variation_orig</span> <span class="o">=</span> <span class="n">_lattice_variation_orig</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_lattice_variation_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed lattice variation (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;lattice_variation_relax&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">lattice_variation_relax</span> <span class="o">=</span> <span class="n">_lattice_variation_relax</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_ldau_TLUJ</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;on site coulomb interaction (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: This vector of numbers contains the parameters of the DFT+U calculations, based on a corrective functional inspired by the Hubbard model.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ldau_TLUJ&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">ldau_TLUJ</span> <span class="o">=</span> <span class="n">_ldau_TLUJ</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_loop</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;process category (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Informs the user of the type of post-processing that was performed.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;loop&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">loop</span> <span class="o">=</span> <span class="n">_loop</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_natoms</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell atom count (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the number of atoms in the unit cell of the structure entry. The number can be non integer if partial occupation is considered within appropriate approximations.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;natoms&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">natoms</span> <span class="o">=</span> <span class="n">_natoms</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_nbondxx</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Nearest neighbors bond lengths (`optional`). Units: `&amp;Aring;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Nearest neighbors bond lengths of the relaxed structure per ordered set of species Ai,Aj greater than or equal to i.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nbondxx&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">nbondxx</span> <span class="o">=</span> <span class="n">_nbondxx</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_node_CPU_Cores</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;available CPU cores (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Information about the number of cores in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;node_CPU_Cores&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">node_CPU_Cores</span> <span class="o">=</span> <span class="n">_node_CPU_Cores</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_node_CPU_MHz</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;CPU rate (`optional`). Units: `Megahertz`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Information about the CPU speed in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;node_CPU_MHz&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">node_CPU_MHz</span> <span class="o">=</span> <span class="n">_node_CPU_MHz</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_node_CPU_Model</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;CPU model (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Information about the CPU model in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;node_CPU_Model&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">node_CPU_Model</span> <span class="o">=</span> <span class="n">_node_CPU_Model</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_node_RAM_GB</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;available RAM (`optional`). Units: `Gigabytes`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Information about the RAM in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;node_RAM_GB&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">node_RAM_GB</span> <span class="o">=</span> <span class="n">_node_RAM_GB</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_nspecies</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;species count (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the number of species in the system (e.g., binary = 2, ternary = 3, etc.).</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nspecies&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">nspecies</span> <span class="o">=</span> <span class="n">_nspecies</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_positions_cartesian</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed absolute positions (`mandatory`). Units: `&amp;Aring;`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Final Cartesian positions (xi,xj,xk) in the notation of the code.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;positions_cartesian&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">positions_cartesian</span> <span class="o">=</span> <span class="n">_positions_cartesian</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_positions_fractional</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed relative positions (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Final fractional positions (xi,xj,xk) with respect to the unit cell as specified in $geometry.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;positions_fractional&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">positions_fractional</span> <span class="o">=</span> <span class="n">_positions_fractional</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_pressure</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;external pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the target pressure selected for the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;pressure&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">pressure</span> <span class="o">=</span> <span class="n">_pressure</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_pressure_final</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;resulting pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the external pressure achieved by the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;pressure_final&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">pressure_final</span> <span class="o">=</span> <span class="n">_pressure_final</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_pressure_residual</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;residual pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the external pressure achieved by the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;pressure_residual&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">pressure_residual</span> <span class="o">=</span> <span class="n">_pressure_residual</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_prototype</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original prototype (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Returns the AFLOW unrelaxed prototype which was used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;prototype&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+
+<span class="n">prototype</span> <span class="o">=</span> <span class="n">_prototype</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_scintillation_attenuation_length</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;attenuation length (`mandatory`). Units: `cm`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the scintillation attenuation length of the compound in cm.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;scintillation_attenuation_length&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">scintillation_attenuation_length</span> <span class="o">=</span> <span class="n">_scintillation_attenuation_length</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_sg</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;compound space group (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sg&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">sg</span> <span class="o">=</span> <span class="n">_sg</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_sg2</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;refined compound space group (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sg2&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">sg2</span> <span class="o">=</span> <span class="n">_sg2</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spacegroup_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;original space group number (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the spacegroup number of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spacegroup_orig&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">spacegroup_orig</span> <span class="o">=</span> <span class="n">_spacegroup_orig</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spacegroup_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;relaxed space group number (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the spacegroup number of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spacegroup_relax&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">spacegroup_relax</span> <span class="o">=</span> <span class="n">_spacegroup_relax</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_species</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic species (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Species of the atoms in this material.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;species&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">species</span> <span class="o">=</span> <span class="n">_species</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_species_pp</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;species pseudopotential(s) (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Pseudopotentials of the atomic species.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;species_pp&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">species_pp</span> <span class="o">=</span> <span class="n">_species_pp</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_species_pp_ZVAL</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;valence atoms per species (`optional`). Units: `electrons`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns the number of valence electrons of the atomic species.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;species_pp_ZVAL&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">species_pp_ZVAL</span> <span class="o">=</span> <span class="n">_species_pp_ZVAL</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_species_pp_version</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;pseudopotential species/version (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Species of the atoms, pseudopotentials species, and pseudopotential versions.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;species_pp_version&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">species_pp_version</span> <span class="o">=</span> <span class="n">_species_pp_version</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spinD</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: For spin polarized calculations, the spin decomposition over the atoms of the cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spinD&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">spinD</span> <span class="o">=</span> <span class="n">_spinD</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spinF</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;fermi level spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: For spin polarized calculations, the magnetization of the cell at the Fermi level.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spinF&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">spinF</span> <span class="o">=</span> <span class="n">_spinF</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spin_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic spin polarization (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: For spin polarized calculations, the magnetization per atom.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spin_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">spin_atom</span> <span class="o">=</span> <span class="n">_spin_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_spin_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell spin polarization (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: For spin polarized calculations, the total magnetization of the cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;spin_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">spin_cell</span> <span class="o">=</span> <span class="n">_spin_cell</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_sponsor</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;sponsor (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns information about funding agencies and other sponsors for the data.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sponsor&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;strings&quot;</span>
+
+<span class="n">sponsor</span> <span class="o">=</span> <span class="n">_sponsor</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_stoich</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell stoichiometry (`optional`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;stoich&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">stoich</span> <span class="o">=</span> <span class="n">_stoich</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_stoichiometry</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell stoichiometry (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;stoichiometry&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">stoichiometry</span> <span class="o">=</span> <span class="n">_stoichiometry</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_stress_tensor</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stress Tensor (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Returns the stress tensor of the completed calculation.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;stress_tensor&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">list</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;numbers&quot;</span>
+
+<span class="n">stress_tensor</span> <span class="o">=</span> <span class="n">_stress_tensor</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_valence_cell_iupac</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell IUPAC valence (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns IUPAC valence, the maximum number of univalent atoms that may combine with the atoms.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;valence_cell_iupac&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">valence_cell_iupac</span> <span class="o">=</span> <span class="n">_valence_cell_iupac</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_valence_cell_std</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell standard valence (`mandatory`). Units: ``.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns standard valence, the maximum number of univalent atoms that may combine with the atoms.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;valence_cell_std&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">valence_cell_std</span> <span class="o">=</span> <span class="n">_valence_cell_std</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_volume_atom</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;atomic volume (`mandatory`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;/atom`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the volume per atom in the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;volume_atom&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">volume_atom</span> <span class="o">=</span> <span class="n">_volume_atom</span><span class="p">()</span>
+    
+<span class="k">class</span> <span class="nc">_volume_cell</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;unit cell volume (`mandatory`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Returns the volume of the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;volume_cell&quot;</span>
+    <span class="n">ptype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">atype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
+
+<span class="n">volume_cell</span> <span class="o">=</span> <span class="n">_volume_cell</span><span class="p">()</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

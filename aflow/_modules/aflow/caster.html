@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aflow.caster &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aflow.caster</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for casting AFLOW type names to valid python objects. This also</span>
+<span class="sd">creates :class:`numpy.ndarray` for vector or tensor-valued properties.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">_rx_int</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d+$&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_strings</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_rx_int</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_numbers</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">svals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">_number</span><span class="p">(</span><span class="n">svals</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">svals</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_forces</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+    <span class="n">forces</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_kpoints</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+    <span class="n">relaxation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_number</span><span class="p">,</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))))</span>
+    <span class="n">static</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_number</span><span class="p">,</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="c1">#The web page (possibly outdated) includes an example where</span>
+        <span class="c1">#this would be the case. We include it here for</span>
+        <span class="c1">#completeness. I haven&#39;t found a case yet that we could use in</span>
+        <span class="c1">#the unit tests to trigger this.</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">nsamples</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">nsamples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;relaxation&quot;</span><span class="p">:</span> <span class="n">relaxation</span><span class="p">,</span>
+        <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="n">static</span><span class="p">,</span>
+        <span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="n">points</span><span class="p">,</span>
+        <span class="s2">&quot;nsamples&quot;</span><span class="p">:</span> <span class="n">nsamples</span>
+        <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">_stoich</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_number</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">docstrings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;kpoints&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;dict: with keys [&#39;relaxation&#39;, &#39;static&#39;, &#39;points&#39;, &#39;nsamples&#39;]</span>
+<span class="s2">describing the cells for the relaxation and static calculations, the</span>
+<span class="s2">k-space symmetry points of the structure and the number of samples.&quot;&quot;&quot;</span>
+<span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;dict: key-value pairs for custom docstrings describing the return</span>
+<span class="sd">value of keywords with complex structure.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">exceptions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;forces&quot;</span><span class="p">,</span> <span class="s2">&quot;kpoints&quot;</span><span class="p">,</span> <span class="s2">&quot;positions_cartesian&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;positions_fractional&quot;</span><span class="p">,</span> <span class="s2">&quot;spind&quot;</span><span class="p">,</span> <span class="s2">&quot;stoich&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;list: of AFLOW keywords for which the casting has to be handled in a special</span>
+<span class="sd">way.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ptype"><a class="viewcode-back" href="../../caster.html#aflow.caster.ptype">[docs]</a><span class="k">def</span> <span class="nf">ptype</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a `str` representing the *python* type for the</span>
+<span class="sd">    specified AFLOW type and keyword.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        atype (str): name of the AFLOW type.</span>
+<span class="sd">        keyword (str): name of the keyword that the value is associated with.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">castmap</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;numbers&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;forces&quot;</span><span class="p">:</span> <span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kpoints&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;positions_cartesian&quot;</span><span class="p">:</span> <span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;positions_fractional&quot;</span><span class="p">:</span> <span class="s2">&quot;numpy.ndarray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spind&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stoich&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;None&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">castmap</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">castmap</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="cast"><a class="viewcode-back" href="../../caster.html#aflow.caster.cast">[docs]</a><span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Casts the specified value to a python type, using the AFLOW type as a</span>
+<span class="sd">    reference.</span>
+
+<span class="sd">    .. note:: Unfortunately, some of the AFLOW type names are not descriptive or</span>
+<span class="sd">      unique enough to make general rule casting possible. Instead, we have to</span>
+<span class="sd">      encode some exceptions directly in this module.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        atype (str): name of the AFLOW type.</span>
+<span class="sd">        keyword (str): name of the keyword that the value is associated with.</span>
+<span class="sd">        value: object (usually a string) to cast into python types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">castmap</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="n">_strings</span><span class="p">,</span>
+        <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="n">_number</span><span class="p">,</span>
+        <span class="s2">&quot;numbers&quot;</span><span class="p">:</span> <span class="n">_numbers</span><span class="p">,</span>
+        <span class="s2">&quot;forces&quot;</span><span class="p">:</span> <span class="n">_forces</span><span class="p">,</span>
+        <span class="s2">&quot;kpoints&quot;</span><span class="p">:</span> <span class="n">_kpoints</span><span class="p">,</span>
+        <span class="s2">&quot;positions_cartesian&quot;</span><span class="p">:</span> <span class="n">_forces</span><span class="p">,</span>
+        <span class="s2">&quot;positions_fractional&quot;</span><span class="p">:</span> <span class="n">_forces</span><span class="p">,</span>
+        <span class="s2">&quot;spind&quot;</span><span class="p">:</span> <span class="n">_numbers</span><span class="p">,</span>
+        <span class="s2">&quot;stoich&quot;</span><span class="p">:</span> <span class="n">_stoich</span><span class="p">,</span>
+        <span class="s2">&quot;None&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">castmap</span><span class="p">[</span><span class="n">atype</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">castmap</span><span class="p">[</span><span class="n">keyword</span><span class="p">](</span><span class="n">value</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

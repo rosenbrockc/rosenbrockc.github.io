@@ -1,0 +1,2289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aflow.entries &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aflow.entries</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provides class and methods for abstracting the data from AFLOW into</span>
+<span class="sd">python.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">aflow.caster</span> <span class="k">import</span> <span class="n">cast</span>
+<span class="kn">import</span> <span class="nn">aflow.keywords</span> <span class="k">as</span> <span class="nn">kw</span>
+    
+<span class="k">def</span> <span class="nf">_val_from_str</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieves the specified attribute&#39;s value, cast to an</span>
+<span class="sd">    appropriate python type where possible.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clsname</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="n">clsname</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="n">clsname</span><span class="p">)</span>
+        <span class="n">atype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;atype&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;kpoints&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">atype</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Entry"><a class="viewcode-back" href="../../entries.html#aflow.entries.Entry">[docs]</a><span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encapsulates the result of a single material entry in the AFLOW</span>
+<span class="sd">    database.</span>
+
+<span class="sd">    .. note:: Additional keyword values will be loaded lazily as</span>
+<span class="sd">      requested (using additional HTTP requests). For optimization, it</span>
+<span class="sd">      is recommended to request *all* known keywords up front.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        kwargs (dict): of key-value pairs obtained from the initial</span>
+<span class="sd">          AFLUX request.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        attributes (dict): of key-value pairs requested for the given</span>
+<span class="sd">          material. This will only be identical to the passed in the</span>
+<span class="sd">          keyword arguments if no additional property requests have been</span>
+<span class="sd">          made.</span>
+<span class="sd">        raw (dict): original response dictionary (without any cast</span>
+<span class="sd">          values).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="n">_val_from_str</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">_lazy_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads the value of the specified keyword via HTTP request against the</span>
+<span class="sd">        AFLUX API, if it isn&#39;t already present on the object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyword (str): name of the keyword to retrieve for this entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">requests</span>
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="n">aurl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;aurl&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.edu:&quot;</span><span class="p">,</span> <span class="s2">&quot;.edu/&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">{0}</span><span class="s2">?</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aurl</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span>
+            
+            <span class="c1">#We need to coerce the string returned from aflow into the</span>
+            <span class="c1">#appropriate python format.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_val_from_str</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Bravais_lattice_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original bravais lattice (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the Bravais lattice of the original unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Bravais_lattice_orig=MCLC`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Bravais_lattice_orig&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Bravais_lattice_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed bravais lattice (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the Bravais lattice of the original relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Bravais_lattice_relax=MCLC`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Bravais_lattice_relax&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Egap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;energy gap (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Band gap calculated with the approximations and pseudopotentials described by other keywords.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Egap=2.5`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Egap&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Egap_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;fitted band gap (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Simple cross-validated correction (fit) of Egap.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Egap_fit=3.5`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Egap_fit&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Egap_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;band gap type (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Given a band gap, this keyword describes if the system is a metal, a semi-metal, an insulator with direct or indirect band gap.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Egap_type=insulator_direct`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Egap_type&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">PV_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic pressure*volume (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Pressure multiplied by volume of the atom.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `PV_atom=12.13`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;PV_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">PV_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell pressure*volume (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Pressure multiplied by volume of the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `PV_cell=12.13`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;PV_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Pearson_symbol_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original pearson symbol (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the Pearson symbol of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Pearson_symbol_orig=mS32`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Pearson_symbol_orig&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Pearson_symbol_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed pearson symbol (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the Pearson symbol of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Pearson_symbol_relax=mS32`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Pearson_symbol_relax&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Pulay_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pulay Stress (`mandatory`). Units: `kbar`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns a metric of the basis set inconsistency for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `pulay_stress=10.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Pulay_stress&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Pullay_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pulay Stress (`mandatory`). Units: `kbar`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns a metric of the basis set inconsistency for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `Pullay_stress=10.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;Pullay_stress&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_bulk_modulus_reuss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL Reuss bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the bulk modulus as calculated using the Reuss method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_bulk_modulus_reuss=105.315`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_bulk_modulus_reuss&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_bulk_modulus_voigt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL Voigt bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the bulk modulus as calculated using the Voigt method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_bulk_modulus_voiht=105.315`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_bulk_modulus_voigt&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_bulk_modulus_vrh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL VRH bulk modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the bulk modulus as calculated using the Voigt-Reuss-Hill average with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_bulk_modulus_vrh=105.315`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_bulk_modulus_vrh&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_elastic_anistropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL elastic anistropy (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the elastic anistropy as calculated with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_elastic_anistropy=0.0008165`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_elastic_anistropy&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_poisson_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL Poisson ratio (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the istropic Poisson ratio as calculated with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_poisson_ratio=0.216`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_poisson_ratio&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_shear_modulus_reuss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL Reuss shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the shear modulus as calculated using the Reuss method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_shear_modulus_reuss=73.787`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_shear_modulus_reuss&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_shear_modulus_voigt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL Voigt shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the shear modulus as calculated using the Voigt method with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_shear_modulus_voigt=73.799`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_shear_modulus_voigt&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ael_shear_modulus_vrh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AEL VRH shear modulus (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the shear modulus as calculated using the Voigt-Reuss-Hill average with AEL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ael_shear_modulus_vrh=73.793`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ael_shear_modulus_vrh&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aflow_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;aflow version (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the version number of AFLOW used to perform the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aflow_version=aflow30641`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aflow_version&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aflowlib_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;material generation date (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the date of the AFLOW post-processor which generated the entry for the library.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aflowlib_date=20140204_13:10:39_GMT-5`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aflowlib_date&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aflowlib_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;aflowlib entries (`conditional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: For projects and set-layer entries, aflowlib_entries lists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aflowlib_entries=AgAl,AgAs,AgAu,AgB_h,AgBa_sv,AgBe_sv,AgBi_d,AgBr,AgCa_sv,...`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aflowlib_entries&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aflowlib_entries_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;aflowlib entry count (`conditional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: For projects and set-layer entries, aflowlib_entrieslists the available sub-entries which are associated with the $aurl of the subdirectories.  By parsing $aurl/?aflowlib_entries (containing $aurl/aflowlib_entries_number entries) the user finds further locations to interrogate.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aflowlib_entries_number=654`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aflowlib_entries_number&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aflowlib_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;aflowlib version (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the version of the AFLOW post-processor which generated the entry for the library.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aflowlib_version=3.1.103`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aflowlib_version&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_acoustic_debye</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL acoustic Debye temperature (`optional`). Units: `K`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the acoustic Debye temperature as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_acoustic_debye=492`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_acoustic_debye&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_bulk_modulus_isothermal_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL isothermal bulk modulus 300K (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the isothermal bulk modulus at 300K as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_bulk_modulus_isothermal_300K=96.6`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_bulk_modulus_isothermal_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_bulk_modulus_static_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL static bulk modulus 300K (`optional`). Units: `GPa`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the static bulk modulus at 300K as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_bulk_modulus_static_300K=99.6`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_bulk_modulus_static_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_debye</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL Debye temperature (`optional`). Units: `K`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the Debye temperature as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_debye=620`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_debye&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_gruneisen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL Gruneisen parameter (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the Gruneisen parameter as calculated with AGL.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_gruneisen=2.06`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_gruneisen&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_heat_capacity_Cp_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL heat capacity Cp (`optional`). Units: `kB/cell`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the heat capacity at constant pressure as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_heat_capacity_Cp_300K=5.502`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_heat_capacity_Cp_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_heat_capacity_Cv_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL heat capacity Cv (`optional`). Units: `kB/cell`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the heat capacity at constant volume as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_heat_capacity_Cv_300K=4.901`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_heat_capacity_Cv_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_thermal_conductivity_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL thermal conductivity (`optional`). Units: `W/m*K`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the thermal conductivity as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_thermal_conductivity_300K=24.41`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_thermal_conductivity_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">agl_thermal_expansion_300K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AGL thermal expansion (`optional`). Units: `1/K`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the thermal expansion as calculated with AGL at 300K.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `agl_thermal_expansion_300K=4.997e-05`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;agl_thermal_expansion_300K&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">auid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AFLOWLIB Unique Identifier (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: AFLOWLIB Unique Identifier for the entry, AUID, which can be used as a publishable object identifier.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `auid=aflow:e9c6d914c4b8d9ca`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;auid&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aurl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AFLOWLIB Uniform Resource Locator (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: AFLOWLIB Uniform Resource Locator returns the AURL of the entry.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `aurl=aflowlib.duke.edu:AFLOWDATA/LIB3_RAW/Bi_dRh_pvTi_sv/T0003.ABC:LDAU2`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;aurl&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">author</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;author (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns the name (not necessarily an individual) and affiliation associated with authorship of the data.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `author=Marco_Buongiorno_Nardelli,Ohad_Levy,Jesus_Carrete`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bader_atomic_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic volume per atom (`optional`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns the volume of each atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis. This volume encapsulates the electron density associated with each atom above a threshold of 0.0001 electrons.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `bader_atomic_volumes=15.235,12.581,13.009`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;bader_atomic_volumes&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bader_net_charges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;partial charge per atom (`optional`). Units: `electrons`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns a comma delimited set of partial charges per atom of the primitive cell as calculated by the Bader Atoms in Molecules Analysis.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `bader_net_charges=0.125,0.125,-0.25`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;bader_net_charges&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">calculation_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;used CPU cores (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Number of processors/cores used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `calculation_cores=32`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;calculation_cores&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">calculation_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;used RAM (`optional`). Units: `Megabytes`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The maximum memory used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `calculation_memory=32`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;calculation_memory&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">calculation_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;used time (`optional`). Units: `seconds`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Total time taken for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `calculation_time=32`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;calculation_time&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;catalog (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the context set for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `catalog=icsd`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;catalog&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">code</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ab initio code (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the software name and version used to perform the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `code=vasp.4.6.35`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;composition (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns a comma delimited composition description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `composition=2,6,6`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;composition&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">compound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;chemical formula (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the composition description of the compound in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `compound=Co2Er6Si6`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;compound&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">corresponding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;coresponding (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns the name (not necessarily an individual) and affiliation associated with the data origin concerning correspondence about data.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `corresponding=M_Buongiorno_Nardelli_mbn@unt.edu`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;corresponding&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;REST API version (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: AFLOWLIB version of the entry, API.}</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `data_api=aapi1.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;data_api&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_language</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;data language (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Gives the language of the data in AFLOWLIB.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `data_language=aflowlib`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;data_language&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;data source (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Gives the source of the data in AFLOWLIB.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `data_source=aflowlib`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;data_source&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">delta_electronic_energy_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Electronic Energy of Convergence Step (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the change in energy from the last step of the convergence iteration.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `delta_electronic_energy_convergence=6.09588e-05`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;delta_electronic_energy_convergence&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">delta_electronic_energy_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Electronic Energy of Convergence Threshold (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the maximimum change in energy required for the convergence iteration.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `delta_electronic_energy_threshold=0.0001`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;delta_electronic_energy_threshold&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;mass density (`optional`). Units: `grams/cm&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the mass density in grams/cm3.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `density=7.76665`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;density&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dft_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DFT type (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns information about the pseudopotential type, the exchange correlation functional used (normal or hybrid) and use of GW.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `dft_type=PAW_PBE,HSE06`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;dft_type&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eentropy_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomistic electronic entropy (`optional`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the electronic entropy of the atom used to converge the ab initio calculation (smearing).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `eentropy_atom=0.0011`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;eentropy_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eentropy_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell electronic entropy (`optional`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the electronic entropy of the unit cell used to converge the ab initio calculation (smearing).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `eentropy_cell=0.0011`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;eentropy_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic energy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the total ab initio energy per atom- the value of energy_cell/$N$).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `energy_atom=-82.1656`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;energy_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell energy (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the total ab initio energy of the unit cell, E. At T=0K and p=0, this is the internal energy of the system (per unit cell).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `energy_cell=-82.1656`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;energy_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;energy cutoff (`optional`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Set of energy cut-offs used during the various steps of the calculations.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `energy_cutoff=384.1,384.1,384.1`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;energy_cutoff&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enthalpy_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic enthalpy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the enthalpy per atom- the value of enthalpy_cell/N).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `enthalpy_atom=-82.1656`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;enthalpy_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enthalpy_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell enthalpy (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the enthalpy of the system of the unit cell, H = E + PV.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `enthalpy_cell=-82.1656`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;enthalpy_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enthalpy_formation_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic formation enthalpy (`mandatory`). Units: `eV/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the formation enthalpy DeltaHFatomic per atom).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `enthalpy_formation_atom=-33.1587`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;enthalpy_formation_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">enthalpy_formation_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell formation enthalpy (`mandatory`). Units: `eV`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the formation enthalpy DeltaHF per unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `enthalpy_formation_cell=-33.1587`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;enthalpy_formation_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entropic_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;entropic temperature (`mandatory`). Units: `Kelvin`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the entropic temperature for the structure.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `entropic_temperature=1072.1`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;entropic_temperature&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;I/O files (`conditional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Provides access to the input and output files used in the simulation (provenance data).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `files=Bi_dRh_pv.33.cif,Bi_dRh_pv.33.png,CONTCAR.relax,CONTCAR.relax1,`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">forces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Quantum Forces (`optional`). Units: `eV/&amp;Aring;`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Final quantum mechanical forces (Fi,Fj,Fk) in the notation of the code.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `forces=0,-0.023928,0.000197;0,0.023928,-0.000197;...`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;forces&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell basis (`mandatory`). Units: `&amp;Aring;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns geometrical data describing the unit cell in the usual a,b,c,alpha,beta,gamma notation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `geometry=18.82,18.82,18.82,32.41,32.41,32.41`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Title (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: This includes the list of keywords available in the entry, separated by commas.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `keywords=aurl,auid,loop,code,compound,prototype,nspecies,natoms,...`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;keywords&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;K-point mesh (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Set of k-point meshes uniquely identifying the various steps of the calculations, e.g. relaxation, static and electronic band structure (specifying the k-space symmetry points of the structure).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `kpoints=10,10,10;16,16,16;G-X-W-K-G-L-U-W-L-K+U-X`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;kpoints&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lattice_system_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original lattice system (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `lattice_system_orig=rhombohedral`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;lattice_system_orig&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lattice_system_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed lattice system (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `lattice_system_relax=rhombohedral`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;lattice_system_relax&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lattice_variation_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original lattice variation (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Return the lattice system and lattice variation (Brillouin zone) of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `lattice_variation_orig=rhombohedral`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;lattice_variation_orig&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lattice_variation_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed lattice variation (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Return the lattice system and lattice variation (Brillouin zone) of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `lattice_variation_relax=rhombohedral`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;lattice_variation_relax&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ldau_TLUJ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;on site coulomb interaction (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: This vector of numbers contains the parameters of the DFT+U calculations, based on a corrective functional inspired by the Hubbard model.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `ldau_TLUJ=2;2,0,0;5,0,0;0,0,0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;ldau_TLUJ&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;process category (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Informs the user of the type of post-processing that was performed.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `loop=thermodynamics,bands,magnetic`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;loop&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">natoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell atom count (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the number of atoms in the unit cell of the structure entry. The number can be non integer if partial occupation is considered within appropriate approximations.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `natoms=12`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;natoms&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nbondxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Nearest neighbors bond lengths (`optional`). Units: `&amp;Aring;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Nearest neighbors bond lengths of the relaxed structure per ordered set of species Ai,Aj greater than or equal to i.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `nbondxx=1.2599,1.0911,1.0911,1.7818,1.2599,1.7818`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;nbondxx&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">node_CPU_Cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;available CPU cores (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Information about the number of cores in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `node_CPU_Cores=12`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;node_CPU_Cores&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">node_CPU_MHz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;CPU rate (`optional`). Units: `Megahertz`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Information about the CPU speed in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `node_CPU_MHz=12`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;node_CPU_MHz&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">node_CPU_Model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;CPU model (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Information about the CPU model in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `node_CPU_Model=12`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;node_CPU_Model&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">node_RAM_GB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;available RAM (`optional`). Units: `Gigabytes`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Information about the RAM in the node/cluster where the calculation was performed.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `node_RAM_GB=12`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;node_RAM_GB&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nspecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;species count (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the number of species in the system (e.g., binary = 2, ternary = 3, etc.).</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `nspecies=3`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;nspecies&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positions_cartesian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed absolute positions (`mandatory`). Units: `&amp;Aring;`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Final Cartesian positions (xi,xj,xk) in the notation of the code.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `positions_cartesian=0,0,0;18.18438,0,2.85027;...`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;positions_cartesian&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positions_fractional</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed relative positions (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Final fractional positions (xi,xj,xk) with respect to the unit cell as specified in $geometry.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `positions_fractional=0,0,0;0.25,0.25,0.25;...`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;positions_fractional&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pressure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;external pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the target pressure selected for the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `pressure=10.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;pressure&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pressure_final</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;resulting pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the external pressure achieved by the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `pressure_final=10.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;pressure_final&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pressure_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;residual pressure (`mandatory`). Units: `kbar`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the external pressure achieved by the simulation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `pressure_residual=10.0`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;pressure_residual&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prototype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original prototype (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Returns the AFLOW unrelaxed prototype which was used for the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `prototype=T0001.A2BC`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;prototype&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scintillation_attenuation_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;attenuation length (`mandatory`). Units: `cm`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the scintillation attenuation length of the compound in cm.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `scintillation_attenuation_length=2.21895`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;scintillation_attenuation_length&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;compound space group (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `sg=Fm-3m#225,Fm-3m#225,Fm-3m#225`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;sg&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sg2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;refined compound space group (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Evolution of the space group of the compound.  The first, second and third string represent space group name/number before the first, after the first, and after the last relaxation of the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `sg2=Fm-3m#225,Fm-3m#225,Fm-3m#225`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;sg2&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacegroup_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;original space group number (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the spacegroup number of the original-unrelaxed structure before the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spacegroup_orig=225`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spacegroup_orig&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacegroup_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relaxed space group number (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the spacegroup number of the relaxed structure after the calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spacegroup_relax=225`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spacegroup_relax&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic species (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Species of the atoms in this material.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `species=Y,Zn,Zr`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">species_pp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;species pseudopotential(s) (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Pseudopotentials of the atomic species.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `species_pp=Y,Zn,Zr`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;species_pp&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">species_pp_ZVAL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;valence atoms per species (`optional`). Units: `electrons`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns the number of valence electrons of the atomic species.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `species_pp_ZVAL=3`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;species_pp_ZVAL&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">species_pp_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;pseudopotential species/version (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Species of the atoms, pseudopotentials species, and pseudopotential versions.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `species_pp_version=Y,Zn,Zr`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;species_pp_version&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spinD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: For spin polarized calculations, the spin decomposition over the atoms of the cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spinD=0.236,0.236,-0.023,1.005`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spinD&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spinF</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;fermi level spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: For spin polarized calculations, the magnetization of the cell at the Fermi level.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spinF=0.410879`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spinF&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spin_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic spin polarization (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: For spin polarized calculations, the magnetization per atom.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spin_atom=2.16419`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spin_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spin_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell spin polarization (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: For spin polarized calculations, the total magnetization of the cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `spin_cell=2.16419`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;spin_cell&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sponsor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sponsor (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns information about funding agencies and other sponsors for the data.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `sponsor=DOD_N000141310635,NIST_70NANB12H163`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;sponsor&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stoich</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell stoichiometry (`optional`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `stoichiometry=0.5,0.25,0.25`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;stoich&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stoichiometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell stoichiometry (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Similar to composition, returns a comma delimited stoichiometry description of the structure entry in the calculated cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `stoichiometry=0.5,0.25,0.25`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;stoichiometry&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stress_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stress Tensor (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
+<span class="sd">        </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Returns the stress tensor of the completed calculation.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `stress_tensor=-0.96,-0,-0,-0,-0.96,-0,-0,-0,-0.96`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;stress_tensor&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valence_cell_iupac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell IUPAC valence (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns IUPAC valence, the maximum number of univalent atoms that may combine with the atoms.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `valence_cell_iupac=22`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;valence_cell_iupac&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valence_cell_std</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell standard valence (`mandatory`). Units: ``.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns standard valence, the maximum number of univalent atoms that may combine with the atoms.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `valence_cell_std=22`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;valence_cell_std&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">volume_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;atomic volume (`mandatory`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;/atom`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the volume per atom in the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `volume_atom=100.984`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;volume_atom&quot;</span><span class="p">)</span>    
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">volume_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;unit cell volume (`mandatory`). Units: `&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: The following verifications are available for this</span>
+<span class="sd">          keyword. They are exposed as additional methods on this object.</span>
+<span class="sd">          </span>
+<span class="sd">          - :meth:`energy_cutoff`</span>
+<span class="sd">          - :meth:`forces`</span>
+<span class="sd">          - :meth:`kpoints`</span>
+<span class="sd">          - :meth:`pressure_residual`</span>
+<span class="sd">          - :meth:`stress_tensor`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Returns the volume of the unit cell.</span>
+<span class="sd">        </span>
+<span class="sd">        Examples:</span>
+<span class="sd">            You can expect the *content* of the result to be something like:</span>
+
+<span class="sd">            `volume_cell=100.984`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lazy_load</span><span class="p">(</span><span class="s2">&quot;volume_cell&quot;</span><span class="p">)</span>    </div>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

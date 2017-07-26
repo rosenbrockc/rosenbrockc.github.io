@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aflow.generators &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aflow.generators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Documentation and format builders for the latest AFLUX</span>
+<span class="sd">specification. Since AFLUX is in constant flux, we generate the</span>
+<span class="sd">documentation and keyword lists dynamically at development time</span>
+<span class="sd">whenever a new version is released. This happens by parsing the HTML</span>
+<span class="sd">page that lists all available keywords and then querying the `help`</span>
+<span class="sd">feature of the AFLOW API for additional information. This is then used</span>
+<span class="sd">to generate the API documentation automatically.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">urllib</span>
+<span class="k">def</span> <span class="nf">_get_keywords</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the currently valid keywords for the AFLUX API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">urllib</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+    <span class="n">urlopen</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://aflowlib.duke.edu/search/API/?schema&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_get_kw_help</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the documentation string and type information, etc. from</span>
+<span class="sd">    the AFLUX API.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        keyword (str): name of the keyword to get help for.</span>
+<span class="sd">        metadata (dict): key-value pairs describing the keyword&#39;s</span>
+<span class="sd">          metadata in the AFLOW database.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: with key-value pairs returned by AFLUX (if the entry</span>
+<span class="sd">        exists); otherwise `None`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_set_defaults</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">aflow.caster</span> <span class="k">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">docstrings</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;ptype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ptype</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">keyword</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">docstrings</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;customdoc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">docstrings</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">metadata</span>
+
+<span class="k">def</span> <span class="nf">_set_defaults</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds the default values to the specified dictionary if they don&#39;t already</span>
+<span class="sd">    exist. This includes all the parameters necessary to construct the templates</span>
+<span class="sd">    for the classes.</span>
+
+<span class="sd">    .. note:: This mutates the given dictionary if some of the keys are missing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;No schema information available.&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;inclusion&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;No description was returned from AFLUX.&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="keywords"><a class="viewcode-back" href="../../generators.html#aflow.generators.keywords">[docs]</a><span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a python module file for the :class:`~aflow.entries.Entry` that</span>
+<span class="sd">    has documented methods for lazy loading of properties from AFLOW database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): path in which to generate the module files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+    <span class="kn">from</span> <span class="nn">aflow.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
+    <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;aflow&quot;</span><span class="p">,</span> <span class="s2">&quot;entries.py&quot;</span><span class="p">)</span>
+        <span class="n">keyword</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reporoot</span><span class="p">,</span> <span class="s2">&quot;aflow&quot;</span><span class="p">,</span> <span class="s2">&quot;keywords.py&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;entries.py&quot;</span><span class="p">)</span>
+        <span class="n">keyword</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;keywords.py&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Compile a dictionary of all the keywords and their corresponding</span>
+    <span class="c1">#dictionaries.</span>
+    <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+    <span class="n">kws</span> <span class="o">=</span> <span class="n">_get_keywords</span><span class="p">()</span>
+    <span class="n">kwdata</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kws</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">kws</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">kw</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;__&quot;</span><span class="p">:</span>
+            <span class="n">kwdata</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_kw_help</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+        
+    <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="n">kwdata</span>
+    <span class="p">}</span>
+
+    <span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s1">&#39;aflow&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">),</span>
+                      <span class="n">keep_trailing_newline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">tentry</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;entry.py&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tentry</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">))</span>
+
+    <span class="n">tkeyword</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;keywords.py&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tkeyword</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

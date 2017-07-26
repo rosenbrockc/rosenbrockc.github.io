@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aflow.control &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aflow.control</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for controlling high-level search functionality for the</span>
+<span class="sd">AFLOW database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">server</span> <span class="o">=</span> <span class="s2">&quot;http://aflowlib.duke.edu/search/API/?&quot;</span>
+<span class="sd">&quot;&quot;&quot;str: API server address over HTTP.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">aflow</span> <span class="k">import</span> <span class="n">msg</span>
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../control.html#aflow.control.search">[docs]</a><span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a :class:`aflow.control.Query` to help construct the search</span>
+<span class="sd">    query.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        catalog (str): one of the catalogs supported on AFLOW: [&#39;icsd&#39;, &#39;lib1&#39;,</span>
+<span class="sd">          &#39;lib2&#39;, &#39;lib3&#39;]. Also supports a `list` of catalog names.</span>
+<span class="sd">        batch_size (int): number of data entries to return per HTTP request.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Query</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Query"><a class="viewcode-back" href="../../control.html#aflow.control.Query">[docs]</a><span class="k">class</span> <span class="nc">Query</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a search againts the AFLUX API.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        catalog (str): one of the catalogs supported on AFLOW: [&#39;icsd&#39;, &#39;lib1&#39;,</span>
+<span class="sd">          &#39;lib2&#39;, &#39;lib3&#39;]. Also supports a `list` of catalog names.</span>
+<span class="sd">        batch_size (int): number of data entries to return per HTTP request.</span>
+<span class="sd">        step (int): step size over entries.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        filters (list): of `str` filter arguments to pass to the matchbook</span>
+<span class="sd">          section of the API request.</span>
+<span class="sd">        select (list): of :class:`aflow.keywords.Keyword` to *include* in the request.</span>
+<span class="sd">        excludes (list): of :class:`aflow.keywords.Keyword` to *exclude* in the request.</span>
+<span class="sd">        orderby (str): name of the keyword to order by. AFLUX only supports a</span>
+<span class="sd">          single order-by parameter for now.</span>
+<span class="sd">        catalog (str): one of the catalogs supported on AFLOW: [&#39;icsd&#39;, &#39;lib1&#39;,</span>
+<span class="sd">          &#39;lib2&#39;, &#39;lib3&#39;]. Also supports a `list` of catalog names.</span>
+<span class="sd">        N (int): number of results in the current search query.</span>
+<span class="sd">        reverse (bool): when True, reverse the order of the results in the</span>
+<span class="sd">          query.</span>
+<span class="sd">        k (int): number of datasets per page for the current iterator. Can be</span>
+<span class="sd">          controlled by `batch_size`.</span>
+<span class="sd">        responses (dict): keys are (n,k) tuples from the pagination; values are</span>
+<span class="sd">          the corresponding JSON dictionaries.</span>
+<span class="sd">        step (int): step size over entries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">aflow.keywords</span> <span class="k">import</span> <span class="n">keywords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selects</span> <span class="o">=</span> <span class="p">[]</span><span class="c1">#keywords]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">=</span> <span class="n">catalog</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span> <span class="k">else</span> <span class="p">[</span><span class="n">catalog</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;int: number of results in the current search query.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="sd">&quot;&quot;&quot;int: current integer id of the iterator in the *whole* dataset; this</span>
+<span class="sd">        means it can have a value greater than :attr:`k`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;int: index of the maximum entry that should be returned from this</span>
+<span class="sd">        query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matchbook</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;str: matchbook portion of the request URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_final</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="sd">&quot;&quot;&quot;bool: when True, this query is finalized and no additional filters,</span>
+<span class="sd">        etc. can be added to it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Query.reset_iter"><a class="viewcode-back" href="../../control.html#aflow.control.Query.reset_iter">[docs]</a>    <span class="k">def</span> <span class="nf">reset_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets the iterator back to zero so that the collection can be</span>
+<span class="sd">        iterated over again *without* needing to request the data from the</span>
+<span class="sd">        server again.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="mi">0</span></div>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Current page number for the iterator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">N</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_N</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum integer index that will be reached by this query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_entry</span>
+    
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+        <span class="c1">#We need to trigger the first request to make sure that the total</span>
+        <span class="c1">#number of entries is fixed on the parent object, and so that the</span>
+        <span class="c1">#pointers to the response caching are all the same.</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        
+        <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">slice</span><span class="p">:</span>
+            <span class="c1">#Perform a shallow copy so that we get a new reference for the</span>
+            <span class="c1">#indices.</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_max_entry</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">stop</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">step</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="n">seq</span>
+            <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs the query string for this :class:`Query` object for the</span>
+<span class="sd">        specified paging limits and then returns the response from the REST API</span>
+<span class="sd">        as a python object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): page number of the results to return.</span>
+<span class="sd">            k (int): number of datasets per page.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#We are making the very first request, finalize the query.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+        
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">urllib</span>
+        <span class="n">urlopen</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">,</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matchbook</span><span class="p">(),</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_directives</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+        <span class="c1">#If this is the first request, then save the number of results in the</span>
+        <span class="c1">#query.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+
+<div class="viewcode-block" id="Query.finalize"><a class="viewcode-back" href="../../control.html#aflow.control.Query.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finalizes the current state of the query. This means that the request URL</span>
+<span class="sd">        will be saved, but the individual keyword objects will be</span>
+<span class="sd">        *reset*. Re-executing the search query will reconstruct the same object</span>
+<span class="sd">        and request, but any cached responses will be lost.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Generate the matchbook query, this has all the filters, selects and</span>
+        <span class="c1">#ordering information.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matchbook</span><span class="p">()</span>
+        <span class="c1">#Next, reset all the keywords for the global AFLOW.</span>
+        <span class="kn">from</span> <span class="nn">aflow.keywords</span> <span class="k">import</span> <span class="n">reset</span>
+        <span class="n">reset</span><span class="p">()</span>
+        <span class="c1">#Switch out all of the keyword instances for their string</span>
+        <span class="c1">#representations.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selects</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="c1">#Set the finalizer flag so that this object doesn&#39;t allow mutations.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_final</span> <span class="o">=</span> <span class="kc">True</span></div>
+        
+<div class="viewcode-block" id="Query.matchbook"><a class="viewcode-back" href="../../control.html#aflow.control.Query.matchbook">[docs]</a>    <span class="k">def</span> <span class="nf">matchbook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs the matchbook portion of the query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matchbook</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1">#AFLUX orders by the first element in the query. If we have an orderby</span>
+            <span class="c1">#specified, then place it first.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">))</span>
+
+            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">selects</span><span class="p">)))</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)))</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;$</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span><span class="p">])</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_matchbook</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matchbook</span></div>
+
+    <span class="k">def</span> <span class="nf">_directives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the directives portion of the AFLUX query.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): page number of the results to return.</span>
+<span class="sd">            k (int): number of datasets per page.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;catalog(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">)))</span>
+
+        <span class="c1">#Next, add the paging context. This query maintains its own paging</span>
+        <span class="c1">#context</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;paging(</span><span class="si">{0:d}</span><span class="s2">,</span><span class="si">{1:d}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="Query.next"><a class="viewcode-back" href="../../control.html#aflow.control.Query.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Yields a generator over AFLUX API request results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
+    
+    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Yields a generator over AFLUX API request results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#First, find out which entry we are on.</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+
+        <span class="c1">#Reverse the sign now that we have figured out the ordinal page number.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_N</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="kn">from</span> <span class="nn">aflow.entries</span> <span class="k">import</span> <span class="n">Entry</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_N</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">(</span><span class="o">**</span><span class="n">raw</span><span class="p">)</span>
+
+            <span class="c1">#Increment the iterator right before we return the entry.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_final_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether this object is finalized; if it is, print a friendly</span>
+<span class="sd">        message and return False, otherwise True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;This query has been finalized. It cannot be mutated. &quot;</span>
+                     <span class="s2">&quot;Create a new query to change the matchbook.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final</span>
+        
+<div class="viewcode-block" id="Query.filter"><a class="viewcode-back" href="../../control.html#aflow.control.Query.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a search term to the current filter list. Calling :meth:`filter`</span>
+<span class="sd">        multiple times will join the final filters together using logical *and*.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyword (aflow.keywords.Keyword): that encapsulates the AFLUX</span>
+<span class="sd">              request language logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_check</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Query.select"><a class="viewcode-back" href="../../control.html#aflow.control.Query.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a keyword to the list of properties to return for each material</span>
+<span class="sd">        in the request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyword (aflow.keywords.Keyword): that encapsulates the AFLUX</span>
+<span class="sd">              request language logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_check</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Query.orderby"><a class="viewcode-back" href="../../control.html#aflow.control.Query.orderby">[docs]</a>    <span class="k">def</span> <span class="nf">orderby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a keyword to be the one by which </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyword (aflow.keywords.Keyword): that encapsulates the AFLUX</span>
+<span class="sd">              request language logic.</span>
+<span class="sd">            reverse (bool): when True, reverse the ordering.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_check</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">keyword</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="o">=</span> <span class="n">reverse</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selects</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selects</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+    
+<div class="viewcode-block" id="Query.exclude"><a class="viewcode-back" href="../../control.html#aflow.control.Query.exclude">[docs]</a>    <span class="k">def</span> <span class="nf">exclude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a keyword to be *excluded* from the response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyword (aflow.keywords.Keyword): that encapsulates the AFLUX</span>
+<span class="sd">              request language logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_check</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">aflow 0.0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

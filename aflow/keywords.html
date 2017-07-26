@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AFLOW Database Keywords &#8212; aflow 0.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AFLOW Database Entries" href="entries.html" />
+    <link rel="prev" title="Query Constructor" href="control.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="entries.html" title="AFLOW Database Entries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="control.html" title="Query Constructor"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aflow-database-keywords">
+<h1><cite>AFLOW</cite> Database Keywords<a class="headerlink" href="#aflow-database-keywords" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>AFLOW</cite> database supports a fixed number of keywords related to
+the calculated physical properties. The generators create a
+sub-classed <a class="reference internal" href="#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">Keyword</span></code></a> object that supports
+logical operations supported by the AFLUX standard.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because of the way the operators are overloaded, each
+comparison needs to be placed in its own set of parenthesis to
+ensure that the order of operators is respected correctly. See
+<a class="reference internal" href="examples.html"><span class="doc">Example Queries with aflow</span></a>.</p>
+</div>
+<p>The <a class="reference internal" href="#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">Keyword</span></code></a> class provides the following
+operators:</p>
+<ol class="arabic simple">
+<li><cite>&gt;</cite> and <cite>&lt;</cite> behave as expected. However, these are overloaded for
+string comparisons in the spirit of the AFLUX endpoint. For example
+<cite>author &lt; &#8220;curtarolo&#8221;</cite> will match <cite>*curtarolo</cite> and <cite>author &gt;
+&#8220;curtarolo&#8221; will match `curtarolo*</cite>.</li>
+<li><cite>==</cite> behaves as expected for all keywords.</li>
+<li><cite>%</cite> allows for string searches. <cite>author % &#8220;curtarolo&#8221;</cite> matches
+<cite>*curtarolo*</cite>.</li>
+<li><cite>~</cite> inverts the filter (equivalent to a boolean <cite>not</cite>).</li>
+<li><cite>&amp;</cite> is the logical <cite>and</cite> between two conditions.</li>
+<li><cite>|</cite> is the logical <cite>or</cite> between two conditions.</li>
+</ol>
+<div class="section" id="module-aflow.keywords">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-aflow.keywords" title="Permalink to this headline">¶</a></h2>
+<p>Implements classes to represent each keyword with overloaded
+operators to make querying with AFLUX intuitive.</p>
+<dl class="class">
+<dt id="aflow.keywords.Keyword">
+<em class="property">class </em><code class="descclassname">aflow.keywords.</code><code class="descname">Keyword</code><span class="sig-paren">(</span><em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/keywords.html#Keyword"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.keywords.Keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents an abstract keyword that can be sub-classed for a
+specific material attribute. This class also represents logical
+operators that define search queries. The combination of two
+keywords with a logical operator produces one more keyword, but
+which has its <a class="reference internal" href="#aflow.keywords.Keyword.state" title="aflow.keywords.Keyword.state"><code class="xref py py-attr docutils literal"><span class="pre">state</span></code></a> altered.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; current query state of this keyword (combination).</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="aflow.keywords.Keyword.state">
+<code class="descname">state</code><a class="headerlink" href="#aflow.keywords.Keyword.state" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of <cite>str</cite> <em>composite</em> queries for this keyword (combination).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.keywords.Keyword.ptype">
+<code class="descname">ptype</code><a class="headerlink" href="#aflow.keywords.Keyword.ptype" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>type</em> &#8211; python type that values for this keyword will have.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.keywords.Keyword.name">
+<code class="descname">name</code><a class="headerlink" href="#aflow.keywords.Keyword.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; keyword name to use in the AFLUX request.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.keywords.Keyword.cache">
+<code class="descname">cache</code><a class="headerlink" href="#aflow.keywords.Keyword.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; of <cite>str</cite> <em>simple</em> operator comparisons.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="aflow.keywords.Keyword.classes">
+<code class="descname">classes</code><a class="headerlink" href="#aflow.keywords.Keyword.classes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>set</em> &#8211; of <cite>str</cite> keyword names that have been combined into the
+current keyword.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="aflow.keywords.load">
+<code class="descclassname">aflow.keywords.</code><code class="descname">load</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/keywords.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.keywords.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all keywords into the specified target dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="aflow.keywords.reset">
+<code class="descclassname">aflow.keywords.</code><code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/keywords.html#reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.keywords.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all the keyword instances internal states so that they
+can be re-used for a new query.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><cite>AFLOW</cite> Database Keywords</a><ul>
+<li><a class="reference internal" href="#module-aflow.keywords">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="control.html"
+                        title="previous chapter">Query Constructor</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="entries.html"
+                        title="next chapter"><cite>AFLOW</cite> Database Entries</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/keywords.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="entries.html" title="AFLOW Database Entries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="control.html" title="Query Constructor"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>
