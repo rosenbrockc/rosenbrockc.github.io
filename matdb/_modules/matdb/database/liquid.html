@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -28,7 +28,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,9 +56,83 @@
 <div class="viewcode-block" id="LiquidDatabase"><a class="viewcode-back" href="../../../database/liquid.html#matdb.database.liquid.LiquidDatabase">[docs]</a><span class="k">class</span> <span class="nc">LiquidDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Represents a sub-sampled molecular dynamics run created at a</span>
 <span class="sd">    specific temperature.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (quippy.atoms.Atoms): seed configuration that will be</span>
+<span class="sd">          displaced to generate the database.</span>
+<span class="sd">        root (str): path to the folder where the database directories will</span>
+<span class="sd">          be stored.</span>
+<span class="sd">        parent (matdb.database.controller.DatabaseCollection): parent collection</span>
+<span class="sd">          to which this database belongs.</span>
+<span class="sd">        incar (dict): specify additional settings for the INCAR file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        kpoints (dict): specify additional settings for the PRECALC file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+
+<span class="sd">    .. note:: Additional attributes are also exposed by the super class</span>
+<span class="sd">      :class:`Database`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): name of this database type relative to the over database</span>
+<span class="sd">          collection. This is also the name of the folder in which all of its</span>
+<span class="sd">          calculations will be performed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;liquid&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span>
+                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{},</span> <span class="n">nconfigs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LiquidDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
+                                             <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                             <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="o">=</span><span class="n">nconfigs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="o">=</span> <span class="n">nconfigs</span><span class="o">*</span><span class="n">samplerate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdmdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;phoncache&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;dict: keys are [&#39;q&#39;, &#39;w&#39;, &#39;path&#39;, &#39;Q&#39;], values are the distance along</span>
+<span class="sd">        the special path (scalar), phonon frequencies at that distance (vector,</span>
+<span class="sd">        one component for each frequency), q-positions of the special points</span>
+<span class="sd">        along the paths, and their corresponding distances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;tuple: result of querying the materialscloud.org special path</span>
+<span class="sd">        service. First term is a list of special point labels; second is the</span>
+<span class="sd">        list of points corresponding to those labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;dict: with keys [&#39;dynmat&#39;, &#39;eigvals&#39;, &#39;eigvecs&#39;] representing the dynamical</span>
+<span class="sd">        matrix for the gamma point in the seed configuration along with its</span>
+<span class="sd">        eigenvalues and eigenvectors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_incar</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_incar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds the usual settings for the INCAR file when performing</span>
+<span class="sd">        frozen-phonon calculations. They are only added if they weren&#39;t already</span>
+<span class="sd">        specified in the config file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">usuals</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;encut&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+            <span class="s2">&quot;ibrion&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;ediff&quot;</span><span class="p">:</span> <span class="s1">&#39;1.0e-08&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;ialgo&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+            <span class="s2">&quot;ismear&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;lreal&quot;</span><span class="p">:</span> <span class="kc">False</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">usuals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
 </pre></div>
 
           </div>
@@ -95,7 +169,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -30,7 +30,7 @@
     <link rel="next" title="Special Paths in k-Space" href="../kpoints.html" />
     <link rel="prev" title="Potential Fitting API" href="../fitting.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,8 +56,393 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="fitting-for-gap-potentials">
-<h1>Fitting for GAP Potentials<a class="headerlink" href="#fitting-for-gap-potentials" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-matdb.fitting.gap">
+<span id="fitting-for-gap-potentials"></span><h1>Fitting for GAP Potentials<a class="headerlink" href="#module-matdb.fitting.gap" title="Permalink to this headline">¶</a></h1>
+<p>Implements classes and methods for performing a GAP fit over a
+database defined in the YAML specification file.</p>
+<dl class="class">
+<dt id="matdb.fitting.gap.GAPTrainer">
+<em class="property">class </em><code class="descclassname">matdb.fitting.gap.</code><code class="descname">GAPTrainer</code><span class="sig-paren">(</span><em>gap=None</em>, <em>db=None</em>, <em>gp_file=None</em>, <em>e0=0.0</em>, <em>default_sigma=None</em>, <em>sparse_jitter=1e-12</em>, <em>split=0.5</em>, <em>root=None</em>, <em>execution={}</em>, <em>configs=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a simple wrapper around the GAP training functionality that
+can integrate with the methods of the <cite>database</cite> sub-package.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Creating GAP potentials is a multi-fitting procedure. For a
+<cite>2 + 3 + …</cite> potential, we first need to fit the 2-body, and then (based
+on its errors), configure the fitting for the 2 + 3 potential. The results
+from the previous fit are used to configure the fitting that includes the
+next, higher-order potential type. As a result, the fits take longer as
+more complexity is included <em>and</em> the previous, lower-body terms have to
+be refit as part of the total many-body potential.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gap</strong> (<em>list</em>) – of <cite>str</cite> that are either <cite>*body</cite> for the n-body potentials
+or <cite>soap</cite>. This determines which potentials are included as part of
+the fit.</li>
+<li><strong>db</strong> (<em>matdb.database.controller.Controller</em>) – database controller whose
+data will be used to train the potentials.</li>
+<li><strong>gp_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the output GAP potential file. Defaults to
+<cite>gp_nbody_soap.xml</cite> where <cite>nbody</cite> is a list of the n-body potentials
+included  and <cite>soap</cite> is included if it was part of the fit.</li>
+<li><strong>e0</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – reference “zero” for the potential energy surface.</li>
+<li><strong>default_sigma</strong> (<em>list</em>) – of <cite>float</cite> specifies the expected variance in the
+energy, force, virial, and hessian respectively. It should have length
+4. Defaults to <cite>[0.001, 0.01, 1.0, 1.0]</cite>.</li>
+<li><strong>sparse_jitter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – jitter added to the matrices before inversion to
+help improve the condition number.</li>
+<li><strong>split</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – percentage of the available data to use for
+training (vs. validation).</li>
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – root directory for the entire alloy database
+(i.e., corresponding to a single YAML specification file).</li>
+<li><strong>execution</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – settings needed to configure the jobfile for running
+the GAP fit.</li>
+<li><strong>configs</strong> (<em>list</em>) – of <cite>str</cite> configuration ids from the database
+that should be included in the training and validation.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – additional parameters accepted by <cite>teach_sparse</cite> or a
+<cite>*body</cite> or <cite>soap</cite> dict that defines the settings for each particular
+GAP.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.ogap">
+<code class="descname">ogap</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.ogap" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>collections.OrderedDict</em> – keys are integer n-body values
+(SOAP=10), values are the [“2-body”, “3-body”, …, “soap”] string
+values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.gap">
+<code class="descname">gap</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.gap" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>str</cite> that are either <cite>*body</cite> for the n-body potentials
+or <cite>soap</cite>. This determines which potentials are included as part of
+the fit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.db">
+<code class="descname">db</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.db" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>matdb.database.controller.Controller</em> – database controller whose
+data will be used to train the potentials.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.gp_file">
+<code class="descname">gp_file</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.gp_file" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of the output GAP potential file. Defaults to
+<cite>gp_nbody_soap.xml</cite> where <cite>nbody</cite> is a list of the n-body potentials
+included  and <cite>soap</cite> is included if it was part of the fit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.name">
+<code class="descname">name</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of the folder in which all the fitting for this trainer
+takes place; defaults to <a class="reference internal" href="#matdb.fitting.gap.GAPTrainer.gp_file" title="matdb.fitting.gap.GAPTrainer.gp_file"><code class="xref py py-attr docutils literal"><span class="pre">gp_file</span></code></a> without the “.xml”
+extension.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.root">
+<code class="descname">root</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.root" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – root directory that this trainer operates in.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.e0">
+<code class="descname">e0</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.e0" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – reference “zero” for the potential energy surface.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.default_sigma">
+<code class="descname">default_sigma</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.default_sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>float</cite> specifies the expected variance in the
+energy, force, virial, and hessian respectively. It should have length
+4. Defaults to <cite>[0.001, 0.01, 0.1, 0.1]</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.sparse_jitter">
+<code class="descname">sparse_jitter</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.sparse_jitter" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – jitter added to the matrices before inversion to
+help improve the condition number.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.split">
+<code class="descname">split</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.split" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – percentage of the available data to use for
+training (vs. validation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.execution">
+<code class="descname">execution</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.execution" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – settings needed to configure the jobfile for running
+the GAP fit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.teach_sparse">
+<code class="descname">teach_sparse</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.teach_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – key-value pairs that are passed directly to
+<cite>teach_sparse</cite> that are not in [“e0”, “default_sigma”,
+“sparse_jitter”].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.gaps">
+<code class="descname">gaps</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.gaps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are one of [“2body”, “3body”, …, “soap”] describing
+the kind of potential. Values are the actual potential key-value
+pairs for configuring that particular GAP.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.seeds">
+<code class="descname">seeds</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.seeds" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are database names in the controller; values are
+copies of the seed configuration <code class="xref py py-class docutils literal"><span class="pre">quippy.Atoms</span></code> objects in each
+of those databases, with hessian and force information attached.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.state">
+<code class="descname">state</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.state" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>int</cite> GAP n-body codes in <a class="reference internal" href="#matdb.fitting.gap.GAPTrainer.gap" title="matdb.fitting.gap.GAPTrainer.gap"><code class="xref py py-attr docutils literal"><span class="pre">gap</span></code></a> indicating the current
+progress/state in the multi-chain fitting process. This value iterates
+over each of the GAPs in turn, adding one extra one each time the
+previous set has finished executing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.hessfit">
+<code class="descname">hessfit</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.hessfit" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – when True, the trainer is performing a hessian-based fit
+over the configurations (as opposed to using the entire configuration
+library).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.latest">
+<code class="descname">latest</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.latest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of the latest, complete potential file that can be
+used to make predictions for configurations.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.configs">
+<code class="descname">configs</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.configs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>str</cite> configuration ids from the database
+that should be included in the training and validation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.calculator">
+<code class="descname">calculator</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instance of <code class="xref py py-class docutils literal"><span class="pre">ase.Calculator</span></code> using the latest
+fitted GAP potential in this trainer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.fitting.gap.GAPTrainer.command">
+<code class="descname">command</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer.command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <cite>teach_sparse</cite> command that is needed to train the GAP
+potentials specified by this object.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method also configures the directory that the command
+will run in so that it has the relevant files.</p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.delta_cache">
+<code class="descname">delta_cache</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.delta_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the path the <cite>delta</cite> parameter file for each of the GAPs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.fitting.gap.GAPTrainer.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>dryrun=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits the job script for the currently configured potential
+training.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dryrun</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, simulate the submission without
+actually submitting.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the submission generated a job id
+(considered successful).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.jobfile">
+<code class="descname">jobfile</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.jobfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the jobfile for the current training iteration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.fitting.gap.GAPTrainer.status">
+<code class="descname">status</code><span class="sig-paren">(</span><em>printed=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns or prints the current status of the GAP training.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>printed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, print the status to screen; otherwise,
+return a dictionary with the relevant quantities.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.train_file">
+<code class="descname">train_file</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.train_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the XYZ training file that will be passed to the
+teach_sparse command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.fitting.gap.GAPTrainer.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates the latest calculator in this training sequence against the
+<cite>holdout.xyz</cite> configurations in the controller database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">with keys [“e_dft”, “e_gap”] where the values are
+DFT-calculated and GAP-calculated predictions for the energies.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.fitting.gap.GAPTrainer.validation_list">
+<code class="descname">validation_list</code><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.validation_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <code class="xref py py-class docutils literal"><span class="pre">quippy.AtomsList</span></code> of configurations that can be
+used for potential validation. The atoms list will depend on the type of
+fit (Hessian or not).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.fitting.gap.GAPTrainer.write_jobfile">
+<code class="descname">write_jobfile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#GAPTrainer.write_jobfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.GAPTrainer.write_jobfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up the job file for the next GAP in the potential that needs to
+be executed. This includes creating folders, training XYZ files and
+setting up any other dependencies required by <cite>teach_sparse</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Calling the method assumes that you are using a newly
+constructed <a class="reference internal" href="#matdb.fitting.gap.GAPTrainer" title="matdb.fitting.gap.GAPTrainer"><code class="xref py py-class docutils literal"><span class="pre">GAPTrainer</span></code></a>. The initialization of the class
+determines where in the fitting sequence of a <cite>2 + 3 + …</cite> GAP
+potential we are. If you call this repeatedly with the same class in
+memory, it won’t progress.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method also runs <a class="reference internal" href="#matdb.fitting.gap.GAPTrainer.command" title="matdb.fitting.gap.GAPTrainer.command"><code class="xref py py-meth docutils literal"><span class="pre">command()</span></code></a>, which configures the
+directory that the executable will run in.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matdb.fitting.gap.dict_to_str">
+<code class="descclassname">matdb.fitting.gap.</code><code class="descname">dict_to_str</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#dict_to_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.dict_to_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the specified dictionary of QUIP-compatible settings into a
+single string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – key-value pairs that are recognized settings by QUIP
+for descriptors, teach_sparse, eval, etc.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matdb.fitting.gap.gpfile_name">
+<code class="descclassname">matdb.fitting.gap.</code><code class="descname">gpfile_name</code><span class="sig-paren">(</span><em>gaps</em>, <em>prefix=’gp’</em>, <em>hessfit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#gpfile_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.gpfile_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the expected gp file name for the specified set of GAPs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gaps</strong> (<em>list</em>) – of <cite>int</cite> body sizes for the potentials. SOAP has value 10
+by arbitrary definition.</li>
+<li><strong>hessfit</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the fit is being performed using Hessian
+fitting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">gp_{nbody_list}(_{soap})?.xml if valid potentials are in the list;
+otherwise None.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matdb.fitting.gap.update_nbody">
+<code class="descclassname">matdb.fitting.gap.</code><code class="descname">update_nbody</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#update_nbody"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.update_nbody" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the usual n-body settings to the specified dictionary. This function
+<em>alters</em> the <cite>settings</cite> parameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – key-value pairs that are accepted by the GAP
+<cite>distance_Nb</cite> potential type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matdb.fitting.gap.update_soap">
+<code class="descclassname">matdb.fitting.gap.</code><code class="descname">update_soap</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/fitting/gap.html#update_soap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.fitting.gap.update_soap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the usual soap settings to the specified dictionary. This function
+<em>alters</em> the <cite>settings</cite> parameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – key-value pairs that are accepted by the GAP
+<cite>soap</cite> potential type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 
@@ -114,7 +499,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

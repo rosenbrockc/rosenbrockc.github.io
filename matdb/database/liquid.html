@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -26,9 +26,11 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Potential Fitting API" href="../fitting.html" />
+    <link rel="prev" title="Phonon Database Documentation" href="phonon.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +40,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="../fitting.html" title="Potential Fitting API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="phonon.html" title="Phonon Database Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../databases.html" accesskey="U"><cite>matdb</cite> Database Types</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -53,9 +62,42 @@
 configurations generated from liquid-temperature molecular dynamics.</p>
 <dl class="class">
 <dt id="matdb.database.liquid.LiquidDatabase">
-<em class="property">class </em><code class="descclassname">matdb.database.liquid.</code><code class="descname">LiquidDatabase</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">matdb.database.liquid.</code><code class="descname">LiquidDatabase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>incar={}</em>, <em>kpoints={}</em>, <em>execution={}</em>, <em>nconfigs=None</em>, <em>samplerate=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a sub-sampled molecular dynamics run created at a
 specific temperature.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
+displaced to generate the database.</li>
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
+be stored.</li>
+<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
+to which this database belongs.</li>
+<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
+differing from, or in addition to those in the global set).</li>
+<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
+differing from, or in addition to those in the global set).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Additional attributes are also exposed by the super class
+<code class="xref py py-class docutils literal"><span class="pre">Database</span></code>.</p>
+</div>
+<dl class="attribute">
+<dt id="matdb.database.liquid.LiquidDatabase.name">
+<code class="descname">name</code><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of this database type relative to the over database
+collection. This is also the name of the folder in which all of its
+calculations will be performed.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -66,6 +108,12 @@ specific temperature.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="phonon.html"
+                        title="previous chapter">Phonon Database Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../fitting.html"
+                        title="next chapter">Potential Fitting API</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -96,12 +144,19 @@ specific temperature.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="../fitting.html" title="Potential Fitting API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="phonon.html" title="Phonon Database Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../databases.html" ><cite>matdb</cite> Database Types</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

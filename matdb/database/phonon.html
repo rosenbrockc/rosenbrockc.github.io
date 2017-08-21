@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -26,9 +26,11 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Liquid Database Documentation" href="liquid.html" />
+    <link rel="prev" title="matdb Database Types" href="../databases.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +40,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="liquid.html" title="Liquid Database Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../databases.html" title="matdb Database Types"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../databases.html" accesskey="U"><cite>matdb</cite> Database Types</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -62,17 +71,17 @@ create the individual modulations.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) &#8211; seed configuration that will be
+<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
 displaced to generate the database.</li>
-<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the folder where the database directories will
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
 be stored.</li>
-<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) &#8211; parent collection
+<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
 to which this database belongs.</li>
-<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the INCAR file (i.e.,
+<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the PRECALC file (i.e.,
+<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specifying additional settings for <cite>phonopy</cite>
+<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specifying additional settings for <cite>phonopy</cite>
 configuration files (i.e., differing from, or in addition to those in
 the global set).</li>
 </ul>
@@ -88,7 +97,7 @@ the global set).</li>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononBase.name">
 <code class="descname">name</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of this database type relative to the over database
+<dd><p><em>str</em> – name of this database type relative to the over database
 collection. This is also the name of the folder in which all of its
 calculations will be performed.</p>
 </dd></dl>
@@ -96,20 +105,20 @@ calculations will be performed.</p>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononBase.supercell">
 <code class="descname">supercell</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.supercell" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <cite>int</cite>; number of cells in each direction for
+<dd><p><em>list</em> – of <cite>int</cite>; number of cells in each direction for
 generating the supercell.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononBase.phonodir">
 <code class="descname">phonodir</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.phonodir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; directory in which all <cite>phonopy</cite> executions take place.</p>
+<dd><p><em>str</em> – directory in which all <cite>phonopy</cite> executions take place.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononBase.grid">
 <code class="descname">grid</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.grid" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <cite>int</cite>; number of splits in each reciprocal
+<dd><p><em>list</em> – of <cite>int</cite>; number of splits in each reciprocal
 lattice vector according to Monkhorst-Pack scheme.</p>
 </dd></dl>
 
@@ -122,7 +131,7 @@ consumed by the <cite>matdb</cite> interfaces.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are [&#8216;q&#8217;, &#8216;w&#8217;, &#8216;path&#8217;, &#8216;Q&#8217;], values are the distance along
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are [‘q’, ‘w’, ‘path’, ‘Q’], values are the distance along
 the special path (scalar), phonon frequencies at that distance (vector,
 one component for each frequency), q-positions of the special points
 along the paths, and their corresponding distances.</td>
@@ -141,7 +150,7 @@ along the paths, and their corresponding distances.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, recalculate the DOS, even if the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
 file already exists.</td>
 </tr>
 </tbody>
@@ -157,7 +166,7 @@ materialscloud.org service.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, recalculate the DOS, even if the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
 file already exists.</td>
 </tr>
 </tbody>
@@ -172,7 +181,7 @@ file already exists.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, recalculate the force sets, even if the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the force sets, even if the
 file already exists.</td>
 </tr>
 </tbody>
@@ -188,7 +197,7 @@ density of states.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, redo any calculations that use the DFT
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, redo any calculations that use the DFT
 outputs to find other quantities.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the database is ready; this means that any other
@@ -253,20 +262,20 @@ in the linear regime.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) &#8211; seed configuration that will be
+<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
 displaced to generate the database.</li>
-<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the folder where the database directories will
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
 be stored.</li>
-<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) &#8211; parent collection
+<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
 to which this database belongs.</li>
-<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the INCAR file (i.e.,
+<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the PRECALC file (i.e.,
+<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specifying additional settings for <cite>phonopy</cite>
+<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specifying additional settings for <cite>phonopy</cite>
 configuration files (i.e., differing from, or in addition to those in
 the global set).</li>
-<li><strong>nconfigs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the number of different <em>amplitudes</em> to try out in
+<li><strong>nconfigs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – the number of different <em>amplitudes</em> to try out in
 calibrating.</li>
 </ul>
 </td>
@@ -281,7 +290,7 @@ calibrating.</li>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.name">
 <code class="descname">name</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of this database type relative to the over database
+<dd><p><em>str</em> – name of this database type relative to the over database
 collection. This is also the name of the folder in which all of its
 calculations will be performed.</p>
 </dd></dl>
@@ -289,7 +298,7 @@ calculations will be performed.</p>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.phonons">
 <code class="descname">phonons</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.phonons" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; specifying additional settings for <cite>phonopy</cite>
+<dd><p><em>dict</em> – specifying additional settings for <cite>phonopy</cite>
 configuration files (i.e., differing from, or in addition to those in
 the global set).</p>
 </dd></dl>
@@ -297,21 +306,21 @@ the global set).</p>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.base">
 <code class="descname">base</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.base" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>PhononBase</em> &#8211; reference database that computed the dynamical matrix
+<dd><p><em>PhononBase</em> – reference database that computed the dynamical matrix
 for the seed configuration.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.confname">
 <code class="descname">confname</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.confname" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of the phonopy configuration file used for the
+<dd><p><em>str</em> – name of the phonopy configuration file used for the
 modulations in this database.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.amplitudes">
 <code class="descname">amplitudes</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.amplitudes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; of logarithmically-spaced amplitudes to
+<dd><p><em>dict</em> – of logarithmically-spaced amplitudes to
 modulate the seed configuration with. Keys are the <cite>cid</cite> keys in
 <code class="xref py py-attr docutils literal"><span class="pre">configs</span></code>.</p>
 </dd></dl>
@@ -319,14 +328,14 @@ modulate the seed configuration with. Keys are the <cite>cid</cite> keys in
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.outfile">
 <code class="descname">outfile</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.outfile" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; path to the <cite>calibration.dat</cite> file that contains the list
+<dd><p><em>str</em> – path to the <cite>calibration.dat</cite> file that contains the list
 of amplitudes and displacements from the calibration run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.sampling">
 <code class="descname">sampling</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.sampling" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; specifies how the DOS is sampled for this database to
+<dd><p><em>str</em> – specifies how the DOS is sampled for this database to
 produce modulated sub-configurations.</p>
 </dd></dl>
 
@@ -353,7 +362,7 @@ regime.</p>
 <code class="descname">infer_amplitude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononCalibration.infer_amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.infer_amplitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tries to infer the maximum amplitude that can be used for modulation
 such that the average forces experienced by all atoms in the seed
-configuration&#8217;s supercell are still in the linear regime.</p>
+configuration’s supercell are still in the linear regime.</p>
 </dd></dl>
 
 <dl class="method">
@@ -374,7 +383,7 @@ resulting forces can be calibrated sensibly.</p>
 
 <dl class="class">
 <dt id="matdb.database.phonon.PhononDatabase">
-<em class="property">class </em><code class="descclassname">matdb.database.phonon.</code><code class="descname">PhononDatabase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>kpoints={}</em>, <em>incar={}</em>, <em>phonons={}</em>, <em>execution={}</em>, <em>nconfigs=100</em>, <em>calibrate=True</em>, <em>amplitude=None</em>, <em>sampling='uniform'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">matdb.database.phonon.</code><code class="descname">PhononDatabase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>kpoints={}</em>, <em>incar={}</em>, <em>phonons={}</em>, <em>execution={}</em>, <em>nconfigs=100</em>, <em>calibrate=True</em>, <em>amplitude=None</em>, <em>sampling=’uniform’</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a set of displaced configurations where atoms are
 moved, within a supercell, according to phonon eigenmodes.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -382,26 +391,26 @@ moved, within a supercell, according to phonon eigenmodes.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) &#8211; seed configuration that will be
+<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
 displaced to generate the database.</li>
-<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the folder where the database directories will
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
 be stored.</li>
-<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) &#8211; parent collection
+<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
 to which this database belongs.</li>
-<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the INCAR file (i.e.,
+<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specify additional settings for the PRECALC file (i.e.,
+<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
 differing from, or in addition to those in the global set).</li>
-<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; specifying additional settings for <cite>phonopy</cite>
+<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specifying additional settings for <cite>phonopy</cite>
 configuration files (i.e., differing from, or in addition to those in
 the global set).</li>
-<li><strong>calibrate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, the maximum amplitude possible will be
+<li><strong>calibrate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the maximum amplitude possible will be
 selected ensuring that the force is still in the linear regime.</li>
-<li><strong>amplitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; amplitude of displacement <span class="math">\(A\)</span> for eigenmode
+<li><strong>amplitude</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – amplitude of displacement <span class="math">\(A\)</span> for eigenmode
 modulation.</li>
-<li><strong>sampling</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; on of [&#8216;uniform&#8217;, &#8216;sample&#8217;, &#8216;top&#8217;], where the method
+<li><strong>sampling</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – on of [‘uniform’, ‘sample’, ‘top’], where the method
 dictates how frequencies are selected from the DOS for the seed
-configuration&#8217;s phonon spectrum.</li>
+configuration’s phonon spectrum.</li>
 </ul>
 </td>
 </tr>
@@ -415,49 +424,49 @@ configuration&#8217;s phonon spectrum.</li>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.sampling">
 <code class="descname">sampling</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.sampling" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; on of [&#8216;uniform&#8217;, &#8216;sample&#8217;, &#8216;top&#8217;], where the method
+<dd><p><em>str</em> – on of [‘uniform’, ‘sample’, ‘top’], where the method
 dictates how frequencies are selected from the DOS for the seed
-configuration&#8217;s phonon spectrum.</p>
+configuration’s phonon spectrum.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.supercell">
 <code class="descname">supercell</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.supercell" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <cite>int</cite>; number of cells in each direction for
+<dd><p><em>list</em> – of <cite>int</cite>; number of cells in each direction for
 generating the supercell.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.phonodir">
 <code class="descname">phonodir</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.phonodir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; directory in which all <cite>phonopy</cite> executions take place.</p>
+<dd><p><em>str</em> – directory in which all <cite>phonopy</cite> executions take place.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.calibrate">
 <code class="descname">calibrate</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.calibrate" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; when True, the maximum amplitude possible will be
+<dd><p><em>bool</em> – when True, the maximum amplitude possible will be
 selected ensuring that the force is still in the linear regime.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.amplitude">
 <code class="descname">amplitude</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> &#8211; amplitude of displacement <span class="math">\(A\)</span> for eigenmode
+<dd><p><em>float</em> – amplitude of displacement <span class="math">\(A\)</span> for eigenmode
 modulation.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.calibrator">
 <code class="descname">calibrator</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.calibrator" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>PhononCalibration</em> &#8211; instance used to calculate force
+<dd><p><em>PhononCalibration</em> – instance used to calculate force
 vs. amplitude for the seed configuration.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.name">
 <code class="descname">name</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of this database type relative to the over database
+<dd><p><em>str</em> – name of this database type relative to the over database
 collection. This is also the name of the folder in which all of its
 calculations will be performed.</p>
 </dd></dl>
@@ -465,7 +474,7 @@ calculations will be performed.</p>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononDatabase.confname">
 <code class="descname">confname</code><a class="headerlink" href="#matdb.database.phonon.PhononDatabase.confname" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of the phonopy configuration file used for the
+<dd><p><em>str</em> – name of the phonopy configuration file used for the
 modulations in this database.</p>
 </dd></dl>
 
@@ -512,7 +521,7 @@ sets for phonon spectra.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>db</strong> (<em>Database</em>) &#8211; database with parameters needed to module the atoms.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>db</strong> (<em>Database</em>) – database with parameters needed to module the atoms.</td>
 </tr>
 </tbody>
 </table>
@@ -520,7 +529,7 @@ sets for phonon spectra.</p>
 
 <dl class="function">
 <dt id="matdb.database.phonon.sample_dos">
-<code class="descclassname">matdb.database.phonon.</code><code class="descname">sample_dos</code><span class="sig-paren">(</span><em>meshfile</em>, <em>sampling='uniform'</em>, <em>nfreqs=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#sample_dos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.sample_dos" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">matdb.database.phonon.</code><code class="descname">sample_dos</code><span class="sig-paren">(</span><em>meshfile</em>, <em>sampling=’uniform’</em>, <em>nfreqs=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#sample_dos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.sample_dos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Samples the DOS to extract frequencies from which modulations can be
 generated.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -528,12 +537,12 @@ generated.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>meshfile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the <cite>mesh.yaml</cite> file that the frequencies and
+<li><strong>meshfile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the <cite>mesh.yaml</cite> file that the frequencies and
 q-vectors can be extracted from.</li>
-<li><strong>sampling</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of [&#8216;uniform&#8217;, &#8216;sample&#8217;, &#8216;top&#8217;], where the method
+<li><strong>sampling</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of [‘uniform’, ‘sample’, ‘top’], where the method
 dictates how frequencies are selected from the DOS for the seed
-configuration&#8217;s phonon spectrum.</li>
-<li><strong>nfreqs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of frequencies to return by sampling the DOS.</li>
+configuration’s phonon spectrum.</li>
+<li><strong>nfreqs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of frequencies to return by sampling the DOS.</li>
 </ul>
 </td>
 </tr>
@@ -579,12 +588,12 @@ sampling method.</td>
 <dt id="matdb.database.phonon.update_phonons">
 <code class="descclassname">matdb.database.phonon.</code><code class="descname">update_phonons</code><span class="sig-paren">(</span><em>basic</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#update_phonons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.update_phonons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the <cite>basic</cite> phonon settings using the usual defaults. The update
-only happens if the user didn&#8217;t already specify a value in the config file.</p>
+only happens if the user didn’t already specify a value in the config file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>basic</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; user-specified phonon settings that should be updated to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>basic</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – user-specified phonon settings that should be updated to
 include defaults.</td>
 </tr>
 </tbody>
@@ -599,6 +608,12 @@ include defaults.</td>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../databases.html"
+                        title="previous chapter"><cite>matdb</cite> Database Types</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="liquid.html"
+                        title="next chapter">Liquid Database Documentation</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -629,12 +644,19 @@ include defaults.</td>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="liquid.html" title="Liquid Database Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../databases.html" title="matdb Database Types"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../databases.html" ><cite>matdb</cite> Database Types</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -27,9 +27,10 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utility and Package Functions" href="utility.html" />
     <link rel="prev" title="Phonon Calculation and Plotting" href="phonons.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,6 +40,9 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="utility.html" title="Utility and Package Functions"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="phonons.html" title="Phonon Calculation and Plotting"
              accesskey="P">previous</a> |</li>
@@ -59,7 +63,7 @@ configurations. This necessitates conversion between file types, etc.</p>
 <span class="target" id="module-matdb.io"></span><p>Functions for interacting with various output formats.</p>
 <dl class="function">
 <dt id="matdb.io.vasp_to_xyz">
-<code class="descclassname">matdb.io.</code><code class="descname">vasp_to_xyz</code><span class="sig-paren">(</span><em>folder, outfile='output.xyz', recalc=False, properties=['species', 'pos', 'z', 'dft_force'], parameters=['dft_energy', 'dft_virial']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matdb/io.html#vasp_to_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.io.vasp_to_xyz" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">matdb.io.</code><code class="descname">vasp_to_xyz</code><span class="sig-paren">(</span><em>folder, outfile=’output.xyz’, recalc=False, properties=[‘species’, ‘pos’, ‘z’, ‘dft_force’], parameters=[‘dft_energy’, ‘dft_virial’]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matdb/io.html#vasp_to_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.io.vasp_to_xyz" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an extended XYZ file for the calculated structure in
 OUTCAR for the given folder.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -67,11 +71,11 @@ OUTCAR for the given folder.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; path to the folder to convert.</li>
-<li><strong>outfile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the XYZ file to create. The file will
+<li><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder to convert.</li>
+<li><strong>outfile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the XYZ file to create. The file will
 be created in the same folder as the original if no absolute
 path is given.</li>
-<li><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, re-convert the OUTCAR file, even if
+<li><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, re-convert the OUTCAR file, even if
 the target XYZ file already exists.</li>
 </ul>
 </td>
@@ -91,6 +95,9 @@ the target XYZ file already exists.</li>
   <h4>Previous topic</h4>
   <p class="topless"><a href="phonons.html"
                         title="previous chapter">Phonon Calculation and Plotting</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utility.html"
+                        title="next chapter">Utility and Package Functions</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -122,6 +129,9 @@ the target XYZ file already exists.</li>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
+          <a href="utility.html" title="Utility and Package Functions"
+             >next</a> |</li>
+        <li class="right" >
           <a href="phonons.html" title="Phonon Calculation and Plotting"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">matdb 0.0.4 documentation</a> &#187;</li> 
@@ -129,7 +139,7 @@ the target XYZ file already exists.</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
