@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Materials Database Generator API Documentation &#8212; matdb 0.0.4 documentation</title>
+    <title>Database Construction Workflow &#8212; matdb 0.0.4 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,7 +27,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Database Construction Workflow" href="workflow.html" /> 
+    <link rel="next" title="matdb.yml Database Specification File" href="matdbyml.html" />
+    <link rel="prev" title="Materials Database Generator API Documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -40,9 +41,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="workflow.html" title="Database Construction Workflow"
+          <a href="matdbyml.html" title="matdb.yml Database Specification File"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="index.html" title="Materials Database Generator API Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">matdb 0.0.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -51,35 +55,30 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="materials-database-generator-api-documentation">
-<h1>Materials Database Generator API Documentation<a class="headerlink" href="#materials-database-generator-api-documentation" title="Permalink to this headline">¶</a></h1>
-<p><cite>matdb</cite> is a python package for generating databases of configurations
-needed for the building of interatomic potentials. While we are
-working toward a fully-automated approach, in the meantime databases
-can be constructed by building an appropriate <a class="reference internal" href="matdbyml.html"><span class="doc">matdb.yml Database Specification File</span></a>. The
-following links document the internal API and give some examples.</p>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Sub-packages and Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="workflow.html">Database Construction Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matdbyml.html"><cite>matdb.yml</cite> Database Specification File</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts for High-level Interaction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="databases.html"><cite>matdb</cite> Database Types</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fitting.html">Potential Fitting API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kpoints.html">Special Paths in k-Space</a></li>
-<li class="toctree-l1"><a class="reference internal" href="phonons.html">Phonon Calculation and Plotting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">File Conversion and I/O Routines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utility.html">Utility and Package Functions</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+  <div class="section" id="database-construction-workflow">
+<h1>Database Construction Workflow<a class="headerlink" href="#database-construction-workflow" title="Permalink to this headline">¶</a></h1>
+<p>After you have familiarized yourself with <a class="reference internal" href="matdbyml.html"><span class="doc">matdb.yml Database Specification File</span></a>, you are
+ready to initiate a construction workflow. The workflow uses the
+<a class="reference internal" href="scripts/build.html"><span class="doc">Database Builder</span></a> to grant high-level access to sequences of API
+calls.</p>
+<p>The workflow for <cite>matdb</cite> typically follows these steps:</p>
+<ol class="arabic simple">
+<li>Run <cite>matdb_build.py matdb.yaml -s</cite> to run the setup of all VASP
+folders that need to be computed.</li>
+<li>Run <cite>matdb_build.py matdb.yaml –status</cite> to see whether the folders
+are setup correctly.</li>
+<li>Run <cite>matdb_build.py matdb.yaml -x</cite> to queue the jobs with the job
+scheduler.</li>
+<li>Run <cite>matdb_build.py matdb.yaml -c</cite> to cleanup the VASP calculations
+and extract the relevant parameters for the next round of
+calculations.</li>
+</ol>
+<p>These steps are repeated until all databases have been calculated and
+cleaned up. For example, after running this the first time, the
+<cite>PhononDFT</cite> calculations will be finished and cleaned up. These are
+needed by <cite>PhononDatabase</cite> to created modulated configurations, so we
+run all four steps again. This can be repeated until the database is
+ready.</p>
 </div>
 
 
@@ -88,19 +87,16 @@ following links document the internal API and give some examples.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Materials Database Generator API Documentation</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Materials Database Generator API Documentation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="workflow.html"
-                        title="next chapter">Database Construction Workflow</a></p>
+  <p class="topless"><a href="matdbyml.html"
+                        title="next chapter"><cite>matdb.yml</cite> Database Specification File</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
+      <li><a href="_sources/workflow.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -128,9 +124,12 @@ following links document the internal API and give some examples.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="workflow.html" title="Database Construction Workflow"
+          <a href="matdbyml.html" title="matdb.yml Database Specification File"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">matdb 0.0.4 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="index.html" title="Materials Database Generator API Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">matdb 0.0.4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -69,6 +69,8 @@
 <span class="sd">          differing from, or in addition to those in the global set).</span>
 <span class="sd">        kpoints (dict): specify additional settings for the PRECALC file (i.e.,</span>
 <span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        execution (dict): specify override parameters for the execution</span>
+<span class="sd">          templates in this database.</span>
 
 <span class="sd">    .. note:: Additional attributes are also exposed by the super class</span>
 <span class="sd">      :class:`Database`.</span>
@@ -81,58 +83,84 @@
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;liquid&quot;</span>
         
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span>
-                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{},</span> <span class="n">nconfigs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{},</span> <span class="n">nconfigs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">samplerate</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">strain</span><span class="o">=</span><span class="mf">3.</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LiquidDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
                                              <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
                                              <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="o">=</span><span class="n">nconfigs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samplerate</span> <span class="o">=</span> <span class="n">samplerate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="o">=</span> <span class="n">nconfigs</span><span class="o">*</span><span class="n">samplerate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mdmdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;phoncache&quot;</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="sd">&quot;&quot;&quot;dict: keys are [&#39;q&#39;, &#39;w&#39;, &#39;path&#39;, &#39;Q&#39;], values are the distance along</span>
-<span class="sd">        the special path (scalar), phonon frequencies at that distance (vector,</span>
-<span class="sd">        one component for each frequency), q-positions of the special points</span>
-<span class="sd">        along the paths, and their corresponding distances.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="sd">&quot;&quot;&quot;tuple: result of querying the materialscloud.org special path</span>
-<span class="sd">        service. First term is a list of special point labels; second is the</span>
-<span class="sd">        list of points corresponding to those labels.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="sd">&quot;&quot;&quot;dict: with keys [&#39;dynmat&#39;, &#39;eigvals&#39;, &#39;eigvecs&#39;] representing the dynamical</span>
-<span class="sd">        matrix for the gamma point in the seed configuration along with its</span>
-<span class="sd">        eigenvalues and eigenvectors.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">):</span>
-            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">):</span>
-            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdmdir</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdmdir</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_incar</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_update_incar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds the usual settings for the INCAR file when performing</span>
-<span class="sd">        frozen-phonon calculations. They are only added if they weren&#39;t already</span>
+<span class="sd">        MD calculations. They are only added if they weren&#39;t already</span>
 <span class="sd">        specified in the config file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">usuals</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;encut&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
-            <span class="s2">&quot;ibrion&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;ediff&quot;</span><span class="p">:</span> <span class="s1">&#39;1.0e-08&#39;</span><span class="p">,</span>
-            <span class="s2">&quot;ialgo&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
-            <span class="s2">&quot;ismear&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;lreal&quot;</span><span class="p">:</span> <span class="kc">False</span>
+            <span class="s2">&quot;maxmix&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="c1"># reuse mixer from one MD step to next          </span>
+            <span class="s2">&quot;ncore&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>   <span class="c1"># one orbital on 4 cores                        </span>
+            <span class="s2">&quot;nelmin&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># minimum 4 steps per time step, avoid breaking after 2 steps</span>
+            <span class="s2">&quot;ibrion&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;nwrite&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;lcharg&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="c1"># canonic (Nose) MD with XDATCAR updated every N steps</span>
+            <span class="s2">&quot;nblock&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> 
+            <span class="s2">&quot;smass&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;potim&quot;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
+            <span class="s2">&quot;nsw&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">usuals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                
+<div class="viewcode-block" id="LiquidDatabase.ready"><a class="viewcode-back" href="../../../database/liquid.html#matdb.database.liquid.LiquidDatabase.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines if this database is finished calculating by testing the</span>
+<span class="sd">        existence of the xyz database file in the root folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;output.xyz&quot;</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nsuccess</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LiquidDatabase.cleanup"><a class="viewcode-back" href="../../../database/liquid.html#matdb.database.liquid.LiquidDatabase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates the XYZ database file for all the sub-configs in this</span>
+<span class="sd">        liquid database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           bool: True if the database is ready; this means that any other</span>
+<span class="sd">           databases that rely on its outputs can be run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#First, we need to check that the MD is done; then we can subsample it</span>
+        <span class="c1">#and run the individual DFT calculations.</span>
+        
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">LiquidDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
+            <span class="k">return</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">(</span><span class="n">config_type</span><span class="o">=</span><span class="s2">&quot;liq&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="LiquidDatabase.setup"><a class="viewcode-back" href="../../../database/liquid.html#matdb.database.liquid.LiquidDatabase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displaces the seed configuration preparatory to calculating the force</span>
+<span class="sd">        sets for phonon spectra.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We can&#39;t module atoms unless the phonon base is ready.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We can&#39;t module in calibrate mode unless the calibrator is also ready.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span></div></div>
 </pre></div>
 
           </div>

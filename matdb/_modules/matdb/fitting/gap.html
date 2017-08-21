@@ -607,7 +607,7 @@
 <span class="sd">        eigenvectors to relevant properties on copies of the seed configuration</span>
 <span class="sd">        atoms objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">matdb.database.phonon</span> <span class="k">import</span> <span class="n">PhononBase</span>
+        <span class="kn">from</span> <span class="nn">matdb.database.phonon</span> <span class="k">import</span> <span class="n">PhononDFT</span>
         <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
         
         <span class="n">hname</span> <span class="o">=</span> <span class="s2">&quot;hessian</span><span class="si">{}</span><span class="s2">&quot;</span>        
@@ -619,7 +619,7 @@
                     <span class="k">continue</span>
             
             <span class="bp">self</span><span class="o">.</span><span class="n">seeds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dbset</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">dmatrix</span> <span class="o">=</span> <span class="n">dbset</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononBase</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">dmatrix</span>
+            <span class="n">dmatrix</span> <span class="o">=</span> <span class="n">dbset</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononDFT</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">dmatrix</span>
             <span class="n">eigvecs</span><span class="p">,</span> <span class="n">eigvals</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">[</span><span class="s2">&quot;eigvecs&quot;</span><span class="p">],</span> <span class="n">dmatrix</span><span class="p">[</span><span class="s2">&quot;eigvals&quot;</span><span class="p">]</span>
             <span class="n">atc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seeds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
             

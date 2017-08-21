@@ -62,7 +62,7 @@
 configurations generated from liquid-temperature molecular dynamics.</p>
 <dl class="class">
 <dt id="matdb.database.liquid.LiquidDatabase">
-<em class="property">class </em><code class="descclassname">matdb.database.liquid.</code><code class="descname">LiquidDatabase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>incar={}</em>, <em>kpoints={}</em>, <em>execution={}</em>, <em>nconfigs=None</em>, <em>samplerate=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">matdb.database.liquid.</code><code class="descname">LiquidDatabase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>incar={}</em>, <em>kpoints={}</em>, <em>execution={}</em>, <em>nconfigs=None</em>, <em>samplerate=100</em>, <em>strain=3.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a sub-sampled molecular dynamics run created at a
 specific temperature.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -80,6 +80,8 @@ to which this database belongs.</li>
 differing from, or in addition to those in the global set).</li>
 <li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
 differing from, or in addition to those in the global set).</li>
+<li><strong>execution</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify override parameters for the execution
+templates in this database.</li>
 </ul>
 </td>
 </tr>
@@ -96,6 +98,38 @@ differing from, or in addition to those in the global set).</li>
 <dd><p><em>str</em> – name of this database type relative to the over database
 collection. This is also the name of the folder in which all of its
 calculations will be performed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.liquid.LiquidDatabase.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the XYZ database file for all the sub-configs in this
+liquid database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the database is ready; this means that any other
+databases that rely on its outputs can be run.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.liquid.LiquidDatabase.ready">
+<code class="descname">ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if this database is finished calculating by testing the
+existence of the xyz database file in the root folder.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.liquid.LiquidDatabase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/liquid.html#LiquidDatabase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.liquid.LiquidDatabase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displaces the seed configuration preparatory to calculating the force
+sets for phonon spectra.</p>
 </dd></dl>
 
 </dd></dl>

@@ -93,7 +93,7 @@
 
     <span class="k">return</span> <span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">band</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PhononBase"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase">[docs]</a><span class="k">class</span> <span class="nc">PhononBase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT">[docs]</a><span class="k">class</span> <span class="nc">PhononDFT</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sets up the displacement calculations needed to construct the dynamical</span>
 <span class="sd">    matrix. The dynamical matrix is required by :class:`PhononDatabase` to</span>
 <span class="sd">    create the individual modulations.</span>
@@ -126,11 +126,11 @@
 <span class="sd">        grid (list): of `int`; number of splits in each reciprocal</span>
 <span class="sd">          lattice vector according to Monkhorst-Pack scheme.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;phonbase&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;phondft&quot;</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span> <span class="n">phonons</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{}):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PhononDFT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
                                          <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
                                          <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phonons</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dim&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
@@ -182,7 +182,7 @@
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             
-<div class="viewcode-block" id="PhononBase.ready"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.ready"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns True if all the phonon calculations have been completed, the</span>
 <span class="sd">        force sets have been created, and the DOS has been calculated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -290,7 +290,7 @@
             
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span>
     
-<div class="viewcode-block" id="PhononBase.calc_bands"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_bands">[docs]</a>    <span class="k">def</span> <span class="nf">calc_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.calc_bands"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.calc_bands">[docs]</a>    <span class="k">def</span> <span class="nf">calc_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates the bands at the special points given by the</span>
 <span class="sd">        materialscloud.org service.</span>
 
@@ -333,7 +333,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
     
-<div class="viewcode-block" id="PhononBase.calc_DOS"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_DOS">[docs]</a>    <span class="k">def</span> <span class="nf">calc_DOS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.calc_DOS"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.calc_DOS">[docs]</a>    <span class="k">def</span> <span class="nf">calc_DOS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates the *total* density of states.</span>
 
 <span class="sd">        Args:</span>
@@ -364,7 +364,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
             
-<div class="viewcode-block" id="PhononBase.calc_forcesets"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_forcesets">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forcesets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.calc_forcesets"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.calc_forcesets">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forcesets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extracts the force sets from the displacement calculations.</span>
 
 <span class="sd">        Args:</span>
@@ -395,11 +395,11 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
             
-<div class="viewcode-block" id="PhononBase.setup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.setup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Displaces the seed configuration preparatory to calculating the force</span>
 <span class="sd">        sets for phonon spectra.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononDFT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
             <span class="k">return</span>
 
         <span class="c1">#We also don&#39;t want to setup again if we have the results already.</span>
@@ -430,7 +430,7 @@
         <span class="c1"># Last of all, create the job file to execute the job array.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobfile</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PhononBase.cleanup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PhononDFT.cleanup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDFT.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Runs post-DFT execution routines to calculate the force-sets and the</span>
 <span class="sd">        density of states.</span>
 
@@ -442,7 +442,7 @@
 <span class="sd">           bool: True if the database is ready; this means that any other</span>
 <span class="sd">           databases that rely on its outputs can be run.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononDFT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
             <span class="k">return</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">calc_forcesets</span><span class="p">(</span><span class="n">recalc</span><span class="p">)</span>
@@ -533,7 +533,7 @@
 
 <div class="viewcode-block" id="modulate_atoms"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.modulate_atoms">[docs]</a><span class="k">def</span> <span class="nf">modulate_atoms</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generates modulated configurations using the dynamical matrix of the</span>
-<span class="sd">    :class:`PhononBase` instance.</span>
+<span class="sd">    :class:`PhononDFT` instance.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        db (Database): database with parameters needed to module the atoms.</span>
@@ -603,7 +603,7 @@
 <span class="sd">        phonons (dict): specifying additional settings for `phonopy`</span>
 <span class="sd">          configuration files (i.e., differing from, or in addition to those in</span>
 <span class="sd">          the global set).</span>
-<span class="sd">        base (PhononBase): reference database that computed the dynamical matrix</span>
+<span class="sd">        base (PhononDFT): reference database that computed the dynamical matrix</span>
 <span class="sd">          for the seed configuration.</span>
 <span class="sd">        confname (str): name of the phonopy configuration file used for the</span>
 <span class="sd">          modulations in this database.</span>
@@ -624,7 +624,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">PhononCalibration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
                                                 <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
                                                 <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononBase</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononDFT</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span> <span class="o">=</span> <span class="n">phonons</span>
         
         <span class="n">update_phonons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="p">)</span>
@@ -825,8 +825,8 @@
 
         <span class="n">imsg</span> <span class="o">=</span> <span class="s2">&quot;Using </span><span class="si">{}</span><span class="s2"> as modulation </span><span class="si">{}</span><span class="s2">amplitude for </span><span class="si">{}</span><span class="s2">.&quot;</span>
         <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">imsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">calibrated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononBase</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononDFT</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span> <span class="o">=</span> <span class="n">phonons</span>        
         <span class="n">update_phonons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="p">)</span>
 

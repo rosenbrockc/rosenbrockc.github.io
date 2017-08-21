@@ -61,197 +61,6 @@
 <p>Database of configurations that is created by displacing a given
 unit cell along phonon modes using the eigenvectors.</p>
 <dl class="class">
-<dt id="matdb.database.phonon.PhononBase">
-<em class="property">class </em><code class="descclassname">matdb.database.phonon.</code><code class="descname">PhononBase</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>kpoints={}</em>, <em>incar={}</em>, <em>phonons={}</em>, <em>execution={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up the displacement calculations needed to construct the dynamical
-matrix. The dynamical matrix is required by <a class="reference internal" href="#matdb.database.phonon.PhononDatabase" title="matdb.database.phonon.PhononDatabase"><code class="xref py py-class docutils literal"><span class="pre">PhononDatabase</span></code></a> to
-create the individual modulations.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
-displaced to generate the database.</li>
-<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
-be stored.</li>
-<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
-to which this database belongs.</li>
-<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
-differing from, or in addition to those in the global set).</li>
-<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
-differing from, or in addition to those in the global set).</li>
-<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specifying additional settings for <cite>phonopy</cite>
-configuration files (i.e., differing from, or in addition to those in
-the global set).</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Additional attributes are also exposed by the super class
-<code class="xref py py-class docutils literal"><span class="pre">Database</span></code>.</p>
-</div>
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.name">
-<code class="descname">name</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – name of this database type relative to the over database
-collection. This is also the name of the folder in which all of its
-calculations will be performed.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.supercell">
-<code class="descname">supercell</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.supercell" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – of <cite>int</cite>; number of cells in each direction for
-generating the supercell.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.phonodir">
-<code class="descname">phonodir</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.phonodir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – directory in which all <cite>phonopy</cite> executions take place.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.grid">
-<code class="descname">grid</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.grid" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – of <cite>int</cite>; number of splits in each reciprocal
-lattice vector according to Monkhorst-Pack scheme.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.bands">
-<code class="descname">bands</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.bands" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the DFT-accurate phonon bands in a format that can be
-consumed by the <cite>matdb</cite> interfaces.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are [‘q’, ‘w’, ‘path’, ‘Q’], values are the distance along
-the special path (scalar), phonon frequencies at that distance (vector,
-one component for each frequency), q-positions of the special points
-along the paths, and their corresponding distances.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.calc_DOS">
-<code class="descname">calc_DOS</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.calc_DOS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.calc_DOS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the <em>total</em> density of states.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
-file already exists.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.calc_bands">
-<code class="descname">calc_bands</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.calc_bands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.calc_bands" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the bands at the special points given by the
-materialscloud.org service.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
-file already exists.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.calc_forcesets">
-<code class="descname">calc_forcesets</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.calc_forcesets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.calc_forcesets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts the force sets from the displacement calculations.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the force sets, even if the
-file already exists.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs post-DFT execution routines to calculate the force-sets and the
-density of states.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, redo any calculations that use the DFT
-outputs to find other quantities.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the database is ready; this means that any other
-databases that rely on its outputs can be run.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.dmatrix">
-<code class="descname">dmatrix</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.dmatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the dynamical matrix extracted from the frozen
-phonon calculations at the gamma point in the BZ.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="matdb.database.phonon.PhononBase.kpath">
-<code class="descname">kpath</code><a class="headerlink" href="#matdb.database.phonon.PhononBase.kpath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the materialscloud.org special path in k-space for the seed
-configuration of this database.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result of querying the materialscloud.org special path
-service. First term is a list of special point labels; second is the
-list of points corresponding to those labels.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)">tuple</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.ready">
-<code class="descname">ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.ready" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if all the phonon calculations have been completed, the
-force sets have been created, and the DOS has been calculated.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="matdb.database.phonon.PhononBase.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononBase.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Displaces the seed configuration preparatory to calculating the force
-sets for phonon spectra.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="matdb.database.phonon.PhononCalibration">
 <em class="property">class </em><code class="descclassname">matdb.database.phonon.</code><code class="descname">PhononCalibration</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>kpoints={}</em>, <em>incar={}</em>, <em>phonons={}</em>, <em>execution={}</em>, <em>nconfigs=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononCalibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononCalibration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a set of modulated sub-configurations of differing amplitude,
@@ -306,7 +115,7 @@ the global set).</p>
 <dl class="attribute">
 <dt id="matdb.database.phonon.PhononCalibration.base">
 <code class="descname">base</code><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.base" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>PhononBase</em> – reference database that computed the dynamical matrix
+<dd><p><em>PhononDFT</em> – reference database that computed the dynamical matrix
 for the seed configuration.</p>
 </dd></dl>
 
@@ -377,6 +186,197 @@ existence of the xyz database file in the root folder.</p>
 <code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononCalibration.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononCalibration.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Displaces the seed configuration with varying amplitudes so that the
 resulting forces can be calibrated sensibly.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matdb.database.phonon.PhononDFT">
+<em class="property">class </em><code class="descclassname">matdb.database.phonon.</code><code class="descname">PhononDFT</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>root=None</em>, <em>parent=None</em>, <em>kpoints={}</em>, <em>incar={}</em>, <em>phonons={}</em>, <em>execution={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up the displacement calculations needed to construct the dynamical
+matrix. The dynamical matrix is required by <a class="reference internal" href="#matdb.database.phonon.PhononDatabase" title="matdb.database.phonon.PhononDatabase"><code class="xref py py-class docutils literal"><span class="pre">PhononDatabase</span></code></a> to
+create the individual modulations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>quippy.atoms.Atoms</em>) – seed configuration that will be
+displaced to generate the database.</li>
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the database directories will
+be stored.</li>
+<li><strong>parent</strong> (<em>matdb.database.controller.DatabaseCollection</em>) – parent collection
+to which this database belongs.</li>
+<li><strong>incar</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the INCAR file (i.e.,
+differing from, or in addition to those in the global set).</li>
+<li><strong>kpoints</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specify additional settings for the PRECALC file (i.e.,
+differing from, or in addition to those in the global set).</li>
+<li><strong>phonons</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – specifying additional settings for <cite>phonopy</cite>
+configuration files (i.e., differing from, or in addition to those in
+the global set).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Additional attributes are also exposed by the super class
+<code class="xref py py-class docutils literal"><span class="pre">Database</span></code>.</p>
+</div>
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.name">
+<code class="descname">name</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – name of this database type relative to the over database
+collection. This is also the name of the folder in which all of its
+calculations will be performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.supercell">
+<code class="descname">supercell</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.supercell" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>int</cite>; number of cells in each direction for
+generating the supercell.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.phonodir">
+<code class="descname">phonodir</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.phonodir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – directory in which all <cite>phonopy</cite> executions take place.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.grid">
+<code class="descname">grid</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.grid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>int</cite>; number of splits in each reciprocal
+lattice vector according to Monkhorst-Pack scheme.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.bands">
+<code class="descname">bands</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the DFT-accurate phonon bands in a format that can be
+consumed by the <cite>matdb</cite> interfaces.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are [‘q’, ‘w’, ‘path’, ‘Q’], values are the distance along
+the special path (scalar), phonon frequencies at that distance (vector,
+one component for each frequency), q-positions of the special points
+along the paths, and their corresponding distances.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.calc_DOS">
+<code class="descname">calc_DOS</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.calc_DOS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.calc_DOS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the <em>total</em> density of states.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
+file already exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.calc_bands">
+<code class="descname">calc_bands</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.calc_bands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.calc_bands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the bands at the special points given by the
+materialscloud.org service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the DOS, even if the
+file already exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.calc_forcesets">
+<code class="descname">calc_forcesets</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.calc_forcesets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.calc_forcesets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the force sets from the displacement calculations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, recalculate the force sets, even if the
+file already exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>recalc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs post-DFT execution routines to calculate the force-sets and the
+density of states.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recalc</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, redo any calculations that use the DFT
+outputs to find other quantities.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the database is ready; this means that any other
+databases that rely on its outputs can be run.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.dmatrix">
+<code class="descname">dmatrix</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.dmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dynamical matrix extracted from the frozen
+phonon calculations at the gamma point in the BZ.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matdb.database.phonon.PhononDFT.kpath">
+<code class="descname">kpath</code><a class="headerlink" href="#matdb.database.phonon.PhononDFT.kpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the materialscloud.org special path in k-space for the seed
+configuration of this database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">result of querying the materialscloud.org special path
+service. First term is a list of special point labels; second is the
+list of points corresponding to those labels.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)">tuple</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.ready">
+<code class="descname">ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if all the phonon calculations have been completed, the
+force sets have been created, and the DOS has been calculated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matdb.database.phonon.PhononDFT.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#PhononDFT.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.PhononDFT.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displaces the seed configuration preparatory to calculating the force
+sets for phonon spectra.</p>
 </dd></dl>
 
 </dd></dl>
@@ -516,7 +516,7 @@ sets for phonon spectra.</p>
 <dt id="matdb.database.phonon.modulate_atoms">
 <code class="descclassname">matdb.database.phonon.</code><code class="descname">modulate_atoms</code><span class="sig-paren">(</span><em>db</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/matdb/database/phonon.html#modulate_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matdb.database.phonon.modulate_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates modulated configurations using the dynamical matrix of the
-<a class="reference internal" href="#matdb.database.phonon.PhononBase" title="matdb.database.phonon.PhononBase"><code class="xref py py-class docutils literal"><span class="pre">PhononBase</span></code></a> instance.</p>
+<a class="reference internal" href="#matdb.database.phonon.PhononDFT" title="matdb.database.phonon.PhononDFT"><code class="xref py py-class docutils literal"><span class="pre">PhononDFT</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
