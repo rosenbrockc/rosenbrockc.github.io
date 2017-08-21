@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matdb.phonons &#8212; matdb 0.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matdb.phonons</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Methods for calculating the phonon spectra of materials.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+<span class="k">def</span> <span class="nf">_ordered_unique</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the list of unique items in the list while still *preserving* the</span>
+<span class="sd">    order in which they appeared.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">or</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">))]</span>
+
+<span class="k">def</span> <span class="nf">_get_calculator</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">potfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns an ASE-compatible calculator to use for the phonon calculations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): name of the potential type; valid options are [&quot;GAP&quot;,</span>
+<span class="sd">          &quot;MTP&quot;].</span>
+<span class="sd">        potfile (str): full path to the potential file that the potential should</span>
+<span class="sd">          use. For GAP, this is a `.xml` file; for MTP, it is a `.ini`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span>
+    <span class="kn">from</span> <span class="nn">quippy.potential</span> <span class="k">import</span> <span class="n">Potential</span>
+    
+    <span class="c1">#GAP doesn&#39;t like relative paths when their are multiple binary files</span>
+    <span class="c1">#representing the various inter-atomic potentials. We want to switch to the</span>
+    <span class="c1">#phonon directory so that the phonon files are cached in the right place;</span>
+    <span class="c1">#but first we need to change into the potential directory.</span>
+    <span class="n">curdir</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">potdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">potfile</span><span class="p">)</span>
+    <span class="n">chdir</span><span class="p">(</span><span class="n">potdir</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;mtp&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">lammpslib</span> <span class="k">import</span> <span class="n">LAMMPSlib</span>
+            <span class="n">otypes</span> <span class="o">=</span> <span class="n">_ordered_unique</span><span class="p">(</span><span class="n">AgPd</span><span class="o">.</span><span class="n">get_chemical_symbols</span><span class="p">())</span>
+            <span class="n">atom_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">otypes</span><span class="p">)}</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;units metal&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;dimension 3&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;boundary p p p&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;atom_style atomic&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;atom_modify map array&quot;</span><span class="p">]</span>
+            <span class="n">cmds</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pair_style MLIP </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">potfile</span><span class="p">),</span>
+                    <span class="s2">&quot;pair_coeff * *&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;mass 1 106.42&quot;</span><span class="p">,</span> <span class="c1">#Pd</span>
+                    <span class="s2">&quot;mass 2 107.87&quot;</span><span class="p">,</span> <span class="c1">#Ag</span>
+                    <span class="s2">&quot;neighbor 2.0 bin&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;neigh_modify delay 10 check yes&quot;</span><span class="p">]</span>
+            <span class="n">pot</span> <span class="o">=</span> <span class="n">LAMMPSlib</span><span class="p">(</span><span class="n">lmpcmds</span><span class="o">=</span><span class="n">cmds</span><span class="p">,</span> <span class="n">atom_types</span><span class="o">=</span><span class="n">atom_types</span><span class="p">,</span>
+                            <span class="n">lammps_header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">keep_alive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pot</span> <span class="o">=</span> <span class="n">Potential</span><span class="p">(</span><span class="s2">&quot;IP GAP&quot;</span><span class="p">,</span> <span class="n">param_filename</span><span class="o">=</span><span class="n">potfile</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1">#If there is an initialization error in either GAP or MTP, we don&#39;t want</span>
+        <span class="c1">#the current directory to be different than it was before we came into</span>
+        <span class="c1">#this method.</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pot</span>
+
+<div class="viewcode-block" id="calc"><a class="viewcode-back" href="../../phonons.html#matdb.phonons.calc">[docs]</a><span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">potfile</span><span class="p">,</span> <span class="n">kpath</span><span class="p">,</span> <span class="n">cachedir</span><span class="p">,</span> <span class="n">supercell</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">Npts</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+         <span class="n">potname</span><span class="o">=</span><span class="s2">&quot;GAP&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates the phonon band structure for the specified QUIP IP parameter</span>
+<span class="sd">    file.</span>
+
+<span class="sd">    .. warning:: If the delta given to this routine does *not* match the delta</span>
+<span class="sd">      used in the phonon calculations (`phonopy` uses the</span>
+<span class="sd">      `DISPLACEMENT_DISTANCE` tag to set this value). Since the `phonopy`</span>
+<span class="sd">      default is 0.01 A, we use that same value here.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (quippy.Atoms): atomic structure information.</span>
+<span class="sd">        potfile (str): full path to the parameter file for the IP.</span>
+<span class="sd">        kpath (list): of :class:`numpy.ndarray` specifying the points in k-space</span>
+<span class="sd">          that should be visited.</span>
+<span class="sd">        cachedir (str): path to the directory where phonon calculations are</span>
+<span class="sd">          cached. The cache is sorted by system (using chemical formula), *and*</span>
+<span class="sd">          by the name of the potential being used.</span>
+<span class="sd">        supercell (int or list): number of times to duplicate the cell when</span>
+<span class="sd">          forming the supercell; if an `int` is given, the cell is duplicated</span>
+<span class="sd">          equally in all three dimensions.</span>
+<span class="sd">        delta (float): displacement in Angstroms of each atom when computing the</span>
+<span class="sd">          phonons. </span>
+<span class="sd">        Npts (int): number of points to sample across the k-path.</span>
+<span class="sd">        potname (str): one of [&quot;MTP&quot;, &quot;GAP&quot;] specifying whether to use the</span>
+<span class="sd">          `lammpslib` and MTP :class:`ase.Calculator` to interface with LAMMPS</span>
+<span class="sd">          instead of a `quippy` GAP potential.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: `(q, omega, path_k, Q)` where `q` is the 1D path vector for plotting;</span>
+<span class="sd">        `omega` is the matrix of phonon modes; `path_k` is the matrix of actual</span>
+<span class="sd">        k-points that were sampled (corresponding to `q`); `Q` is the list of</span>
+<span class="sd">        special points (in `q`) corresponding to the given `kpath`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">reporoot</span>
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">mkdir</span><span class="p">,</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span>
+
+    <span class="c1">#First, we initialize a potential object to calculate forces and energies</span>
+    <span class="c1">#with.</span>
+    <span class="n">pot</span> <span class="o">=</span> <span class="n">_get_calculator</span><span class="p">(</span><span class="n">potname</span><span class="p">,</span> <span class="n">potfile</span><span class="p">)</span>
+
+    <span class="c1">#The phonon calculator caches the displacements and force sets for each</span>
+    <span class="c1">#atomic displacement using pickle. This generates three files for each</span>
+    <span class="c1">#atomic degree of freedom (one for each cartesian direction). We want to</span>
+    <span class="c1">#save these in a special directory.</span>
+    <span class="n">potname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">potfile</span><span class="p">)</span>
+    <span class="n">cachename</span> <span class="o">=</span> <span class="n">potname</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cachedir</span><span class="p">,</span> <span class="n">cachename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="n">mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+    <span class="n">curdir</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="kn">from</span> <span class="nn">ase.optimize.precon</span> <span class="k">import</span> <span class="n">Exp</span><span class="p">,</span> <span class="n">PreconLBFGS</span>
+    <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">redirect_stdout</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+            
+        <span class="c1">#Relax the cell before we try and get phonons out.</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">set_calculator</span><span class="p">(</span><span class="n">pot</span><span class="p">)</span>
+        <span class="c1">#minim = PreconLBFGS(atoms, precon=Exp(A=3.0))</span>
+        <span class="c1">#minim.run(fmax=1e-7)</span>
+
+        <span class="c1">#Now run the phonon calculation</span>
+        <span class="kn">from</span> <span class="nn">ase.phonons</span> <span class="k">import</span> <span class="n">Phonons</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">supercell</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">supercell</span> <span class="o">=</span> <span class="p">[</span><span class="n">supercell</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span>
+        <span class="n">ph</span> <span class="o">=</span> <span class="n">Phonons</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">pot</span><span class="p">,</span> <span class="n">supercell</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">supercell</span><span class="p">),</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">stdout</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;phonons.log&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="n">ph</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+                <span class="c1">#Read forces and assemble the dynamical matrix</span>
+                <span class="n">ph</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">acoustic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1">#Conversion from eV to THz. We want to get out the phonon modes for the</span>
+        <span class="c1">#full path. They are in units of eV, which we want to convert to THz for</span>
+        <span class="c1">#comparison with the published values. We use the speed of light $c$:</span>
+
+        <span class="c1">#$c = f \lambda$ is the simple relation for wave velocity vs. frequency</span>
+        <span class="c1">#and wavelength; we combine that with the photon energy relation $E =</span>
+        <span class="c1">#\frac{h c}{\lambda}$ to obtain $E = h f$.</span>
+
+        <span class="c1">#Simplifying, we obtain: $f = \frac{E}{h}$</span>
+        <span class="c1">#The value for $h$ in units of `eV.s` is $h = 0.004135668 \times</span>
+        <span class="c1">#10^{-12}$ where the $10^{-12} gives us `eV/THz`.</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="mf">0.004135668</span>
+        <span class="kn">import</span> <span class="nn">ase.dft.kpoints</span> <span class="k">as</span> <span class="nn">kpt</span>
+        <span class="n">path_kc</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">kpt</span><span class="o">.</span><span class="n">get_bandpath</span><span class="p">(</span><span class="n">kpath</span><span class="p">,</span> <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="p">,</span> <span class="n">Npts</span><span class="p">)</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">band_structure</span><span class="p">(</span><span class="n">path_kc</span><span class="p">)</span><span class="o">/</span><span class="n">h</span> <span class="c1">#Now in units of THz</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1">#Switch the directory back to what it was.</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+        <span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="n">omega</span><span class="p">,</span>
+        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path_kc</span><span class="p">,</span>
+        <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="n">Q</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="from_yaml"><a class="viewcode-back" href="../../phonons.html#matdb.phonons.from_yaml">[docs]</a><span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts the `band.yaml` file generated by phonopy into a </span>
+<span class="sd">    format we can plot against the IPs</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): path to the `band.yaml` file.</span>
+<span class="sd">            </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (q, w) where `q` is the distance along the special path </span>
+<span class="sd">        and `w` is the array of band values at that distance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">yaml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">dbands</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dbands</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">]])</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">k</span><span class="p">[</span><span class="s2">&quot;frequency&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;band&quot;</span><span class="p">]]</span>
+                     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dbands</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">]])</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;q-position&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dbands</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">]])</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dbands</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">]</span>
+                  <span class="k">if</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">e</span><span class="p">])</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+        <span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span>
+        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="p">,</span>
+        <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="n">Q</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="bandplot"><a class="viewcode-back" href="../../phonons.html#matdb.phonons.bandplot">[docs]</a><span class="k">def</span> <span class="nf">bandplot</span><span class="p">(</span><span class="n">phonons</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">nbands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+             <span class="n">ptype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Phonon Spectrum&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plots the phonon spectrum along the given path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        phonons (dict): keys are arbitrary ids, though they should</span>
+<span class="sd">          correspond to `style` and `ptype`; values are `dict`</span>
+<span class="sd">          instances returned by either :func:`calc` or</span>
+<span class="sd">          :func:`from_yaml`. </span>
+<span class="sd">        names (list): of `str`; specifies the labels for each of the points in `Q`.</span>
+<span class="sd">        nbands (int): number of phonon bands (dispersion curves) to</span>
+<span class="sd">          plot. If not specified, all of them are used.</span>
+<span class="sd">        style (dict): keys are same as for `phonons`; values are the line/scatter</span>
+<span class="sd">          styles to use for the plotting, given as a keyword argument dictionary that</span>
+<span class="sd">          is passed directly to the plotting method.</span>
+<span class="sd">        ptype (dict): keys are same as for `q` an `w`; values are one of </span>
+<span class="sd">          [&quot;plot&quot;, &quot;scatter&quot;], specifying whether to produce a line plot or scatter</span>
+<span class="sd">          plot. If not specified, then scatter plots are used by</span>
+<span class="sd">          default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">([</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">07</span><span class="p">,</span> <span class="o">.</span><span class="mi">67</span><span class="p">,</span> <span class="o">.</span><span class="mi">85</span><span class="p">])</span>
+
+    <span class="n">first</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phonons</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">maxq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phonons</span><span class="p">[</span><span class="n">first</span><span class="p">][</span><span class="s2">&quot;q&quot;</span><span class="p">])</span>
+    <span class="n">minq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">phonons</span><span class="p">[</span><span class="n">first</span><span class="p">][</span><span class="s2">&quot;q&quot;</span><span class="p">])</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">phonons</span><span class="p">[</span><span class="n">first</span><span class="p">][</span><span class="s2">&quot;Q&quot;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">minq</span><span class="o">-.</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxq</span><span class="o">+.</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Frequency ($\mathrm</span><span class="si">{THz}</span><span class="s2">$)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">&#39;on&#39;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">pdict</span> <span class="ow">in</span> <span class="n">phonons</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">pdict</span><span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">pdict</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">scaling</span> <span class="o">=</span> <span class="p">(</span><span class="n">maxq</span><span class="o">-</span><span class="n">minq</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">qs</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qs</span><span class="p">))</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">scaling</span><span class="o">*</span><span class="p">(</span><span class="n">qs</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qs</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">omega</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">omega</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nbands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nbands</span> <span class="o">=</span> <span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">((</span><span class="n">nbands</span><span class="p">,</span> <span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))):</span>
+            <span class="n">omega_n</span> <span class="o">=</span> <span class="n">omega</span><span class="p">[:,</span><span class="n">n</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="n">style</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#The default dictionary is for the line plots.</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lw&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+            
+            <span class="c1">#We only want the label to show up once in the legend.</span>
+            <span class="k">if</span> <span class="n">ptype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">ptype</span><span class="p">:</span>
+                <span class="n">plotter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">plt</span><span class="p">,</span> <span class="n">ptype</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plotter</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span>
+                
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">plotter</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">omega_n</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>        
+                <span class="n">plotter</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">omega_n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1">#Just use the first dict&#39;s special points.</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

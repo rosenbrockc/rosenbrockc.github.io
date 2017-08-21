@@ -1,0 +1,931 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matdb.database.phonon &#8212; matdb 0.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matdb.database.phonon</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Database of configurations that is created by displacing a given</span>
+<span class="sd">unit cell along phonon modes using the eigenvectors.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">.basic</span> <span class="k">import</span> <span class="n">Database</span>
+<span class="kn">from</span> <span class="nn">matdb</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">_parsed_kpath</span><span class="p">(</span><span class="n">poscar</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the special path in the BZ for the structure with the specified</span>
+<span class="sd">    POSCAR and then parses the results into the format required by the package</span>
+<span class="sd">    machinery.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        poscar (str): path to the structure to get special path for.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: result of querying the materialscloud.org special path</span>
+<span class="sd">        service. First term is a list of special point labels; second is the</span>
+<span class="sd">        list of points corresponding to those labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matdb.kpoints</span> <span class="k">import</span> <span class="n">kpath</span>
+    <span class="n">ktup</span> <span class="o">=</span> <span class="n">kpath</span><span class="p">(</span><span class="n">poscar</span><span class="p">)</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">names</span><span class="p">,</span> <span class="n">points</span> <span class="o">=</span> <span class="n">ktup</span>
+
+    <span class="k">def</span> <span class="nf">fix_gamma</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">r</span><span class="s2">&quot;\Gamma&quot;</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;GAMMA&quot;</span> <span class="k">else</span> <span class="n">s</span>
+    
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="c1">#Unfortunately, the web service that returns the path names returns</span>
+        <span class="c1">#GAMMA for \Gamma, so that the labels need to be fixed.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">|</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="n">fix_gamma</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fix_gamma</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="n">band</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">band</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PhononBase"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase">[docs]</a><span class="k">class</span> <span class="nc">PhononBase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets up the displacement calculations needed to construct the dynamical</span>
+<span class="sd">    matrix. The dynamical matrix is required by :class:`PhononDatabase` to</span>
+<span class="sd">    create the individual modulations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (quippy.atoms.Atoms): seed configuration that will be</span>
+<span class="sd">          displaced to generate the database.</span>
+<span class="sd">        root (str): path to the folder where the database directories will</span>
+<span class="sd">          be stored.</span>
+<span class="sd">        parent (matdb.database.controller.DatabaseCollection): parent collection</span>
+<span class="sd">          to which this database belongs.</span>
+<span class="sd">        incar (dict): specify additional settings for the INCAR file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        kpoints (dict): specify additional settings for the PRECALC file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        phonons (dict): specifying additional settings for `phonopy`</span>
+<span class="sd">          configuration files (i.e., differing from, or in addition to those in</span>
+<span class="sd">          the global set).</span>
+
+<span class="sd">    .. note:: Additional attributes are also exposed by the super class</span>
+<span class="sd">      :class:`Database`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): name of this database type relative to the over database</span>
+<span class="sd">          collection. This is also the name of the folder in which all of its</span>
+<span class="sd">          calculations will be performed.</span>
+<span class="sd">        supercell (list): of `int`; number of cells in each direction for</span>
+<span class="sd">          generating the supercell.</span>
+<span class="sd">        phonodir (str): directory in which all `phonopy` executions take place.</span>
+<span class="sd">        grid (list): of `int`; number of splits in each reciprocal</span>
+<span class="sd">          lattice vector according to Monkhorst-Pack scheme.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;phonbase&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span> <span class="n">phonons</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
+                                         <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                         <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phonons</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dim&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phonons</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mp&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;phonopy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;phoncache&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;dict: keys are [&#39;q&#39;, &#39;w&#39;, &#39;path&#39;, &#39;Q&#39;], values are the distance along</span>
+<span class="sd">        the special path (scalar), phonon frequencies at that distance (vector,</span>
+<span class="sd">        one component for each frequency), q-positions of the special points</span>
+<span class="sd">        along the paths, and their corresponding distances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;tuple: result of querying the materialscloud.org special path</span>
+<span class="sd">        service. First term is a list of special point labels; second is the</span>
+<span class="sd">        list of points corresponding to those labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;dict: with keys [&#39;dynmat&#39;, &#39;eigvals&#39;, &#39;eigvecs&#39;] representing the dynamical</span>
+<span class="sd">        matrix for the gamma point in the seed configuration along with its</span>
+<span class="sd">        eigenvalues and eigenvectors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonocache</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_incar</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_incar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds the usual settings for the INCAR file when performing</span>
+<span class="sd">        frozen-phonon calculations. They are only added if they weren&#39;t already</span>
+<span class="sd">        specified in the config file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">usuals</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;encut&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+            <span class="s2">&quot;ibrion&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;ediff&quot;</span><span class="p">:</span> <span class="s1">&#39;1.0e-08&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;ialgo&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+            <span class="s2">&quot;ismear&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;lreal&quot;</span><span class="p">:</span> <span class="kc">False</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">usuals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">incar</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            
+<div class="viewcode-block" id="PhononBase.ready"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if all the phonon calculations have been completed, the</span>
+<span class="sd">        force sets have been created, and the DOS has been calculated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#If the DOS has been calculated, then all the other steps must have</span>
+        <span class="c1">#completed correctly.</span>
+        <span class="n">dosfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;mesh.yaml&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dosfile</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the dynamical matrix extracted from the frozen</span>
+<span class="sd">        phonon calculations at the gamma point in the BZ.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span>
+        
+        <span class="c1">#Otherwise, we need to calculate it from scratch.</span>
+        <span class="n">qpoints</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;qpoints.yaml&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">qpoints</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+            <span class="n">DIM</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span><span class="p">))</span>
+            <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="s1">&#39;--dim=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">DIM</span><span class="p">),</span>
+                     <span class="s1">&#39;--qpoints=&quot;0 0 0&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;--writedm&quot;</span><span class="p">]</span>
+            <span class="n">xres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">qpoints</span><span class="p">):</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;could not calculate phonon bands; see errors.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">qpoints</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">yaml</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">qpoints</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">])):</span>
+                <span class="n">dynmat</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">dynmat_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;phonon&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;dynamical_matrix&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dynmat_data</span><span class="p">:</span>
+                    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                    <span class="n">dynmat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">dynmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dynmat</span><span class="p">)</span>
+
+                <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">dynmat</span><span class="p">)</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;q-position&quot;</span><span class="p">]</span>
+
+                <span class="c1">#This should technically always be true since we only</span>
+                <span class="c1">#ran it at a single q-point.</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]):</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;dynmat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dynmat</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;eigvals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eigvals</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;eigvecs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eigvecs</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Could not extract dynamical matrix from qpoints.yaml &quot;</span>
+                        <span class="s2">&quot;file...&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dmatrix</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the DFT-accurate phonon bands in a format that can be</span>
+<span class="sd">        consumed by the `matdb` interfaces.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are [&#39;q&#39;, &#39;w&#39;, &#39;path&#39;, &#39;Q&#39;], values are the distance along</span>
+<span class="sd">            the special path (scalar), phonon frequencies at that distance (vector,</span>
+<span class="sd">            one component for each frequency), q-positions of the special points</span>
+<span class="sd">            along the paths, and their corresponding distances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">matdb.phonons</span> <span class="k">import</span> <span class="n">from_yaml</span>
+            <span class="n">byaml</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;band.yaml&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">from_yaml</span><span class="p">(</span><span class="n">byaml</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the materialscloud.org special path in k-space for the seed</span>
+<span class="sd">        configuration of this database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: result of querying the materialscloud.org special path</span>
+<span class="sd">            service. First term is a list of special point labels; second is the</span>
+<span class="sd">            list of points corresponding to those labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="n">poscar</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+            <span class="n">kcache</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;kpath.json&quot;</span><span class="p">)</span>
+            <span class="c1">#We use some caching here so that we don&#39;t have to keep querying the</span>
+            <span class="c1">#server and waiting for an identical response.</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">kcache</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">kcache</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">kdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">labels</span><span class="p">,</span> <span class="n">band</span> <span class="o">=</span> <span class="n">_parsed_kpath</span><span class="p">(</span><span class="n">poscar</span><span class="p">)</span>
+                <span class="n">kdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s2">&quot;band&quot;</span><span class="p">:</span> <span class="n">band</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">kcache</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">kdict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span> <span class="o">=</span> <span class="p">(</span><span class="n">kdict</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">],</span> <span class="n">kdict</span><span class="p">[</span><span class="s2">&quot;band&quot;</span><span class="p">])</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpath</span>
+    
+<div class="viewcode-block" id="PhononBase.calc_bands"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_bands">[docs]</a>    <span class="k">def</span> <span class="nf">calc_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the bands at the special points given by the</span>
+<span class="sd">        materialscloud.org service.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recalc (bool): when True, recalculate the DOS, even if the</span>
+<span class="sd">              file already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bandfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;band.yaml&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">recalc</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">bandfile</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We need to create the band.conf file and write the special</span>
+        <span class="c1">#paths in k-space at which the phonons should be calculated.</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ATOM_NAME&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">species</span><span class="p">),</span>
+            <span class="s2">&quot;DIM&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span><span class="p">)),</span>
+            <span class="s2">&quot;MP&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">))</span>
+        <span class="p">}</span>
+
+        <span class="n">labels</span><span class="p">,</span> <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kpath</span>
+        <span class="n">bandfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:.3f}</span><span class="s2"> </span><span class="si">{1:.3f}</span><span class="s2"> </span><span class="si">{2:.3f}</span><span class="s2">&quot;</span>
+        <span class="n">sband</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">:</span>
+            <span class="n">sband</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bandfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">Q</span><span class="p">))</span>
+
+        <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;BAND&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sband</span><span class="p">)</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;BAND_LABELS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;band.conf&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
+        <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+        <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;band.conf&quot;</span><span class="p">]</span>
+        <span class="n">xres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">bandfile</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;could not calculate phonon bands; see errors.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
+    
+<div class="viewcode-block" id="PhononBase.calc_DOS"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_DOS">[docs]</a>    <span class="k">def</span> <span class="nf">calc_DOS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the *total* density of states.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recalc (bool): when True, recalculate the DOS, even if the</span>
+<span class="sd">              file already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dosfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;mesh.yaml&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">recalc</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dosfile</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="c1">#Make sure we have calculated the force sets already.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_forcesets</span><span class="p">(</span><span class="n">recalc</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ATOM_NAME&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">species</span><span class="p">),</span>
+            <span class="s2">&quot;DIM&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span><span class="p">)),</span>
+            <span class="s2">&quot;MP&quot;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">))</span>
+        <span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;dos.conf&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
+        <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+        <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;dos.conf&quot;</span><span class="p">]</span>
+        <span class="n">xres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dosfile</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;could not calculate the DOS; see errors.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
+            
+<div class="viewcode-block" id="PhononBase.calc_forcesets"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.calc_forcesets">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forcesets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extracts the force sets from the displacement calculations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recalc (bool): when True, recalculate the force sets, even if the</span>
+<span class="sd">              file already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fsets</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;FORCE_SETS&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">recalc</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fsets</span><span class="p">):</span>
+            <span class="k">return</span>
+        
+        <span class="c1">#First, make sure we have `vasprun.xml` files in each of the</span>
+        <span class="c1">#directories.</span>
+        <span class="n">vaspruns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">folder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">vasprun</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;vasprun.xml&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">vasprun</span><span class="p">):</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;vasprun.xml does not exist for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vaspruns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vasprun</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vaspruns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+            <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">vaspruns</span>
+            <span class="n">xres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fsets</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t create the FORCE_SETS:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xres</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]))</span></div>
+            
+<div class="viewcode-block" id="PhononBase.setup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displaces the seed configuration preparatory to calculating the force</span>
+<span class="sd">        sets for phonon spectra.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We also don&#39;t want to setup again if we have the results already.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span>
+        
+        <span class="kn">from</span> <span class="nn">ase.io</span> <span class="k">import</span> <span class="n">write</span>
+        <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="s2">&quot;vasp&quot;</span><span class="p">)</span>        
+        <span class="n">scell</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supercell</span><span class="p">))</span>
+        <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s1">&#39;--dim=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scell</span><span class="p">)]</span>
+        <span class="n">pres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span><span class="p">,</span> <span class="n">mkdir</span><span class="p">,</span> <span class="n">rename</span>
+        <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">quippy.atoms</span> <span class="k">import</span> <span class="n">Atoms</span>
+            <span class="k">for</span> <span class="n">dposcar</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="s2">&quot;POSCAR-*&quot;</span><span class="p">):</span>
+                <span class="n">dind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dposcar</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">datoms</span> <span class="o">=</span> <span class="n">Atoms</span><span class="p">(</span><span class="n">dposcar</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">datoms</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">chdir</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+
+        <span class="c1"># Last of all, create the job file to execute the job array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobfile</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PhononBase.cleanup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononBase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recalc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs post-DFT execution routines to calculate the force-sets and the</span>
+<span class="sd">        density of states.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            recalc (bool): when True, redo any calculations that use the DFT</span>
+<span class="sd">              outputs to find other quantities.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           bool: True if the database is ready; this means that any other</span>
+<span class="sd">           databases that rely on its outputs can be run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
+            <span class="k">return</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_forcesets</span><span class="p">(</span><span class="n">recalc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_DOS</span><span class="p">(</span><span class="n">recalc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="sample_dos"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.sample_dos">[docs]</a><span class="k">def</span> <span class="nf">sample_dos</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="n">nfreqs</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Samples the DOS to extract frequencies from which modulations can be</span>
+<span class="sd">    generated.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        meshfile (str): path to the `mesh.yaml` file that the frequencies and</span>
+<span class="sd">          q-vectors can be extracted from.</span>
+<span class="sd">        sampling (str): one of [&#39;uniform&#39;, &#39;sample&#39;, &#39;top&#39;], where the method</span>
+<span class="sd">          dictates how frequencies are selected from the DOS for the seed</span>
+<span class="sd">          configuration&#39;s phonon spectrum.</span>
+<span class="sd">        nfreqs (int): number of frequencies to return by sampling the DOS.</span>
+
+<span class="sd">    - *uniform*: frequencies are selected uniformly from the list of *unique*</span>
+<span class="sd">       frequencies in the DOS.</span>
+<span class="sd">    - *sample*: frequencies are chosen randomly *and* weighted by the q-point</span>
+<span class="sd">       weight in the BZ and the number of times the frequency shows up.</span>
+<span class="sd">    - *top*: the top N *unique* frequencies are selected.</span>
+
+<span class="sd">    .. note:: Because each atomic degree of freedom produces 3 phonon bands, a</span>
+<span class="sd">      cell with 4 unique atoms will produce 12 different frequencies. When the</span>
+<span class="sd">      DOS is sampled, we consider each of these frequencies as independent in</span>
+<span class="sd">      the overall BZ. Thus, if a 20x20x20 q-point grid is used for sampling in</span>
+<span class="sd">      the `mesh.yaml` file, then we would have 8,000 * 12 = 96,000 frequencies</span>
+<span class="sd">      to choose from, each with a corresponding q-vector.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: where each row is a q-vector in reciprocal space</span>
+<span class="sd">        corresponding to a frequency that was selected using the specified</span>
+<span class="sd">        sampling method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">yaml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">dmesh</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        
+    <span class="n">freqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ph</span> <span class="ow">in</span> <span class="n">dmesh</span><span class="p">[</span><span class="s2">&quot;phonon&quot;</span><span class="p">]:</span>
+        <span class="c1">#Depending on the type of sampling we do, we are interested in</span>
+        <span class="c1">#either the mere existing of a frequency or how often it actually</span>
+        <span class="c1">#appears in the BZ.</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="s2">&quot;frequency&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">ph</span><span class="p">[</span><span class="s2">&quot;band&quot;</span><span class="p">]]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">ph</span><span class="p">[</span><span class="s2">&quot;q-position&quot;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">ph</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">sampling</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;top&quot;</span><span class="p">]:</span>
+            <span class="n">freqs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sampling</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span><span class="p">:</span>
+            <span class="n">freqs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fs</span><span class="o">*</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">bandi</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fs</span><span class="p">):</span>
+            <span class="n">rf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rf</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lookup</span><span class="p">:</span>
+                <span class="n">lookup</span><span class="p">[</span><span class="n">rf</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bandi</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+
+    <span class="c1">#Now we can do the actual sampling.</span>
+    <span class="k">if</span> <span class="n">sampling</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+        <span class="n">dfreqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">dfreqs</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nfreqs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sampling</span> <span class="o">==</span> <span class="s2">&quot;top&quot;</span><span class="p">:</span>
+        <span class="n">sfreqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">freqs</span><span class="p">))</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">sfreqs</span><span class="p">[</span><span class="o">-</span><span class="n">nfreqs</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">sampling</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span><span class="p">:</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nfreqs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">lookup</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">6</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="update_phonons"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.update_phonons">[docs]</a><span class="k">def</span> <span class="nf">update_phonons</span><span class="p">(</span><span class="n">basic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates the `basic` phonon settings using the usual defaults. The update</span>
+<span class="sd">    only happens if the user didn&#39;t already specify a value in the config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        basic (dict): user-specified phonon settings that should be updated to</span>
+<span class="sd">          include defaults.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">usuals</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mesh&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span>
+        <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">usuals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">basic</span><span class="p">:</span>
+            <span class="n">basic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="modulate_atoms"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.modulate_atoms">[docs]</a><span class="k">def</span> <span class="nf">modulate_atoms</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates modulated configurations using the dynamical matrix of the</span>
+<span class="sd">    :class:`PhononBase` instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db (Database): database with parameters needed to module the atoms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Generating the modulation file. We need to sample the DOS in order to</span>
+    <span class="c1">#compute that correctly.</span>
+    <span class="n">dosfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="s2">&quot;mesh.yaml&quot;</span><span class="p">)</span>
+    <span class="n">qvecs</span> <span class="o">=</span> <span class="n">sample_dos</span><span class="p">(</span><span class="n">dosfile</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">sampling</span><span class="p">,</span> <span class="n">nfreqs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">nconfigs</span><span class="p">)</span>
+    <span class="n">conffile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">confname</span><span class="p">)</span>
+
+    <span class="n">modstr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">phonons</span><span class="p">[</span><span class="s2">&quot;dim&quot;</span><span class="p">]))]</span>
+    <span class="k">for</span> <span class="n">iq</span><span class="p">,</span> <span class="p">(</span><span class="n">bandi</span><span class="p">,</span> <span class="n">qvec</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">qvecs</span><span class="p">):</span>
+        <span class="n">mstr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:.7f}</span><span class="s2"> </span><span class="si">{1:.7f}</span><span class="s2"> </span><span class="si">{2:.7f}</span><span class="s2"> </span><span class="si">{3:d}</span><span class="s2"> </span><span class="si">{4:.7f}</span><span class="s2"> </span><span class="si">{5:.7f}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s2">&quot;_amplitudes&quot;</span><span class="p">):</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">_amplitudes</span><span class="p">[</span><span class="n">iq</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span><span class="o">*</span><span class="n">db</span><span class="o">.</span><span class="n">amplitude</span>
+            
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">qvec</span> <span class="o">+</span> <span class="p">[</span><span class="n">bandi</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">phi</span><span class="p">]</span>
+        <span class="n">modstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mstr</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))</span>
+
+    <span class="n">phondict</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">phondict</span><span class="p">[</span><span class="s2">&quot;atom_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">species</span><span class="p">)</span>
+    <span class="n">phondict</span><span class="p">[</span><span class="s2">&quot;modulation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">modstr</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conffile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">phondict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">v</span><span class="p">))</span>
+
+    <span class="kn">from</span> <span class="nn">matdb.utility</span> <span class="k">import</span> <span class="n">execute</span>
+    <span class="n">sargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;phonopy&quot;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">confname</span><span class="p">]</span>
+    <span class="n">xres</span> <span class="o">=</span> <span class="n">execute</span><span class="p">(</span><span class="n">sargs</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">phonodir</span><span class="p">,</span> <span class="n">venv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="PhononCalibration"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononCalibration">[docs]</a><span class="k">class</span> <span class="nc">PhononCalibration</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a set of modulated sub-configurations of differing amplitude,</span>
+<span class="sd">    used to determine the maximum modulation amplitude where the force is still</span>
+<span class="sd">    in the linear regime.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (quippy.atoms.Atoms): seed configuration that will be</span>
+<span class="sd">          displaced to generate the database.</span>
+<span class="sd">        root (str): path to the folder where the database directories will</span>
+<span class="sd">          be stored.</span>
+<span class="sd">        parent (matdb.database.controller.DatabaseCollection): parent collection</span>
+<span class="sd">          to which this database belongs.</span>
+<span class="sd">        incar (dict): specify additional settings for the INCAR file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        kpoints (dict): specify additional settings for the PRECALC file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        phonons (dict): specifying additional settings for `phonopy`</span>
+<span class="sd">          configuration files (i.e., differing from, or in addition to those in</span>
+<span class="sd">          the global set).</span>
+<span class="sd">        nconfigs (int): the number of different *amplitudes* to try out in</span>
+<span class="sd">          calibrating.</span>
+
+<span class="sd">    .. note:: Additional attributes are also exposed by the super class</span>
+<span class="sd">      :class:`Database`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): name of this database type relative to the over database</span>
+<span class="sd">          collection. This is also the name of the folder in which all of its</span>
+<span class="sd">          calculations will be performed.</span>
+<span class="sd">        phonons (dict): specifying additional settings for `phonopy`</span>
+<span class="sd">          configuration files (i.e., differing from, or in addition to those in</span>
+<span class="sd">          the global set).</span>
+<span class="sd">        base (PhononBase): reference database that computed the dynamical matrix</span>
+<span class="sd">          for the seed configuration.</span>
+<span class="sd">        confname (str): name of the phonopy configuration file used for the</span>
+<span class="sd">          modulations in this database.</span>
+<span class="sd">        amplitudes (dict): of logarithmically-spaced amplitudes to</span>
+<span class="sd">          modulate the seed configuration with. Keys are the `cid` keys in</span>
+<span class="sd">          :attr:`configs`.</span>
+<span class="sd">        outfile (str): path to the `calibration.dat` file that contains the list</span>
+<span class="sd">          of amplitudes and displacements from the calibration run.</span>
+<span class="sd">        sampling (str): specifies how the DOS is sampled for this database to</span>
+<span class="sd">          produce modulated sub-configurations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;phoncalib&quot;</span>
+    <span class="n">confname</span> <span class="o">=</span> <span class="s2">&quot;calibrate.conf&quot;</span>
+    <span class="n">sampling</span> <span class="o">=</span> <span class="s2">&quot;uniform&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span> <span class="n">phonons</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{},</span> <span class="n">nconfigs</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PhononCalibration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
+                                                <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                                <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononBase</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span> <span class="o">=</span> <span class="n">phonons</span>
+        
+        <span class="n">update_phonons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="p">)</span>
+
+        <span class="c1">#Calculate which amplitudes to use for the calibration based on the</span>
+        <span class="c1">#number of desired configurations (calibration points).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="n">nconfigs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;calibration.dat&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitudes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nconfigs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">amplitudes</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amplitudes</span><span class="p">[</span><span class="n">cid</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+<div class="viewcode-block" id="PhononCalibration.ready"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononCalibration.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines if this database is finished calculating by testing the</span>
+<span class="sd">        existence of the xyz database file in the root folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfile</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PhononCalibration.cleanup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononCalibration.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extracts the calibration information from the configurations to</span>
+<span class="sd">        determine the maiximum allowable amplitude to maintain linear force</span>
+<span class="sd">        regime.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           bool: True if the amplitude calibration is ready.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononCalibration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;cannot cleanup calibration; not all configs ready.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">(</span><span class="n">config_type</span><span class="o">=</span><span class="s2">&quot;phcalib&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;could not extract the calibration XYZ configurations.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imsg</span> <span class="o">=</span> <span class="s2">&quot;Extracted calibration configs from </span><span class="si">{0:d}</span><span class="s2"> folders.&quot;</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">okay</span><span class="p">(</span><span class="n">imsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">)))</span>
+
+        <span class="c1">#Read in the XYZ file and extract the forces on each atom in each</span>
+        <span class="c1">#configuration.</span>
+        <span class="kn">import</span> <span class="nn">quippy</span>
+        <span class="n">forces</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">folder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#Find the mean, *absolute* force in each of the directions. There</span>
+            <span class="c1">#will only be one atom in the atoms list. If the calculation didn&#39;t</span>
+            <span class="c1">#finish, then we exclude it. This happens for some of the</span>
+            <span class="c1">#calibration runs if the atoms are too close together.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">al</span> <span class="o">=</span> <span class="n">quippy</span><span class="o">.</span><span class="n">AtomsList</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;output.xyz&quot;</span><span class="p">))</span>
+                <span class="n">forces</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">al</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dft_force</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">failed</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">failed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;couldn&#39;t extract forces for </span><span class="si">{0:d}</span><span class="s2"> configs.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">failed</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:.7f}</span><span class="s2">  </span><span class="si">{1:.7f}</span><span class="s2">  </span><span class="si">{2:.7f}</span><span class="s2">  </span><span class="si">{3:.7f}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">forces</span><span class="p">:</span>
+                    <span class="n">A</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitudes</span><span class="p">[</span><span class="n">cid</span><span class="p">],</span> <span class="n">forces</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="o">*</span><span class="n">F</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;no forces available to write </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfile</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span></div>
+    
+<div class="viewcode-block" id="PhononCalibration.setup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononCalibration.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displaces the seed configuration with varying amplitudes so that the</span>
+<span class="sd">        resulting forces can be calibrated sensibly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononCalibration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We can&#39;t module atoms unless the phonon base is ready.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#Don&#39;t reproduce the folders if they already exist or we have already</span>
+        <span class="c1">#computed.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span>
+        
+        <span class="n">modulate_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span><span class="p">,</span> <span class="n">remove</span>
+        <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+        <span class="kn">from</span> <span class="nn">quippy.atoms</span> <span class="k">import</span> <span class="n">Atoms</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mi</span><span class="p">,</span> <span class="n">mposcar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;MPOSCAR-*&quot;</span><span class="p">)))):</span>
+                <span class="k">if</span> <span class="n">mposcar</span> <span class="o">==</span> <span class="s2">&quot;MPOSCAR-orig&quot;</span><span class="p">:</span>
+                    <span class="n">remove</span><span class="p">(</span><span class="n">mposcar</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                
+                <span class="n">cid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mposcar</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">matoms</span> <span class="o">=</span> <span class="n">Atoms</span><span class="p">(</span><span class="n">mposcar</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">matoms</span><span class="p">,</span> <span class="n">cid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">amplitudes</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amplitudes</span><span class="p">[</span><span class="n">mi</span><span class="p">]</span>
+                <span class="c1">#Remove the MPOSCAR file so that the directory isn&#39;t polluted.</span>
+                <span class="n">remove</span><span class="p">(</span><span class="n">mposcar</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">chdir</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            
+        <span class="c1"># Last of all, create the job file to execute the job array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobfile</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PhononCalibration.infer_amplitude"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononCalibration.infer_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">infer_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tries to infer the maximum amplitude that can be used for modulation</span>
+<span class="sd">        such that the average forces experienced by all atoms in the seed</span>
+<span class="sd">        configuration&#39;s supercell are still in the linear regime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Our approach is to interpolate linearly starting with the two closest</span>
+        <span class="c1">#points and then moving away one point at a time until the error starts</span>
+        <span class="c1">#to diverge between the linear interpolation and the actual points.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Automatic calibration not configured.&quot;</span><span class="p">)</span></div></div>
+            
+<div class="viewcode-block" id="PhononDatabase"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDatabase">[docs]</a><span class="k">class</span> <span class="nc">PhononDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a set of displaced configurations where atoms are</span>
+<span class="sd">    moved, within a supercell, according to phonon eigenmodes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (quippy.atoms.Atoms): seed configuration that will be</span>
+<span class="sd">          displaced to generate the database.</span>
+<span class="sd">        root (str): path to the folder where the database directories will</span>
+<span class="sd">          be stored.</span>
+<span class="sd">        parent (matdb.database.controller.DatabaseCollection): parent collection</span>
+<span class="sd">          to which this database belongs.</span>
+<span class="sd">        incar (dict): specify additional settings for the INCAR file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        kpoints (dict): specify additional settings for the PRECALC file (i.e.,</span>
+<span class="sd">          differing from, or in addition to those in the global set).</span>
+<span class="sd">        phonons (dict): specifying additional settings for `phonopy`</span>
+<span class="sd">          configuration files (i.e., differing from, or in addition to those in</span>
+<span class="sd">          the global set).</span>
+<span class="sd">        calibrate (bool): when True, the maximum amplitude possible will be</span>
+<span class="sd">          selected ensuring that the force is still in the linear regime.</span>
+<span class="sd">        amplitude (float): amplitude of displacement :math:`A` for eigenmode</span>
+<span class="sd">          modulation. </span>
+<span class="sd">        sampling (str): on of [&#39;uniform&#39;, &#39;sample&#39;, &#39;top&#39;], where the method</span>
+<span class="sd">          dictates how frequencies are selected from the DOS for the seed</span>
+<span class="sd">          configuration&#39;s phonon spectrum.</span>
+
+<span class="sd">    .. note:: Additional attributes are also exposed by the super class</span>
+<span class="sd">      :class:`Database`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sampling (str): on of [&#39;uniform&#39;, &#39;sample&#39;, &#39;top&#39;], where the method</span>
+<span class="sd">          dictates how frequencies are selected from the DOS for the seed</span>
+<span class="sd">          configuration&#39;s phonon spectrum.</span>
+<span class="sd">        supercell (list): of `int`; number of cells in each direction for</span>
+<span class="sd">          generating the supercell.</span>
+<span class="sd">        phonodir (str): directory in which all `phonopy` executions take place.</span>
+<span class="sd">        calibrate (bool): when True, the maximum amplitude possible will be</span>
+<span class="sd">          selected ensuring that the force is still in the linear regime.</span>
+<span class="sd">        amplitude (float): amplitude of displacement :math:`A` for eigenmode</span>
+<span class="sd">          modulation. </span>
+<span class="sd">        calibrator (PhononCalibration): instance used to calculate force</span>
+<span class="sd">          vs. amplitude for the seed configuration.</span>
+<span class="sd">        name (str): name of this database type relative to the over database</span>
+<span class="sd">          collection. This is also the name of the folder in which all of its</span>
+<span class="sd">          calculations will be performed.</span>
+<span class="sd">        confname (str): name of the phonopy configuration file used for the</span>
+<span class="sd">          modulations in this database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;phonons&quot;</span>
+    <span class="n">confname</span> <span class="o">=</span> <span class="s2">&quot;modulate.conf&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kpoints</span><span class="o">=</span><span class="p">{},</span> <span class="n">incar</span><span class="o">=</span><span class="p">{},</span> <span class="n">phonons</span><span class="o">=</span><span class="p">{},</span> <span class="n">execution</span><span class="o">=</span><span class="p">{},</span> <span class="n">nconfigs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">calibrate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PhononDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">incar</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span>
+                                             <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                             <span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="n">nconfigs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling</span> <span class="o">=</span> <span class="n">sampling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span> <span class="o">=</span> <span class="n">calibrate</span>
+
+        <span class="c1">#Setup a calibrator if automatic calibration was selected.</span>
+        <span class="k">if</span> <span class="n">calibrate</span> <span class="ow">and</span> <span class="n">amplitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">=</span> <span class="n">PhononCalibration</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">kpoints</span><span class="p">,</span>
+                                                <span class="n">incar</span><span class="p">,</span> <span class="n">phonons</span><span class="p">,</span> <span class="n">execution</span><span class="p">,</span> <span class="n">calibrate</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononCalibration</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrator</span><span class="o">.</span><span class="n">infer_amplitude</span><span class="p">()</span>
+            <span class="n">calibrated</span> <span class="o">=</span> <span class="s2">&quot;*calibrated* &quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrator</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="n">amplitude</span>
+            <span class="n">calibrated</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">imsg</span> <span class="o">=</span> <span class="s2">&quot;Using </span><span class="si">{}</span><span class="s2"> as modulation </span><span class="si">{}</span><span class="s2">amplitude for </span><span class="si">{}</span><span class="s2">.&quot;</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">imsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">calibrated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="n">PhononBase</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span> <span class="o">=</span> <span class="n">phonons</span>        
+        <span class="n">update_phonons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PhononDatabase.ready"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDatabase.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines if this database is finished calculating by testing the</span>
+<span class="sd">        existence of the xyz database file in the root folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;output.xyz&quot;</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nsuccess</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PhononDatabase.cleanup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDatabase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates the XYZ database file for all the sub-configs in this</span>
+<span class="sd">        phonon database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           bool: True if the database is ready; this means that any other</span>
+<span class="sd">           databases that rely on its outputs can be run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">():</span>
+            <span class="k">return</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">(</span><span class="n">config_type</span><span class="o">=</span><span class="s2">&quot;ph&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="PhononDatabase.setup"><a class="viewcode-back" href="../../../database/phonon.html#matdb.database.phonon.PhononDatabase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displaces the seed configuration preparatory to calculating the force</span>
+<span class="sd">        sets for phonon spectra.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">PhononDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We can&#39;t module atoms unless the phonon base is ready.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1">#We can&#39;t module in calibrate mode unless the calibrator is also ready.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="n">modulate_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">getcwd</span><span class="p">,</span> <span class="n">chdir</span><span class="p">,</span> <span class="n">remove</span>
+        <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+        <span class="kn">from</span> <span class="nn">quippy.atoms</span> <span class="k">import</span> <span class="n">Atoms</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">phonodir</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mi</span><span class="p">,</span> <span class="n">mposcar</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;MPOSCAR-*&quot;</span><span class="p">))))):</span>
+                <span class="k">if</span> <span class="n">mposcar</span> <span class="o">==</span> <span class="s2">&quot;MPOSCAR-orig&quot;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                
+                <span class="n">cid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mposcar</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">matoms</span> <span class="o">=</span> <span class="n">Atoms</span><span class="p">(</span><span class="n">mposcar</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;POSCAR&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">matoms</span><span class="p">,</span> <span class="n">cid</span><span class="p">)</span>
+                <span class="c1">#Remove the MPOSCAR file so that the directory isn&#39;t polluted.</span>
+                <span class="n">remove</span><span class="p">(</span><span class="n">mposcar</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">chdir</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            
+        <span class="c1"># Last of all, create the job file to execute the job array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobfile</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">matdb 0.0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>
