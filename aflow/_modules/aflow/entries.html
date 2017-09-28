@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -28,7 +28,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -54,7 +54,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">aflow.caster</span> <span class="k">import</span> <span class="n">cast</span>
 <span class="kn">import</span> <span class="nn">aflow.keywords</span> <span class="k">as</span> <span class="nn">kw</span>
-    
+
 <span class="k">def</span> <span class="nf">_val_from_str</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Retrieves the specified attribute&#39;s value, cast to an</span>
 <span class="sd">    appropriate python type where possible.</span>
@@ -92,6 +92,18 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="n">_val_from_str</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;ase.atoms.Atoms: atoms object for the configuration in the</span>
+<span class="sd">        database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">aurl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;aurl&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.edu:&quot;</span><span class="p">,</span> <span class="s2">&quot;.edu/&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">aurl</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">auid</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">auid</span>
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auid</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_lazy_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Loads the value of the specified keyword via HTTP request against the</span>
@@ -111,12 +123,86 @@
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span>
-            
+
             <span class="c1">#We need to coerce the string returned from aflow into the</span>
             <span class="c1">#appropriate python format.</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">_val_from_str</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
             <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="Entry.atoms"><a class="viewcode-back" href="../../entries.html#aflow.entries.Entry.atoms">[docs]</a>    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;CONTCAR.relax*&quot;</span><span class="p">,</span> <span class="n">quippy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">calculator</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a :class:`ase.atoms.Atoms` or a :class:`quippy.atoms.Atoms`</span>
+<span class="sd">        object for this database entry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pattern (str): pattern for choosing the file to generate the atomic</span>
+<span class="sd">              lattice and positions from. The pattern is passed to</span>
+<span class="sd">              :func:`~fnmatch.fnmatch` and the *last* entry in the list is</span>
+<span class="sd">              returned (so that `CONTCAR.relax2` would be returned</span>
+<span class="sd">              preferentially over `CONTCAR.relax1` or `CONTCAR.relax`).</span>
+<span class="sd">            quippy (bool): when True, return a :class:`quippy.atoms.Atoms`</span>
+<span class="sd">              object.</span>
+<span class="sd">            keywords (dict): keys are keyword obects accessible from `aflow.K`;</span>
+<span class="sd">              values are desired `str` names in the parameters dictionary of the</span>
+<span class="sd">              atoms object.</span>
+<span class="sd">            calculator (ase.calculators.Calculator): calculator to set for the</span>
+<span class="sd">              newly created atoms object.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Generate a :class:`quippy.atoms.Atoms` object and include the total</span>
+<span class="sd">            energy and forces. Assume that `result` is a valid</span>
+<span class="sd">            :func:`aflow.search` object.</span>
+
+<span class="sd">            &gt;&gt;&gt; entry = result[0] #Get the first result in the set.</span>
+<span class="sd">            &gt;&gt;&gt; keywords = {K.energy_cell: &quot;dft_energy&quot;, K.forces: &quot;dft_force&quot;}</span>
+<span class="sd">            &gt;&gt;&gt; entry.atoms(quippy=True, keywords=keywords)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span>
+        
+        <span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">aurl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;aurl&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.edu:&quot;</span><span class="p">,</span> <span class="s2">&quot;.edu/&quot;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">{0}</span><span class="s2">/</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aurl</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+        <span class="kn">import</span> <span class="nn">requests</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">preline</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; !&#39;</span>
+        <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">preline</span> <span class="o">+</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">contcar</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">quippy</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+            <span class="kn">import</span> <span class="nn">quippy</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">quippy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">ase.io</span> <span class="k">import</span> <span class="n">read</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">read</span>
+
+        <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">StringIO</span>
+        <span class="n">cfile</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">contcar</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="n">reader</span><span class="p">(</span><span class="n">cfile</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;vasp&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">cfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">calculator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="o">.</span><span class="n">set_calculator</span><span class="p">(</span><span class="n">calculator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">keywords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">kw</span><span class="p">,</span> <span class="n">pname</span> <span class="ow">in</span> <span class="n">keywords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kw</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">quippy</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">pname</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#ASE only cares about certain values, but we&#39;ll save</span>
+                <span class="c1">#them all anyway.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">pname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span></div>
+        
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Bravais_lattice_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -160,7 +246,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Egap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;energy gap (`mandatory`). Units: `eV`.</span>
+        <span class="sd">&quot;&quot;&quot;electronic energy band gap (`mandatory`). Units: `eV`.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -265,7 +351,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Pearson_symbol_orig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;original pearson symbol (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;original Pearson symbol (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        </span>
@@ -282,7 +368,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">Pearson_symbol_relax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;relaxed pearson symbol (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;relaxed Pearson symbol (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -1428,7 +1514,8 @@
     <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Title (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
-<span class="sd">        </span>
+<span class="sd">        .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">          knowing that it is subject to change or removal.</span>
 <span class="sd">        </span>
 
 <span class="sd">        Returns:</span>
@@ -1575,7 +1662,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">natoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;unit cell atom count (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;number of atoms in unit cell (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        </span>
@@ -1592,7 +1679,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nbondxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Nearest neighbors bond lengths (`optional`). Units: `&amp;Aring;`.</span>
+        <span class="sd">&quot;&quot;&quot;nearest neighbor bond lengths (`optional`). Units: `&amp;Aring;`.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -1842,7 +1929,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;compound space group (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;space group of compound (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -1865,7 +1952,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sg2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;refined compound space group (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;refined space group of compound  (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -1945,7 +2032,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">species_pp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;species pseudopotential(s) (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;pseudopotential of chemical speciess (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        </span>
@@ -1979,7 +2066,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">species_pp_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;pseudopotential species/version (`mandatory`). Units: ``.</span>
+        <span class="sd">&quot;&quot;&quot;pseudopotential version and species (`mandatory`). Units: ``.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        </span>
@@ -1996,7 +2083,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spinD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;atomic spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+        <span class="sd">&quot;&quot;&quot;spin decomposition over unit cell (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -2017,7 +2104,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spinF</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;fermi level spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+        <span class="sd">&quot;&quot;&quot;magnetization of unit cell at Fermi level (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. note:: The following verifications are available for this</span>
@@ -2283,7 +2370,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

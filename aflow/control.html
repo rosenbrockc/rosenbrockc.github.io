@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -30,7 +30,7 @@
     <link rel="next" title="AFLOW Database Keywords" href="keywords.html" />
     <link rel="prev" title="Example Queries with aflow" href="examples.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -73,10 +73,10 @@ AFLOW database.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
-&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</li>
-<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of data entries to return per HTTP request.</li>
-<li><strong>step</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; step size over entries.</li>
+<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of the catalogs supported on AFLOW: [‘icsd’, ‘lib1’,
+‘lib2’, ‘lib3’]. Also supports a <cite>list</cite> of catalog names.</li>
+<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of data entries to return per HTTP request.</li>
+<li><strong>step</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – step size over entries.</li>
 </ul>
 </td>
 </tr>
@@ -85,67 +85,67 @@ AFLOW database.</p>
 <dl class="attribute">
 <dt id="aflow.control.Query.filters">
 <code class="descname">filters</code><a class="headerlink" href="#aflow.control.Query.filters" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <cite>str</cite> filter arguments to pass to the matchbook
+<dd><p><em>list</em> – of <cite>str</cite> filter arguments to pass to the matchbook
 section of the API request.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.select">
 <code class="descname">select</code><a class="reference internal" href="_modules/aflow/control.html#Query.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.select" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>include</em> in the request.</p>
+<dd><p><em>list</em> – of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>include</em> in the request.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.excludes">
 <code class="descname">excludes</code><a class="headerlink" href="#aflow.control.Query.excludes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>exclude</em> in the request.</p>
+<dd><p><em>list</em> – of <a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><code class="xref py py-class docutils literal"><span class="pre">aflow.keywords.Keyword</span></code></a> to <em>exclude</em> in the request.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.orderby">
 <code class="descname">orderby</code><a class="reference internal" href="_modules/aflow/control.html#Query.orderby"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.control.Query.orderby" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; name of the keyword to order by. AFLUX only supports a
+<dd><p><em>str</em> – name of the keyword to order by. AFLUX only supports a
 single order-by parameter for now.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.catalog">
 <code class="descname">catalog</code><a class="headerlink" href="#aflow.control.Query.catalog" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
-&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</p>
+<dd><p><em>str</em> – one of the catalogs supported on AFLOW: [‘icsd’, ‘lib1’,
+‘lib2’, ‘lib3’]. Also supports a <cite>list</cite> of catalog names.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.N">
 <code class="descname">N</code><a class="headerlink" href="#aflow.control.Query.N" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> &#8211; number of results in the current search query.</p>
+<dd><p><em>int</em> – number of results in the current search query.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.reverse">
 <code class="descname">reverse</code><a class="headerlink" href="#aflow.control.Query.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; when True, reverse the order of the results in the
+<dd><p><em>bool</em> – when True, reverse the order of the results in the
 query.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.k">
 <code class="descname">k</code><a class="headerlink" href="#aflow.control.Query.k" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> &#8211; number of datasets per page for the current iterator. Can be
+<dd><p><em>int</em> – number of datasets per page for the current iterator. Can be
 controlled by <cite>batch_size</cite>.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.responses">
 <code class="descname">responses</code><a class="headerlink" href="#aflow.control.Query.responses" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; keys are (n,k) tuples from the pagination; values are
+<dd><p><em>dict</em> – keys are (n,k) tuples from the pagination; values are
 the corresponding JSON dictionaries.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.control.Query.step">
 <code class="descname">step</code><a class="headerlink" href="#aflow.control.Query.step" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> &#8211; step size over entries.</p>
+<dd><p><em>int</em> – step size over entries.</p>
 </dd></dl>
 
 <dl class="method">
@@ -156,7 +156,7 @@ the corresponding JSON dictionaries.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) – that encapsulates the AFLUX
 request language logic.</td>
 </tr>
 </tbody>
@@ -172,7 +172,7 @@ multiple times will join the final filters together using logical <em>and</em>.<
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) – that encapsulates the AFLUX
 request language logic.</td>
 </tr>
 </tbody>
@@ -221,9 +221,9 @@ and request, but any cached responses will be lost.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+<li><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) – that encapsulates the AFLUX
 request language logic.</li>
-<li><strong>reverse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, reverse the ordering.</li>
+<li><strong>reverse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, reverse the ordering.</li>
 </ul>
 </td>
 </tr>
@@ -248,7 +248,7 @@ in the request.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) &#8211; that encapsulates the AFLUX
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keyword</strong> (<a class="reference internal" href="keywords.html#aflow.keywords.Keyword" title="aflow.keywords.Keyword"><em>aflow.keywords.Keyword</em></a>) – that encapsulates the AFLUX
 request language logic.</td>
 </tr>
 </tbody>
@@ -267,9 +267,9 @@ query.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; one of the catalogs supported on AFLOW: [&#8216;icsd&#8217;, &#8216;lib1&#8217;,
-&#8216;lib2&#8217;, &#8216;lib3&#8217;]. Also supports a <cite>list</cite> of catalog names.</li>
-<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of data entries to return per HTTP request.</li>
+<li><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of the catalogs supported on AFLOW: [‘icsd’, ‘lib1’,
+‘lib2’, ‘lib3’]. Also supports a <cite>list</cite> of catalog names.</li>
+<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of data entries to return per HTTP request.</li>
 </ul>
 </td>
 </tr>
@@ -279,8 +279,8 @@ query.</p>
 
 <dl class="data">
 <dt id="aflow.control.server">
-<code class="descclassname">aflow.control.</code><code class="descname">server</code><em class="property"> = 'http://aflowlib.duke.edu/search/API/?'</em><a class="headerlink" href="#aflow.control.server" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; API server address over HTTP.</p>
+<code class="descclassname">aflow.control.</code><code class="descname">server</code><em class="property"> = ‘http://aflowlib.duke.edu/search/API/?’</em><a class="headerlink" href="#aflow.control.server" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – API server address over HTTP.</p>
 </dd></dl>
 
 </div>
@@ -338,7 +338,7 @@ query.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

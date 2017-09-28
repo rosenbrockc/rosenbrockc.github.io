@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -28,7 +28,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -124,6 +124,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -254,7 +257,7 @@
 <span class="n">Bravais_lattice_relax</span> <span class="o">=</span> <span class="n">_Bravais_lattice_relax</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_Egap</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;energy gap (`mandatory`). Units: `eV`.</span>
+    <span class="sd">&quot;&quot;&quot;electronic energy band gap (`mandatory`). Units: `eV`.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -329,7 +332,7 @@
 <span class="n">PV_cell</span> <span class="o">=</span> <span class="n">_PV_cell</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_Pearson_symbol_orig</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;original pearson symbol (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;original Pearson symbol (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -344,7 +347,7 @@
 <span class="n">Pearson_symbol_orig</span> <span class="o">=</span> <span class="n">_Pearson_symbol_orig</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_Pearson_symbol_relax</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;relaxed pearson symbol (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;relaxed Pearson symbol (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1223,7 +1226,8 @@
 <span class="k">class</span> <span class="nc">_keywords</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Title (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
-<span class="sd">    </span>
+<span class="sd">    .. warning:: This keyword is still listed as development level. Use it</span>
+<span class="sd">      knowing that it is subject to change or removal.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: This includes the list of keywords available in the entry, separated by commas.</span>
@@ -1343,7 +1347,7 @@
 <span class="n">loop</span> <span class="o">=</span> <span class="n">_loop</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_natoms</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;unit cell atom count (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;number of atoms in unit cell (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1358,7 +1362,7 @@
 <span class="n">natoms</span> <span class="o">=</span> <span class="n">_natoms</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_nbondxx</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Nearest neighbors bond lengths (`optional`). Units: `&amp;Aring;`.</span>
+    <span class="sd">&quot;&quot;&quot;nearest neighbor bond lengths (`optional`). Units: `&amp;Aring;`.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1557,7 +1561,7 @@
 <span class="n">scintillation_attenuation_length</span> <span class="o">=</span> <span class="n">_scintillation_attenuation_length</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_sg</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;compound space group (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;space group of compound (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1572,7 +1576,7 @@
 <span class="n">sg</span> <span class="o">=</span> <span class="n">_sg</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_sg2</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;refined compound space group (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;refined space group of compound  (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1632,7 +1636,7 @@
 <span class="n">species</span> <span class="o">=</span> <span class="n">_species</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_species_pp</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;species pseudopotential(s) (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;pseudopotential of chemical speciess (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1662,7 +1666,7 @@
 <span class="n">species_pp_ZVAL</span> <span class="o">=</span> <span class="n">_species_pp_ZVAL</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_species_pp_version</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;pseudopotential species/version (`mandatory`). Units: ``.</span>
+    <span class="sd">&quot;&quot;&quot;pseudopotential version and species (`mandatory`). Units: ``.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1677,7 +1681,7 @@
 <span class="n">species_pp_version</span> <span class="o">=</span> <span class="n">_species_pp_version</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_spinD</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;atomic spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+    <span class="sd">&quot;&quot;&quot;spin decomposition over unit cell (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1692,7 +1696,7 @@
 <span class="n">spinD</span> <span class="o">=</span> <span class="n">_spinD</span><span class="p">()</span>
     
 <span class="k">class</span> <span class="nc">_spinF</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;fermi level spin decomposition (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
+    <span class="sd">&quot;&quot;&quot;magnetization of unit cell at Fermi level (`mandatory`). Units: `&amp;mu;&lt;sub&gt;B&lt;/sub&gt;`.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 
@@ -1895,7 +1899,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

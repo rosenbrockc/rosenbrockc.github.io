@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -30,7 +30,7 @@
     <link rel="next" title="Code Templating Generators" href="generators.html" />
     <link rel="prev" title="AFLOW Database Entries" href="entries.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -58,7 +58,7 @@
   <div class="section" id="aflow-custom-deserializers">
 <h1><cite>AFLOW</cite> Custom Deserializers<a class="headerlink" href="#aflow-custom-deserializers" title="Permalink to this headline">¶</a></h1>
 <p>Unfortunately, the AFLOW library uses a custom-built serialization
-language for its keywords. This means that it isn&#8217;t possible to
+language for its keywords. This means that it isn’t possible to
 standardize the deserialization across all <a class="reference internal" href="keywords.html"><span class="doc">AFLOW Database Keywords</span></a>. Instead,
 we have to implement custom deserialization for some of the keyword
 types.</p>
@@ -80,9 +80,9 @@ encode some exceptions directly in this module.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the AFLOW type.</li>
-<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the keyword that the value is associated with.</li>
-<li><strong>value</strong> &#8211; object (usually a string) to cast into python types.</li>
+<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the AFLOW type.</li>
+<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the keyword that the value is associated with.</li>
+<li><strong>value</strong> – object (usually a string) to cast into python types.</li>
 </ul>
 </td>
 </tr>
@@ -92,15 +92,15 @@ encode some exceptions directly in this module.</p>
 
 <dl class="data">
 <dt id="aflow.caster.docstrings">
-<code class="descclassname">aflow.caster.</code><code class="descname">docstrings</code><em class="property"> = {'kpoints': &quot;dict: with keys ['relaxation', 'static', 'points', 'nsamples']\ndescribing the cells for the relaxation and static calculations, the\nk-space symmetry points of the structure and the number of samples.&quot;}</em><a class="headerlink" href="#aflow.caster.docstrings" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; key-value pairs for custom docstrings describing the return
+<code class="descclassname">aflow.caster.</code><code class="descname">docstrings</code><em class="property"> = {‘kpoints’: “dict: with keys [‘relaxation’, ‘static’, ‘points’, ‘nsamples’]\ndescribing the cells for the relaxation and static calculations, the\nk-space symmetry points of the structure and the number of samples.”}</em><a class="headerlink" href="#aflow.caster.docstrings" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – key-value pairs for custom docstrings describing the return
 value of keywords with complex structure.</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="aflow.caster.exceptions">
-<code class="descclassname">aflow.caster.</code><code class="descname">exceptions</code><em class="property"> = ['forces', 'kpoints', 'positions_cartesian', 'positions_fractional', 'spind', 'stoich']</em><a class="headerlink" href="#aflow.caster.exceptions" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; of AFLOW keywords for which the casting has to be handled in a special
+<code class="descclassname">aflow.caster.</code><code class="descname">exceptions</code><em class="property"> = [‘forces’, ‘kpoints’, ‘positions_cartesian’, ‘positions_fractional’, ‘spind’, ‘stoich’]</em><a class="headerlink" href="#aflow.caster.exceptions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of AFLOW keywords for which the casting has to be handled in a special
 way.</p>
 </dd></dl>
 
@@ -114,8 +114,8 @@ specified AFLOW type and keyword.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the AFLOW type.</li>
-<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the keyword that the value is associated with.</li>
+<li><strong>atype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the AFLOW type.</li>
+<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the keyword that the value is associated with.</li>
 </ul>
 </td>
 </tr>
@@ -178,7 +178,7 @@ specified AFLOW type and keyword.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
