@@ -1,0 +1,222 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.elements &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gblearn.selection" href="gblearn.selection.html" />
+    <link rel="prev" title="gblearn: Machine Learning for Grain Boundaries" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.selection.html" title="gblearn.selection"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="gblearn: Machine Learning for Grain Boundaries"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">gblearn.elements</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter"><cite>gblearn</cite>: Machine Learning for Grain Boundaries</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gblearn.selection.html"
+                        title="next chapter">gblearn.selection</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Modules/gblearn.elements.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gblearn.elements">
+<span id="gblearn-elements"></span><h1>gblearn.elements<a class="headerlink" href="#module-gblearn.elements" title="Permalink to this headline">¶</a></h1>
+<p>Crystal definitions and SOAP vector calculations for simple
+elements.</p>
+<p class="rubric">Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">atoms</span></code>(element)</td>
+<td>Returns a <code class="xref py py-class docutils literal"><span class="pre">quippy.Atoms</span></code> structure for the given element, using the tabulated lattice parameters.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">pissnnl</span></code>(element[,&nbsp;lmax,&nbsp;nmax,&nbsp;rcut,&nbsp;sigma,&nbsp;…])</td>
+<td>Computes the <span class="math">\(P\)</span> matrix for the given element.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">shells</span></code>(element[,&nbsp;n,&nbsp;rcut])</td>
+<td>Returns the neighbor shells for the specified element.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Crystal definitions and SOAP vector calculations for simple
+elements.</p>
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.elements.</code><code class="descname">atoms</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/elements.html#atoms"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a <code class="xref py py-class docutils literal"><span class="pre">quippy.Atoms</span></code> structure for the given
+element, using the tabulated lattice parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the element.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descclassname">gblearn.elements.</code><code class="descname">elements</code><em class="property"> = {‘Ni’: (‘fcc’, 3.52, 28, [0]), ‘Mg’: (‘hcp’, 3.21, 12, [0, 1]), ‘Cr’: (‘bcc’, 2.91, 24, [0, 1])}</em></dt>
+<dd><p><em>dict</em> – keys are element names, values are a tuple of (<cite>str</cite> lattice,
+<cite>float</cite> lattice parameter, <cite>int</cite> element number, <cite>list</cite> basis indices).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.elements.</code><code class="descname">pissnnl</code><span class="sig-paren">(</span><em>element</em>, <em>lmax=12</em>, <em>nmax=12</em>, <em>rcut=6.0</em>, <em>sigma=0.5</em>, <em>trans_width=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/elements.html#pissnnl"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes the <span class="math">\(P\)</span> matrix for the given element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the element.</li>
+<li><strong>nmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor radial basis
+functions.</li>
+<li><strong>lmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor spherical
+harmonics.</li>
+<li><strong>rcut</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – local environment finite cutoff parameter.</li>
+<li><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – width parameter for the Gaussians on each atom.</li>
+<li><strong>trans_width</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – distance over which the coefficients in the
+radial functions are smoothly transitioned to zero.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.elements.</code><code class="descname">shells</code><span class="sig-paren">(</span><em>element</em>, <em>n=6</em>, <em>rcut=6.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/elements.html#shells"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the neighbor shells for the specified element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the element.</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – maximum number of shells to return.</li>
+<li><strong>rcut</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – maximum cutoff to consider in looking for unique shells.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.selection.html" title="gblearn.selection"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="gblearn: Machine Learning for Grain Boundaries"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

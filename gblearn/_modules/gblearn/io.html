@@ -1,0 +1,552 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.io &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gblearn.io</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for I/O interaction of :class:`gblearn.gb.GrainBoundaryCollection`</span>
+<span class="sd">objects and the many results they produce with disk storage.</span>
+
+<span class="sd">.. note:: Whenever a new representation is added, a property getter and setter</span>
+<span class="sd">  need to be added *with documentation* to the :class:`ResultStore`. The three</span>
+<span class="sd">  generic getter and setter functions for numpy arrays, aggregated arrays</span>
+<span class="sd">  and dictionaries of parameterized aggregated arrays should be sufficient to</span>
+<span class="sd">  handle any additional representations we may come up with.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">mkdir</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">gblearn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+    
+<div class="viewcode-block" id="DiskCollection"><a class="viewcode-back" href="../../Modules/gblearn.io.html#gblearn.io.DiskCollection">[docs]</a><span class="k">class</span> <span class="nc">DiskCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For large grain boundary collections, it may not be possible to keep all</span>
+<span class="sd">    SOAP matrices and their derivatives in memory at the same time for</span>
+<span class="sd">    processing. In these cases, it is preferable to read a matrix in, process</span>
+<span class="sd">    it, and then delete it from memory right away.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): path to the folder where the array files are stored.</span>
+<span class="sd">        gbids (list): of ids for each GB; the files should be stored as `id.npy`</span>
+<span class="sd">          in the `root` directory.</span>
+<span class="sd">        restricted (bool): when True, run in memory-restricted mode. Otherwise,</span>
+<span class="sd">          the loaded array files are cached in memory for speedy multiple</span>
+<span class="sd">          retrieval.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        cache (dict): keys are GB ids in :attr:`gbids`; values are the</span>
+<span class="sd">          corresponding :class:`numpy.ndarray` files. This only has values in</span>
+<span class="sd">          :attr:`restricted` is False.</span>
+<span class="sd">        files (dict): keys are GB ids, values are paths to the numpy array files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">gbids</span><span class="p">,</span> <span class="n">restricted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">mkdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.npy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
+                                  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">gbids</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span> <span class="o">=</span> <span class="n">gbids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span> <span class="o">=</span> <span class="n">restricted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">gbpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.npy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gbid</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">gbpath</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    
+    <span class="nd">@contextmanager</span>    
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+                <span class="k">yield</span> <span class="n">result</span>
+                <span class="k">del</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="ResultStore"><a class="viewcode-back" href="../../Modules/gblearn.io.html#gblearn.io.ResultStore">[docs]</a><span class="k">class</span> <span class="nc">ResultStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a collection of results for a</span>
+<span class="sd">    :class:`~gblearn.gb.GrainBoundaryCollection` that can be cached because they</span>
+<span class="sd">    are permanent for the particular collection.</span>
+
+<span class="sd">    .. note:: The result store creates separate sub-folders `P_` for the full</span>
+<span class="sd">      SOAP matrices of each GB; `U_` for the unique decompositions at different</span>
+<span class="sd">      epsilon values; `ASR_` for the ASR representation; and `LER_` for the LER</span>
+<span class="sd">      representations (tied to particular epsilon values and unique</span>
+<span class="sd">      decompositions).</span>
+
+<span class="sd">    .. note:: If any of the results (such as :attr:`P`, :attr:`U`, :attr:`ASR`</span>
+<span class="sd">      or :attr:`LER`) are not saved in the store, `None` will be returned.</span>
+
+<span class="sd">    .. note:: If `root=None` then the results will only be cached in memory and</span>
+<span class="sd">      *not* to disk.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gbids (list): of identifiers for the individual members of the GB</span>
+<span class="sd">          collection. The store makes sure that they match for a given directory</span>
+<span class="sd">          so that results can be kept straight.</span>
+<span class="sd">        root (str): path to the root directory for this result store.</span>
+<span class="sd">        restricted (bool): when True, run in memory-restricted mode. Otherwise,</span>
+<span class="sd">          the loaded array files are cached in memory for speedy multiple</span>
+<span class="sd">          retrieval.</span>
+<span class="sd">        soapargs (dict): arguments for the SOAP descriptor. See</span>
+<span class="sd">          :class:`gblearn.soap.SOAPCalculator` for information.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        root (str): path to the root directory for this result store.</span>
+<span class="sd">        gbids (list): of identifiers for the individual members of the GB</span>
+<span class="sd">          collection.</span>
+<span class="sd">        reps (list): of `str` representation names that will be handled by the</span>
+<span class="sd">          result store.</span>
+<span class="sd">        soapargs (dict): arguments for the SOAP descriptor. See</span>
+<span class="sd">          :class:`gblearn.soap.SOAPCalculator` for information.</span>
+<span class="sd">        soapstr (list): of `str` soap arguments that are formatted to form a</span>
+<span class="sd">          folder name for specific variations of the representations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">soapstr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lmax&quot;</span><span class="p">,</span> <span class="s2">&quot;nmax&quot;</span><span class="p">,</span> <span class="s2">&quot;rcut&quot;</span><span class="p">]</span>
+    <span class="n">reps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;ASR&quot;</span><span class="p">,</span> <span class="s2">&quot;LER&quot;</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gbids</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">restricted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">soapargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span> <span class="o">=</span> <span class="n">restricted</span>
+        <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reps</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">soapargs</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soapstr</span><span class="p">):</span>
+            <span class="n">eargs</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;`</span><span class="si">{}</span><span class="s2">`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soapstr</span><span class="p">])</span>
+            <span class="n">emsg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> are required arguments for ResultStore.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eargs</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">emsg</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span> <span class="o">=</span> <span class="n">gbids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">soapargs</span><span class="p">)</span>
+
+        <span class="c1">#Set the lazy initializers for each of the representations that we</span>
+        <span class="c1">#handle.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clobber_reps</span><span class="p">()</span>
+        <span class="c1">#Create the directories and validate the grain boundary ids that were</span>
+        <span class="c1">#passed in against any existing ones.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_dirs</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_clobber_reps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets all the cached representation values to `None`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reps</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_setup_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates any missing directories if the store is not running in</span>
+<span class="sd">        memory-only mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="c1">#Load any existing gbmap to make sure we are dealing with the same GB</span>
+        <span class="c1">#collection.</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="n">idfile</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;gbids.json&quot;</span><span class="p">)</span>        
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">idfile</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">idfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">_gbids</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="c1">#Make sure that the ids match.</span>
+            <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_gbids</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">idfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            
+        <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reps</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">sdir</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdir</span><span class="p">)):</span>
+                <span class="n">mkdir</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdir</span><span class="p">))</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SOAP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the current SOAP paramater configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: of SOAP arguments used to form the directory name for</span>
+<span class="sd">            particular parameter sets. See :attr:`soapstr`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soapstr</span><span class="p">])</span>
+
+    <span class="nd">@SOAP</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">SOAP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the current SOAP parameter configuration.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            value (dict): of key-value SOAP parameter pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        
+        <span class="c1">#Clobber all of the cached values since we undid the SOAP parameters.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clobber_reps</span><span class="p">()</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SOAP_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the directory string for the current SOAP configuration. It</span>
+<span class="sd">        is defined by `nmax_lmax_rcut`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOAP</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You can&#39;t use the result store until SOAP &quot;</span>
+                             <span class="s2">&quot;parameters have been set. Pass them to the &quot;</span>
+                             <span class="s2">&quot;constructor, or use property SOAP.&quot;</span><span class="p">)</span>            
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">_</span><span class="si">{1:d}</span><span class="s2">_</span><span class="si">{2:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">SOAP</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">P</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;SOAP Representation for each GB in the collection.</span>
+
+<span class="sd">        .. note:: The SOAP matrices returned will be for the currently</span>
+<span class="sd">          configured values of `lmax`, `nmax` and `rcut` in the store.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are `gbid`, values are the SOAP reprentation for that</span>
+<span class="sd">            particular GB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_np_get</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
+
+    <span class="nd">@P</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">P</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the value of the SOAP representation for each of the GBs in this</span>
+<span class="sd">        collection.</span>
+
+<span class="sd">        .. warning:: You *must* make sure that the SOAP parameters for the store</span>
+<span class="sd">          are set correctly before calling this method. Otherwise, the matrices</span>
+<span class="sd">          will be stored in the wrong location.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (dict): keys are `gbid`, values are :class:`numpy.ndarray`</span>
+<span class="sd">              SOAP matrices for the GBs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_np_set</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_np_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Restores a :class:`numpy.ndarray` based representation collection for</span>
+<span class="sd">        each GB in the result store.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): name of the representation being retrieved.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are gbid; values are the numpy arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cache</span>
+
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">DiskCollection</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_np_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a :class:`numpy.ndarray` value for each GB in the collection.</span>
+
+<span class="sd">        .. note:: If a root directory is set for this result store, then these</span>
+<span class="sd">          values will be saved to disk.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): name of the representation to set values for.</span>
+<span class="sd">            value (dict): keys are gbid, values are the numpy arrays to set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">):</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="s2">&quot;The number of GBs in the specified set does not match &quot;</span>
+                    <span class="s2">&quot;the result store configuration.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="n">dc</span> <span class="o">=</span> <span class="n">DiskCollection</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restricted</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="n">dc</span><span class="p">)</span>
+            
+        <span class="n">saved</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">dc</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span>
+            <span class="n">saved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gbid</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">,</span> <span class="n">saved</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the value of the unique decomposition in this store.</span>
+
+<span class="sd">        .. warning:: These value are dependent on the particular SOAP parameter</span>
+<span class="sd">          set. They are saved accordingly.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are values of `epsilon`, rounded to 5 decimal places;</span>
+<span class="sd">            values are those returned by :func:`~gblearn.reduced.unique`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_get</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+
+    <span class="nd">@U</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the value of the unique decomposition in this store. It is</span>
+<span class="sd">        stored according to the current SOAP parameter set.</span>
+
+<span class="sd">        .. warning:: If a file already exists for a particular unique</span>
+<span class="sd">          decomposition at a value of `eps`, it will *not* be overwritten, but</span>
+<span class="sd">          skipped.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (dict): keys are epsilon value controlling when two LAEs are</span>
+<span class="sd">              similar; values are the same as returned by</span>
+<span class="sd">              :meth:`~gblearn.gb.GrainBoundaryCollection.uniquify`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_agg_set</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_agg_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary of aggregated representations for th given name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): name of the representation to get values for.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cache</span>
+
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        
+        <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+        <span class="kn">from</span> <span class="nn">gblearn.utility</span> <span class="k">import</span> <span class="n">chdir</span>
+        <span class="kn">from</span> <span class="nn">cPickle</span> <span class="k">import</span> <span class="n">load</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">result</span>
+        
+        <span class="k">with</span> <span class="n">chdir</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">pkl</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.pkl&quot;</span><span class="p">):</span>
+                <span class="n">seps</span> <span class="o">=</span> <span class="n">pkl</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">seps</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pkl</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_agg_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the value of a parameter-sensitive collection of *aggregated*</span>
+<span class="sd">        representations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): name of the representation to set values for.</span>
+<span class="sd">            value (dict): keys are float parameter values; values are</span>
+<span class="sd">              :class:`numpy.ndarray` aggregated representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">mkdir</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            
+        <span class="kn">from</span> <span class="nn">cPickle</span> <span class="k">import</span> <span class="n">dump</span>
+        <span class="k">for</span> <span class="n">eps</span><span class="p">,</span> <span class="n">utup</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">upath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0:.5f}</span><span class="s2">.pkl&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eps</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">upath</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">upath</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">dump</span><span class="p">(</span><span class="n">utup</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ASR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Averaged SOAP representation for this GB collection using</span>
+<span class="sd">        the currently configured SOAP parameters (see :attr:`SOAP`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_get</span><span class="p">(</span><span class="s2">&quot;ASR&quot;</span><span class="p">)</span>
+
+    <span class="nd">@ASR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ASR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stores the Averaged SOAP representation for this GB collection using</span>
+<span class="sd">        the currently configured SOAP parameters (see :attr:`SOAP`).</span>
+
+<span class="sd">        .. note:: If the file already exists for the ASR at the current SOAP</span>
+<span class="sd">          parameters, then it will *not* be re-saved.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (numpy.ndarray): ASR for the GB collection.        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_set</span><span class="p">(</span><span class="s2">&quot;ASR&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_single_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a representation for the GB system that is based in a single</span>
+<span class="sd">        :class:`numpy.ndarray` *without* parameter dependence (except for SOAP).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cache</span>
+
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.npy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_single_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        
+        <span class="c1">#Handle the memory-only case.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="n">rpath</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.npy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SOAP_str</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">LER</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="sd">&quot;&quot;&quot;Gets the LER for the current SOAP configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are values of `epsilon`, rounded to 5 decimal places;</span>
+<span class="sd">            values are the Local Environment Representation for the GB</span>
+<span class="sd">            collection. The keys in this `dict` are linked with those in</span>
+<span class="sd">            :attr:`U`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agg_get</span><span class="p">(</span><span class="s2">&quot;LER&quot;</span><span class="p">)</span>
+
+    <span class="nd">@LER</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">LER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the LER in the store for the current SOAP configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (dict): keys are values of `epsilon`, rounded to 5 decimal places;</span>
+<span class="sd">              values are the Local Environment Representation for the GB</span>
+<span class="sd">              collection. The keys in this `dict` are linked with those in</span>
+<span class="sd">              :attr:`U`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_agg_set</span><span class="p">(</span><span class="s2">&quot;LER&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

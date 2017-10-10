@@ -1,0 +1,705 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.gb &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gblearn.gb</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions and classes for interacting with grain boundaries.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">gblearn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<div class="viewcode-block" id="GrainBoundaryCollection"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection">[docs]</a><span class="k">class</span> <span class="nc">GrainBoundaryCollection</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a collection of grain boundaries and the unique environments</span>
+<span class="sd">    between them.</span>
+
+<span class="sd">    .. warning:: If you don&#39;t specify a path for `store`, any results (such as</span>
+<span class="sd">      SOAP matrices, ASR, LER, etc. will *not* be saved to disk. Also, they</span>
+<span class="sd">      won&#39;t be loaded from disk if they already exist.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): identifier for this collection.</span>
+<span class="sd">        root (str): path to the directory where the raw GB atomic descriptions</span>
+<span class="sd">          are located.</span>
+<span class="sd">        store (str): path to the :class:`~gblearn.io.ResultStore` root</span>
+<span class="sd">          directory that this collection&#39;s results are stored in. To use a</span>
+<span class="sd">          memory-only store, leave this as `None`.</span>
+<span class="sd">        rxgbid (str): regex pattern for extracting the `gbid` for each GB. Any</span>
+<span class="sd">          files that don&#39;t match the regex are automatically excluded. The regex</span>
+<span class="sd">          should include a named group `(?P&lt;gbid&gt;...)` so that the GB id can be</span>
+<span class="sd">          extracted correctly. If not specified, the file name is used as the</span>
+<span class="sd">          `gbid`.</span>
+<span class="sd">        sortkey (function): when `root` is investigated to load GBs, the file</span>
+<span class="sd">          names are first sorted; here you can specify a custom sorting</span>
+<span class="sd">          function.</span>
+<span class="sd">        reverse (bool): for GB file name sorting (see `sortkey`), whether to</span>
+<span class="sd">          reverse the order.</span>
+<span class="sd">        seed (numpy.ndarray): seed SOAP vector for calculating unique LAEs. This</span>
+<span class="sd">          is usually the SOAP vector of the perfect bulk crystal in the GB.</span>
+<span class="sd">        soapargs (dict): key-value pairs for constructing the SOAP descriptor.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): identifier for this collection.</span>
+<span class="sd">        root (str): path to the directory where the raw GB atomic descriptions</span>
+<span class="sd">          are located.</span>
+<span class="sd">        store (gblearn.io.ResultStore): storage manager for all the</span>
+<span class="sd">          intermediate results generated by this collection.</span>
+<span class="sd">        unique (dict): keys are `float` values of `epsilon` for comparing</span>
+<span class="sd">          environments; values are themselves dictionaries that have keys as</span>
+<span class="sd">          `tuple` of `(gbid, aid)` with `aid` the id of the atom (row id) in the</span>
+<span class="sd">          SOAP vector for the GB; value is the SOAP vector already found to be</span>
+<span class="sd">          unique for that value of `epsilon`.</span>
+<span class="sd">        equivalent (dict): keys are `float` values of `epsilon` for comparing</span>
+<span class="sd">          environments; values are themselves dictionaries that have `gbid` keys</span>
+<span class="sd">          values are a `dict` having linked keys with :attr:`unique` and values</span>
+<span class="sd">          a list of `aid` in the GB whose LAEs that are equivalent to the unique</span>
+<span class="sd">          LAE represented by the key.</span>
+<span class="sd">        soapargs (dict): key-value pairs for constructing the SOAP descriptor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rxgbid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sortkey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">soapargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GrainBoundaryCollection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sortkey</span> <span class="o">=</span> <span class="n">sortkey</span>
+        <span class="sd">&quot;&quot;&quot;function: when `root` is investigated to load GBs, the file names are first</span>
+<span class="sd">          sorted; here you can specify a custom sorting function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reverse</span> <span class="o">=</span> <span class="n">reverse</span>
+        <span class="sd">&quot;&quot;&quot;bool: for GB file name sorting (see `sortkey`), whether to reverse</span>
+<span class="sd">        the order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rxgbid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;_sre.SRE_Pattern: compiled regex for the gbid pattern matching</span>
+<span class="sd">        string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unique</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equivalent</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span> <span class="o">=</span> <span class="n">soapargs</span>
+        
+        <span class="k">if</span> <span class="n">rxgbid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">re</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rxgbid</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">rxgbid</span><span class="p">)</span>
+
+        <span class="c1">#Search for all the GBs in the specified root folder.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_gbs</span><span class="p">()</span>
+
+        <span class="kn">from</span> <span class="nn">gblearn.io</span> <span class="k">import</span> <span class="n">ResultStore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">ResultStore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">store</span><span class="p">,</span> <span class="o">**</span><span class="n">soapargs</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_find_gbs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Finds all the GBs in the root directory using the regex.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">walk</span>
+        <span class="n">allfiles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span><span class="p">)</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">allfiles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">allfiles</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sortkey</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_reverse</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rxgbid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">gbmatch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rxgbid</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">gbmatch</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">gbid</span> <span class="o">=</span> <span class="n">gbmatch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;gbid&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+                        <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+
+        <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> grain boundaries.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="GrainBoundaryCollection.load"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads the GBs from their files to create :class:`GrainBoundary`</span>
+<span class="sd">        objects.</span>
+
+<span class="sd">        .. note:: The :class:`GrainBoundary` objects are stored in this objects</span>
+<span class="sd">          dictionary (it inherits from :class:`~collections.OrderedDict`). Thus</span>
+<span class="sd">          :attr:`keys` are the `gbid` and :attr:`values` are the</span>
+<span class="sd">          :class:`GrainBoundary` instances, in the sorted order that they were</span>
+<span class="sd">          discovered.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parser: object used to parse the raw GB file. Defaults to</span>
+<span class="sd">              :class:`gblearn.lammps.Timestep`. Class should have a method `gb`</span>
+<span class="sd">              that constructs a :class:`GrainBoundary` instance.</span>
+<span class="sd">            kwargs (dict): keyword arguments passed to the `gb` method of</span>
+<span class="sd">             `parser`. For example, see :meth:`gblearn.lammps.Timestep.gb`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">gblearn.lammps</span> <span class="k">import</span> <span class="n">Timestep</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">Timestep</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;soapargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;padding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soapargs</span><span class="p">[</span><span class="s2">&quot;rcut&quot;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>
+            
+        <span class="k">for</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">gbpath</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Timestep</span><span class="p">(</span><span class="n">gbpath</span><span class="p">)</span>
+            <span class="n">gb</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">gb</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">gb</span></div>
+
+<div class="viewcode-block" id="GrainBoundaryCollection.soap"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection.soap">[docs]</a>    <span class="k">def</span> <span class="nf">soap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the SOAP vector matrix for the atomic environments at</span>
+<span class="sd">        each grain boundary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">P</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1">#No need to recompute if the store has the result.</span>
+            <span class="k">return</span> <span class="n">P</span>
+            
+        <span class="k">for</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">gb</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">P</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">soap</span><span class="p">()</span></div>
+            
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">P</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the computed SOAP matrices for each GB in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">P</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The SOAP matrices haven&#39;t been computed yet. Use &quot;</span>
+                     <span class="s2">&quot;:meth:`soap`.&quot;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">result</span>
+            
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ASR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the ASR for the GB collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">ASR</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span>
+        
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">soaps</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">gbid</span> <span class="ow">in</span> <span class="n">P</span><span class="o">.</span><span class="n">gbids</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">P</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="k">as</span> <span class="n">Pi</span><span class="p">:</span>
+                    <span class="n">soaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Pi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">soaps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">ASR</span> <span class="o">=</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="GrainBoundaryCollection.U"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection.U">[docs]</a>    <span class="k">def</span> <span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the uniquified set of environments for the GB collection and</span>
+<span class="sd">        current `soapargs`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eps (float): similarity threshlod parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">U</span>
+        <span class="k">if</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">U</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">eps</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniquify</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+            <span class="n">U</span><span class="p">[</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">U</span>
+
+	<span class="c1">#Just grab the atom ids from each list and then assign that</span>
+	<span class="c1">#particular atom the corresponding unique signature. Note that</span>
+	<span class="c1">#each unique signature atom list has the unique signature as the</span>
+	<span class="c1">#first element, which is why the range starts at 1.</span>
+        <span class="k">for</span> <span class="n">gbid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">:</span>
+            <span class="n">LAEs</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;GBs&quot;</span><span class="p">][</span><span class="n">gbid</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">elist</span> <span class="ow">in</span> <span class="n">LAEs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+	        <span class="k">for</span> <span class="n">PID</span><span class="p">,</span> <span class="n">VID</span> <span class="ow">in</span> <span class="n">elist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span><span class="o">.</span><span class="n">LAEs</span><span class="p">[</span><span class="n">VID</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+                
+        <span class="k">return</span> <span class="n">result</span></div>
+    
+<div class="viewcode-block" id="GrainBoundaryCollection.uniquify"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection.uniquify">[docs]</a>    <span class="k">def</span> <span class="nf">uniquify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extracts all the unique LAEs in the entire GB system using the</span>
+<span class="sd">        specified `epsilon` similarity value.</span>
+
+<span class="sd">        .. warning:: This method does not verify the completion status of any</span>
+<span class="sd">          previous :meth:`uniquify` attempts. It just re-runs everything and</span>
+<span class="sd">          clobbers any existing results for the specified value of `epsilon`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eps (float): similarity scores below this value are considered</span>
+<span class="sd">              identical. Two actually identical GBs will have a similarity score</span>
+<span class="sd">              of `0` by this metric, so smaller is more similar.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: with keys `U` and `GBs`. The `U` key has a dictionary of </span>
+<span class="sd">            `(PID, VID)` identifiers for the unique LAEs in the GB collection. The</span>
+<span class="sd">            values are the corresponding SOAP vectors. `GBs` is a dictionary with</span>
+<span class="sd">            `gbid` keys and values being a `dict` keyed by unique LAEs with values a</span>
+<span class="sd">            list of `(PID, VID)` identifiers from the global GB collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;GBs&quot;</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">}</span>
+        
+        <span class="c1">#We pre-seed the list of unique environments with perfect FCC.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot uniquify LAEs without a seed LAE.&quot;</span><span class="p">)</span>
+        
+        <span class="n">U</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+	<span class="n">U</span><span class="p">[(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span>
+        
+	<span class="k">for</span> <span class="n">gbid</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">):</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="k">as</span> <span class="n">NP</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_uniquify</span><span class="p">(</span><span class="n">NP</span><span class="p">,</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+
+        <span class="c1">#Now that we have the full list of unique environments, go through a</span>
+        <span class="c1">#second time and classify every vector in each GB.</span>
+        <span class="n">used</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">U</span><span class="p">}</span>
+	<span class="k">for</span> <span class="n">gbid</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gbfiles</span><span class="p">):</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span> <span class="k">as</span> <span class="n">NP</span><span class="p">:</span>
+                <span class="n">LAEs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classify</span><span class="p">(</span><span class="n">NP</span><span class="p">,</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">used</span><span class="p">)</span>      			
+            	<span class="n">result</span><span class="p">[</span><span class="s2">&quot;GBs&quot;</span><span class="p">][</span><span class="n">gbid</span><span class="p">]</span> <span class="o">=</span> <span class="n">LAEs</span>
+
+        <span class="c1">#Now, remove any LAEs from U that didn&#39;t get used. We shouldn&#39;t really</span>
+        <span class="c1">#have many of these.</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">used</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+                <span class="k">del</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                
+        <span class="c1">#Populate the result dict with the final unique LAEs. We want to store</span>
+        <span class="c1">#these ordered by similarity to the seed U.</span>
+        <span class="kn">from</span> <span class="nn">gblearn.soap</span> <span class="k">import</span> <span class="n">S</span>
+        <span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">itemgetter</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="n">S</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">U</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">Us</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">u</span><span class="p">,</span> <span class="n">U</span><span class="p">[</span><span class="n">u</span><span class="p">])</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">Us</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+                
+    <span class="k">def</span> <span class="nf">_uniquify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NP</span><span class="p">,</span> <span class="n">gbid</span><span class="p">,</span> <span class="n">uni</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs the first unique identification pass through the collection. Calculates</span>
+<span class="sd">        the unique SOAP vectors in the given GB relative to the current set of</span>
+<span class="sd">        unique ones.</span>
+<span class="sd">        </span>
+<span class="sd">        .. note:: This version was includes refactoring by Jonathan Priedemann.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            NP (numpy.ndarray): matrix of SOAP vectors for the grain boundary.</span>
+<span class="sd">            gbid (str): id of the grain boundary in the publication set.</span>
+<span class="sd">            uni (dict): keys are `tuple` of (PID, VID) with `PID` the</span>
+<span class="sd">              publication Id of the grain boundary and `VID` the id of the SOAP</span>
+<span class="sd">              vector in that GBs descriptor matrix. Value is the actual SOAP</span>
+<span class="sd">              vector already found to be unique for some value of `eps`.</span>
+<span class="sd">            eps (float): cutoff value for deciding whether two vectors are unique.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: keys are `tuple` of (PID, VID) linked to `uni`; values are a</span>
+<span class="sd">            list of `tuple` (PID, VID) of vectors similar to the key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">gblearn.soap</span> <span class="k">import</span> <span class="n">S</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">NP</span><span class="p">)):</span>
+	    <span class="n">Pv</span> <span class="o">=</span> <span class="n">NP</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
+	    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">uni</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+		<span class="n">uP</span> <span class="o">=</span> <span class="n">uni</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>
+		<span class="n">K</span> <span class="o">=</span> <span class="n">S</span><span class="p">(</span><span class="n">Pv</span><span class="p">,</span> <span class="n">uP</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">K</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+                    <span class="c1">#This vector already has at least one possible classification</span>
+        	    <span class="k">break</span>
+	    <span class="k">else</span><span class="p">:</span>
+		<span class="n">uni</span><span class="p">[(</span><span class="n">gbid</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Pv</span>
+
+    <span class="k">def</span> <span class="nf">_classify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NP</span><span class="p">,</span> <span class="n">PID</span><span class="p">,</span> <span class="n">uni</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">used</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs through the collection a second time to reclassify each</span>
+<span class="sd">        environment according to the most-similar unique LAE identified in</span>
+<span class="sd">        :meth:`_uniquify`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">gblearn.soap</span> <span class="k">import</span> <span class="n">S</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">NP</span><span class="p">)):</span>
+	    <span class="n">Pv</span> <span class="o">=</span> <span class="n">NP</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
+	    <span class="n">K0</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1">#Lowest similarity kernel among all unique vectors.</span>
+	    <span class="n">U0</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#Key of the environment corresponding to K0</span>
+            
+	    <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">uP</span> <span class="ow">in</span> <span class="n">uni</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+		<span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">]</span>
+            	<span class="n">K</span> <span class="o">=</span> <span class="n">S</span><span class="p">(</span><span class="n">Pv</span><span class="p">,</span> <span class="n">uP</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">K</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+                    <span class="c1">#These vectors are considered to be equivalent. Store the</span>
+                    <span class="c1">#equivalency in the result.</span>
+        	    <span class="k">if</span> <span class="n">K</span> <span class="o">&lt;</span> <span class="n">K0</span><span class="p">:</span>
+			<span class="n">K0</span> <span class="o">=</span> <span class="n">K</span>
+			<span class="n">U0</span> <span class="o">=</span> <span class="n">u</span>
+                
+	    <span class="k">if</span> <span class="n">K0</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+		<span class="n">result</span><span class="p">[</span><span class="n">U0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PID</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+		<span class="n">used</span><span class="p">[</span><span class="n">U0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+	    <span class="k">else</span><span class="p">:</span><span class="c1"># pragma: no cover</span>
+                <span class="c1">#This is just a catch warning; it should never happen in</span>
+                <span class="c1">#practice.</span>
+                <span class="n">wmsg</span> <span class="o">=</span> <span class="s2">&quot;There was an unclassifiable SOAP vector: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">wmsg</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">PID</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
+                
+   	<span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="GrainBoundaryCollection.LER"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundaryCollection.LER">[docs]</a>    <span class="k">def</span> <span class="nf">LER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Produces the LAE fingerprint for each GB in the system. The LAE</span>
+<span class="sd">        figerprint is the percentage of the GBs local environments that belong to</span>
+<span class="sd">        each unique LAE type.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            eps (float): cutoff value for deciding whether two vectors are</span>
+<span class="sd">              unique.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: rows represent GBs; columns are the percentage of unique</span>
+<span class="sd">              local environments of each type in each GB. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">LER</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">LER</span>
+        <span class="k">if</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">LER</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">LER</span><span class="p">[</span><span class="n">eps</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+        
+            <span class="c1">#Next, loop over each GB and count how many of each kind it has.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">])))</span>
+            <span class="k">for</span> <span class="n">gbi</span><span class="p">,</span> <span class="n">gbid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">ui</span><span class="p">,</span> <span class="n">uid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">]):</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">gbi</span><span class="p">,</span><span class="n">ui</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">gbid</span><span class="p">]</span><span class="o">.</span><span class="n">LAEs</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+                <span class="c1">#Normalize by the total number of atoms of each type</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">gbi</span><span class="p">,:])</span>
+                <span class="k">assert</span> <span class="n">N</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">gbid</span><span class="p">])</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">gbi</span><span class="p">,:]</span> <span class="o">/=</span> <span class="n">N</span>
+
+            <span class="n">LER</span><span class="p">[</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">LER</span> <span class="o">=</span> <span class="n">LER</span>
+            
+        <span class="k">return</span> <span class="n">result</span></div></div>
+    
+<div class="viewcode-block" id="GrainBoundary"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundary">[docs]</a><span class="k">class</span> <span class="nc">GrainBoundary</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a grain boundary that is defined by a list of atomic</span>
+<span class="sd">    positions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xyz (numpy.ndarray): cartesian position of the atoms at the</span>
+<span class="sd">          boundary. Shape is `(N, 3)`.</span>
+<span class="sd">        types (numpy.ndarray): of `int` atom types for each atom in the</span>
+<span class="sd">          `xyz` list.</span>
+<span class="sd">        box (numpy.ndarray): box dimensions in cartesian directions in</span>
+<span class="sd">          format `lo` `hi`. Shape `(3, 2)`. Also supports tricilinic boxes when</span>
+<span class="sd">          shape `(3, 3)` is specified.</span>
+<span class="sd">        Z (int or list): element code(s) for the atomic species.</span>
+<span class="sd">        extras (dict): keys are additional atomic attributes; values are lists</span>
+<span class="sd">          of attribute values. Value arrays must have same length as `xyz`.</span>
+<span class="sd">        selectargs (dict): keyword arguments passed to the selection routine</span>
+<span class="sd">          that sliced the GB atoms in the first place. Needed to ensure</span>
+<span class="sd">          consistency when SOAP matrix is constructed.</span>
+<span class="sd">        soapargs (dict): keyword arguments to pass to the constructor of the</span>
+<span class="sd">          :class:`~gblearn.soap.SOAPCalculator` that will be used to calculate</span>
+<span class="sd">          the `P` matrix for this GB.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        lattice (numpy.ndarray): array of lattice vector for the grain boundary</span>
+<span class="sd">          box; this includes padding in the x-direction to allow a &quot;surface&quot; for</span>
+<span class="sd">          the outermost atoms of the GB slice.</span>
+<span class="sd">        calculator (~gblearn.soap.SOAPCalculator): calculator for getting the</span>
+<span class="sd">          SOAP vector matrix for this GB.</span>
+<span class="sd">        Z (int or list): element code(s) for the atomic species.</span>
+<span class="sd">        P (numpy.ndarray): SOAP vector matrix; shape `(N, S)`, where `N` is the</span>
+<span class="sd">          number of atoms at the boundary and `S` is the dimensionality of the</span>
+<span class="sd">          SOAP vector space (which varies with SOAP parameters).</span>
+<span class="sd">        LAEs (list): of tuple with `(PID, VID)` corresponding to the unique LAE</span>
+<span class="sd">          number in the collection&#39;s global unique set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">selectargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">soapargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">gblearn.soap</span> <span class="k">import</span> <span class="n">SOAPCalculator</span>
+        <span class="kn">from</span> <span class="nn">gblearn.lammps</span> <span class="k">import</span> <span class="n">make_lattice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">xyz</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span> <span class="o">=</span> <span class="n">make_lattice</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculator</span> <span class="o">=</span> <span class="n">SOAPCalculator</span><span class="p">(</span><span class="o">**</span><span class="n">soapargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LAEs</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#For the selection, if padding is present in the dictionary, reduce the</span>
+        <span class="c1">#padding by half so that all the atoms at the GB get a full SOAP</span>
+        <span class="c1">#environment.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span> <span class="o">=</span> <span class="n">selectargs</span>
+        <span class="k">if</span> <span class="s2">&quot;padding&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">[</span><span class="s2">&quot;padding&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">extras</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extras</span> <span class="o">=</span> <span class="n">extras</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extras</span> <span class="o">=</span> <span class="p">[]</span>    
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;quippy.atoms.Atoms: representation of the atoms at the boundary that</span>
+<span class="sd">        is interoperable with QUIP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_NP</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;numpy.ndarray: normalized P matrix, where each row is normalized by</span>
+<span class="sd">        its L2 norm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;numpy.ndarray: matrix of the dot product of every row in :attr:`NP`</span>
+<span class="sd">        with every other row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">NP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the *normalized* P matrix where each row is normalized by its</span>
+<span class="sd">        norm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soap</span><span class="p">()</span>
+            <span class="n">pself</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">P</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_NP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pself</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">P</span><span class="p">))</span>
+                                 <span class="k">if</span> <span class="n">pself</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NP</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the kernel similarity matrix between for the P matrix of this</span>
+<span class="sd">        grain boundary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">NP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NP</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">NP</span><span class="p">,</span> <span class="n">NP</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span>
+
+<div class="viewcode-block" id="GrainBoundary.load"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundary.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a SOAP matrix `P` for this GB from serialized file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr (str): attribute to load from file; one of [&#39;P&#39;, &#39;R&#39;].</span>
+<span class="sd">            filepath (str): full path to the file to load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gbids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the set of atom ids that fall within the padding/cutoff</span>
+<span class="sd">        parameters used for initial atom selection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: of ids in this GBs atoms list that fall within the</span>
+<span class="sd">            padding constraints of the selection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">gblearn.selection</span> <span class="k">as</span> <span class="nn">sel</span>
+        <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+        <span class="n">methmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">sel</span><span class="o">.</span><span class="n">median</span><span class="p">,</span>
+            <span class="s2">&quot;cna&quot;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">cna_max</span><span class="p">,</span> <span class="n">coord</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;cna_z&quot;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">cna_max</span><span class="p">,</span> <span class="n">coord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="c1">#Use the same selection parameters that were used to construct</span>
+        <span class="c1">#the GB in the first place. However, the padding parameter will</span>
+        <span class="c1">#have been updated in the constructor.</span>
+        <span class="n">subpar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">[</span><span class="s2">&quot;pattr&quot;</span><span class="p">]</span>
+        <span class="n">subsel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">subsel</span> <span class="ow">in</span> <span class="n">methmap</span><span class="p">:</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="n">methmap</span><span class="p">[</span><span class="n">subsel</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subpar</span><span class="p">),</span>
+                                  <span class="n">types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ids</span>
+            
+<div class="viewcode-block" id="GrainBoundary.trim"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundary.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trims the atoms list, types list and any extras in this GB object so</span>
+<span class="sd">        that it only includes atoms that fall within the cutoff constraints of</span>
+<span class="sd">        the selection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ids (numpy.ndarray): of atom ids in the list that should be kept. If</span>
+<span class="sd">              not provided, it will be calculated from :attr:`gbids`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span>
+            
+        <span class="c1">#Since we applied padding to the SOAP vectors again, we need</span>
+        <span class="c1">#to restrict the XYZ coordinates and other extras of the GB</span>
+        <span class="c1">#to conform to the new size.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="n">ids</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">ids</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LAEs</span> <span class="o">=</span> <span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">current</span><span class="p">)[</span><span class="n">ids</span><span class="p">])</span></div>
+            
+<div class="viewcode-block" id="GrainBoundary.soap"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundary.soap">[docs]</a>    <span class="k">def</span> <span class="nf">soap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the SOAP vector matrix for the atomic environments at the</span>
+<span class="sd">        grain boundary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            subsel (str): method for subselection of atoms to include</span>
+<span class="sd">              in the SOAP descriptor. One of [&quot;median&quot;, &quot;cna&quot;].</span>
+<span class="sd">            subpar (str): name of the parameter to pass to the selection</span>
+<span class="sd">              routine.</span>
+<span class="sd">            kwargs (dict): additional arguments to pass to the selection</span>
+<span class="sd">              routine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculator</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;descriptor&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_NP</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="s2">&quot;padding&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectargs</span><span class="p">:</span>
+                <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span>
+                <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">ids</span><span class="p">,:]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns an atoms object for the boundary that can be used for</span>
+<span class="sd">        calculating the SOAP vectors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Z (int): element code for the atomic species.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">quippy.atoms</span> <span class="k">import</span> <span class="n">Atoms</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Atoms</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">add_atoms</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span>
+        
+<div class="viewcode-block" id="GrainBoundary.save_xyz"><a class="viewcode-back" href="../../Modules/gblearn.gb.html#gblearn.gb.GrainBoundary.save_xyz">[docs]</a>    <span class="k">def</span> <span class="nf">save_xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">species</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vacuum</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writes the grain boundary atoms to extended XYZ file format</span>
+<span class="sd">        that can be used with QUIP.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): name/path to the file to save to.</span>
+<span class="sd">            species (str): element name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">vacuum</span><span class="p">:</span>
+            <span class="c1">#8</span>
+            <span class="c1">#Lattice=&quot;5.44 0.0 0.0 0.0 5.44 0.0 0.0 0.0 5.44&quot; Properties=species:S:1:pos:R:3 Time=0.0</span>
+            <span class="c1">#Si        0.00000000      0.00000000      0.00000000</span>
+            <span class="c1">#For the y and z lattice vectors, we just get the box values from</span>
+            <span class="c1">#the original files. For x, we make the lattice large so that there is a bunch of</span>
+            <span class="c1">#space around the slice.</span>
+            <span class="n">LVs</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{0:.5f}</span><span class="s2"> </span><span class="si">{1:.5f}</span><span class="s2"> </span><span class="si">{2:.5f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lattice</span><span class="p">])</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">)))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Lattice=&quot;</span><span class="si">{}</span><span class="s1">&quot; Properties=species:S:1:pos:R:3</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">LVs</span><span class="p">))</span>
+                <span class="n">afmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">    </span><span class="si">{1:.5f}</span><span class="s2">    </span><span class="si">{2:.5f}</span><span class="s2">    </span><span class="si">{3:.5f}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">afmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="o">*</span><span class="n">xyz</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">quippy.cinoutput</span> <span class="k">as</span> <span class="nn">qcio</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">qcio</span><span class="o">.</span><span class="n">CInOutputWriter</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                    </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,381 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.io &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gblearn.lammps" href="gblearn.lammps.html" />
+    <link rel="prev" title="gblearn.decomposition" href="gblearn.decomposition.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.lammps.html" title="gblearn.lammps"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.decomposition.html" title="gblearn.decomposition"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">gblearn.io</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gblearn.decomposition.html"
+                        title="previous chapter">gblearn.decomposition</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gblearn.lammps.html"
+                        title="next chapter">gblearn.lammps</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Modules/gblearn.io.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gblearn.io">
+<span id="gblearn-io"></span><h1>gblearn.io<a class="headerlink" href="#module-gblearn.io" title="Permalink to this headline">¶</a></h1>
+<p>Functions for I/O interaction of <code class="xref py py-class docutils literal"><span class="pre">gblearn.gb.GrainBoundaryCollection</span></code>
+objects and the many results they produce with disk storage.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Whenever a new representation is added, a property getter and setter
+need to be added <em>with documentation</em> to the <code class="xref py py-class docutils literal"><span class="pre">ResultStore</span></code>. The three
+generic getter and setter functions for numpy arrays, aggregated arrays
+and dictionaries of parameterized aggregated arrays should be sufficient to
+handle any additional representations we may come up with.</p>
+</div>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">DiskCollection</span></code>(root,&nbsp;gbids[,&nbsp;restricted])</td>
+<td>For large grain boundary collections, it may not be possible to keep all SOAP matrices and their derivatives in memory at the same time for processing.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ResultStore</span></code>(gbids[,&nbsp;root,&nbsp;restricted])</td>
+<td>Represents a collection of results for a <code class="xref py py-class docutils literal"><span class="pre">GrainBoundaryCollection</span></code> that can be cached because they are permanent for the particular collection.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Functions for I/O interaction of <code class="xref py py-class docutils literal"><span class="pre">gblearn.gb.GrainBoundaryCollection</span></code>
+objects and the many results they produce with disk storage.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Whenever a new representation is added, a property getter and setter
+need to be added <em>with documentation</em> to the <code class="xref py py-class docutils literal"><span class="pre">ResultStore</span></code>. The three
+generic getter and setter functions for numpy arrays, aggregated arrays
+and dictionaries of parameterized aggregated arrays should be sufficient to
+handle any additional representations we may come up with.</p>
+</div>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.io.</code><code class="descname">DiskCollection</code><span class="sig-paren">(</span><em>root</em>, <em>gbids</em>, <em>restricted=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/io.html#DiskCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>For large grain boundary collections, it may not be possible to keep all
+SOAP matrices and their derivatives in memory at the same time for
+processing. In these cases, it is preferable to read a matrix in, process
+it, and then delete it from memory right away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the folder where the array files are stored.</li>
+<li><strong>gbids</strong> (<em>list</em>) – of ids for each GB; the files should be stored as <cite>id.npy</cite>
+in the <cite>root</cite> directory.</li>
+<li><strong>restricted</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, run in memory-restricted mode. Otherwise,
+the loaded array files are cached in memory for speedy multiple
+retrieval.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.io.DiskCollection.cache">
+<code class="descname">cache</code><a class="headerlink" href="#gblearn.io.DiskCollection.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are GB ids in <code class="xref py py-attr docutils literal"><span class="pre">gbids</span></code>; values are the
+corresponding <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> files. This only has values in
+<code class="xref py py-attr docutils literal"><span class="pre">restricted</span></code> is False.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.io.DiskCollection.files">
+<code class="descname">files</code><a class="headerlink" href="#gblearn.io.DiskCollection.files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are GB ids, values are paths to the numpy array files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.io.</code><code class="descname">ResultStore</code><span class="sig-paren">(</span><em>gbids</em>, <em>root=None</em>, <em>restricted=True</em>, <em>**soapargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/io.html#ResultStore"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a collection of results for a
+<code class="xref py py-class docutils literal"><span class="pre">GrainBoundaryCollection</span></code> that can be cached because they
+are permanent for the particular collection.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The result store creates separate sub-folders <cite>P_</cite> for the full
+SOAP matrices of each GB; <cite>U_</cite> for the unique decompositions at different
+epsilon values; <cite>ASR_</cite> for the ASR representation; and <cite>LER_</cite> for the LER
+representations (tied to particular epsilon values and unique
+decompositions).</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If any of the results (such as <code class="xref py py-attr docutils literal"><span class="pre">P</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">U</span></code>, <code class="xref py py-attr docutils literal"><span class="pre">ASR</span></code>
+or <code class="xref py py-attr docutils literal"><span class="pre">LER</span></code>) are not saved in the store, <cite>None</cite> will be returned.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <cite>root=None</cite> then the results will only be cached in memory and
+<em>not</em> to disk.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gbids</strong> (<em>list</em>) – of identifiers for the individual members of the GB
+collection. The store makes sure that they match for a given directory
+so that results can be kept straight.</li>
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the root directory for this result store.</li>
+<li><strong>restricted</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, run in memory-restricted mode. Otherwise,
+the loaded array files are cached in memory for speedy multiple
+retrieval.</li>
+<li><strong>soapargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – arguments for the SOAP descriptor. See
+<code class="xref py py-class docutils literal"><span class="pre">gblearn.soap.SOAPCalculator</span></code> for information.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.io.ResultStore.root">
+<code class="descname">root</code><a class="headerlink" href="#gblearn.io.ResultStore.root" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – path to the root directory for this result store.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.io.ResultStore.gbids">
+<code class="descname">gbids</code><a class="headerlink" href="#gblearn.io.ResultStore.gbids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of identifiers for the individual members of the GB
+collection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.io.ResultStore.reps">
+<code class="descname">reps</code><a class="headerlink" href="#gblearn.io.ResultStore.reps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>str</cite> representation names that will be handled by the
+result store.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.io.ResultStore.soapargs">
+<code class="descname">soapargs</code><a class="headerlink" href="#gblearn.io.ResultStore.soapargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – arguments for the SOAP descriptor. See
+<code class="xref py py-class docutils literal"><span class="pre">gblearn.soap.SOAPCalculator</span></code> for information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.io.ResultStore.soapstr">
+<code class="descname">soapstr</code><a class="headerlink" href="#gblearn.io.ResultStore.soapstr" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>str</cite> soap arguments that are formatted to form a
+folder name for specific variations of the representations.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">ASR</code></dt>
+<dd><p>Returns the Averaged SOAP representation for this GB collection using
+the currently configured SOAP parameters (see <code class="xref py py-attr docutils literal"><span class="pre">SOAP</span></code>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">LER</code></dt>
+<dd><p>Gets the LER for the current SOAP configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are values of <cite>epsilon</cite>, rounded to 5 decimal places;
+values are the Local Environment Representation for the GB
+collection. The keys in this <cite>dict</cite> are linked with those in
+<code class="xref py py-attr docutils literal"><span class="pre">U</span></code>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">P</code></dt>
+<dd><p>SOAP Representation for each GB in the collection.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The SOAP matrices returned will be for the currently
+configured values of <cite>lmax</cite>, <cite>nmax</cite> and <cite>rcut</cite> in the store.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are <cite>gbid</cite>, values are the SOAP reprentation for that
+particular GB.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">SOAP</code></dt>
+<dd><p>Returns the current SOAP paramater configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">of SOAP arguments used to form the directory name for
+particular parameter sets. See <a class="reference internal" href="#gblearn.io.ResultStore.soapstr" title="gblearn.io.ResultStore.soapstr"><code class="xref py py-attr docutils literal"><span class="pre">soapstr</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)">tuple</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">SOAP_str</code></dt>
+<dd><p>Returns the directory string for the current SOAP configuration. It
+is defined by <cite>nmax_lmax_rcut</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">U</code></dt>
+<dd><p>Gets the value of the unique decomposition in this store.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">These value are dependent on the particular SOAP parameter
+set. They are saved accordingly.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">keys are values of <cite>epsilon</cite>, rounded to 5 decimal places;
+values are those returned by <code class="xref py py-func docutils literal"><span class="pre">unique()</span></code>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.lammps.html" title="gblearn.lammps"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.decomposition.html" title="gblearn.decomposition"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

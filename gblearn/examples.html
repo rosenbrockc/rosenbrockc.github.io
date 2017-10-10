@@ -1,0 +1,195 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Examples for using gblearn &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Examples for using <cite>gblearn</cite></a><ul>
+<li><a class="reference internal" href="#summary-ler-construction">Summary: LER Construction</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/examples.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="examples-for-using-gblearn">
+<h1>Examples for using <cite>gblearn</cite><a class="headerlink" href="#examples-for-using-gblearn" title="Permalink to this headline">¶</a></h1>
+<p>We begin with the construction of the LER matrix. It represents each
+grain boundary as a feature vector whose components are the relative
+fractions of each <em>unique</em> Local Atomic Environment (LAE) in the
+entire grain boundary system.</p>
+<p>We begin by creating a <code class="xref py py-class docutils literal"><span class="pre">GrainBoundaryCollection</span></code>
+that holds a representation of each <code class="xref py py-class docutils literal"><span class="pre">GrainBoundary</span></code>
+in the collection and manages the calculation and storage of the
+various representations that can be derived using
+<a class="reference internal" href="Modules/gblearn.soap.html#module-gblearn.soap" title="gblearn.soap"><code class="xref py py-mod docutils literal"><span class="pre">soap</span></code></a>. For this code, we assume that all the Olmsted
+<a href="#id2"><span class="problematic" id="id1">[1]_</span></a> dump files from LAMMPS are in <cite>/dbs/olmsted</cite>. We tell the
+framework to store all representations in the <cite>/gbs/olmsted</cite>
+folder. Notice that we give a regular expression that matches the file
+names of the LAMMPS dump files. We use a named capture group to grab
+out the publication integer id from the file name. Each grain boundary
+will be referred to by that id for the rest of the analysis.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gblearn.gb</span> <span class="kn">import</span> <span class="n">GrainBoundaryCollection</span> <span class="k">as</span> <span class="n">GBC</span>
+<span class="n">olmsted</span> <span class="o">=</span> <span class="n">GBC</span><span class="p">(</span><span class="s2">&quot;olmsted&quot;</span><span class="p">,</span> <span class="s2">&quot;/dbs/olmsted&quot;</span><span class="p">,</span> <span class="s2">&quot;/gbs/olmsted&quot;</span><span class="p">,</span>
+              <span class="sa">r</span><span class="s2">&quot;ni.p(?P&lt;gbid&gt;\d+).out&quot;</span><span class="p">,</span>
+              <span class="n">rcut</span><span class="o">=</span><span class="mf">3.25</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You will also notice that we specify the soap parameters as part of
+this constructor. Now that we have the collection, we can calculate
+the SOAP matrices for each grain boundary.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">olmsted</span><span class="o">.</span><span class="n">soap</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">olmsted</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">]</span> <span class="k">as</span> <span class="n">P</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because grain boundary databases can get quite large, and SOAP
+matrices can <em>also</em> get quite large, <cite>gblearn</cite> implements
+memory-sensitive storage for the SOAP matrices. It does this using
+context managers so that a SOAP matrix is read from disk and then
+cleared from memory once it falls out of context. The <cite>with</cite> construct
+shown here will load the file from disk, print it, and then remove it
+from memory.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are only after the Local Environment Representation,
+you won’t have to worry about accessing memory-safe SOAP matrices.</p>
+</div>
+<p>Once the SOAP matrices have been calculated, we can grab the Averaged
+SOAP Representation (ASR) via a property:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">olmsted</span><span class="o">.</span><span class="n">ASR</span>
+</pre></div>
+</div>
+<p>Whenever any of the representations is accessed, it is calculated in
+the background and then cached to disk automatically. To avoid
+caching, specify <cite>None</cite> for the path to storage folder in the
+<code class="xref py py-class docutils literal"><span class="pre">GrainBoundaryCollection</span></code> constructor. Subsequent
+requests for the same representation will be served from memory/disk
+cache for optimization.</p>
+<p>Constructing the LER requires a similarity parameter <cite>eps</cite> that is the
+cutoff for deciding when two atomic environments are similar. It is
+related to the <code class="xref py py-func docutils literal"><span class="pre">S()</span></code> similarity metric between SOAP
+vectors.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">eps</span> <span class="o">=</span> <span class="mf">0.0025</span>
+<span class="n">LER</span> <span class="o">=</span> <span class="n">olmsted</span><span class="o">.</span><span class="n">LER</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When you run this code, will see several progress bars as the code
+runs over the grain boundary collection in the background.</p>
+<ol class="arabic simple">
+<li>All grain boundaries are iterated to determine a set of unique
+environments for the entire collection.</li>
+<li>The collection is iterated over <em>again</em> so that every atom in each
+grain boundary can be classified with the unique LAE that it is
+<em>most</em> similar to.</li>
+<li>The fraction of each type of unique LAE is computed for each grain
+boundary to form the LER vectors.</li>
+</ol>
+<div class="section" id="summary-ler-construction">
+<h2>Summary: LER Construction<a class="headerlink" href="#summary-ler-construction" title="Permalink to this headline">¶</a></h2>
+<p>In summary, you can generate the LER for new collection of grain
+boundaries using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gblearn.gb</span> <span class="kn">import</span> <span class="n">GrainBoundaryCollection</span> <span class="k">as</span> <span class="n">GBC</span>
+<span class="n">olmsted</span> <span class="o">=</span> <span class="n">GBC</span><span class="p">(</span><span class="s2">&quot;olmsted&quot;</span><span class="p">,</span> <span class="s2">&quot;/dbs/olmsted&quot;</span><span class="p">,</span> <span class="s2">&quot;/gbs/olmsted&quot;</span><span class="p">,</span>
+              <span class="sa">r</span><span class="s2">&quot;ni.p(?P&lt;gbid&gt;\d+).out&quot;</span><span class="p">,</span>
+              <span class="n">rcut</span><span class="o">=</span><span class="mf">3.25</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">olmsted</span><span class="o">.</span><span class="n">soap</span><span class="p">()</span>
+<span class="n">olmsted</span><span class="o">.</span><span class="n">LER</span><span class="p">(</span><span class="mf">0.0025</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

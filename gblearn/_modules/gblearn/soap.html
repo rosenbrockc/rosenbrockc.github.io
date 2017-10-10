@@ -1,0 +1,166 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.soap &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gblearn.soap</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for generating the SOAP representation of a grain</span>
+<span class="sd">boundary.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="viewcode-block" id="S"><a class="viewcode-back" href="../../Modules/gblearn.soap.html#gblearn.soap.S">[docs]</a><span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the SOAP similarity kernel between two SOAP vectors,</span>
+<span class="sd">    :math:`d(a,b) = \sqrt{K(a,a)+K(b,b)-2*K(a,b)}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SOAPCalculator"><a class="viewcode-back" href="../../Modules/gblearn.soap.html#gblearn.soap.SOAPCalculator">[docs]</a><span class="k">class</span> <span class="nc">SOAPCalculator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a set of unique SOAP parameters for which SOAP</span>
+<span class="sd">    vectors can be calculated.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rcut (float): local environment finite cutoff parameter.</span>
+<span class="sd">        nmax (int): bandwidth limits for the SOAP descriptor radial basis</span>
+<span class="sd">          functions.</span>
+<span class="sd">        lmax (int): bandwidth limits for the SOAP descriptor spherical</span>
+<span class="sd">          harmonics.</span>
+<span class="sd">        sigma (float): width parameter for the Gaussians on each atom.</span>
+<span class="sd">        trans_width (float): distance over which the coefficients in the</span>
+<span class="sd">            radial functions are smoothly transitioned to zero.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        rcut (float): local environment finite cutoff parameter.</span>
+<span class="sd">        nmax (int): bandwidth limits for the SOAP descriptor radial basis</span>
+<span class="sd">          functions.</span>
+<span class="sd">        lmax (int): bandwidth limits for the SOAP descriptor spherical</span>
+<span class="sd">          harmonics.</span>
+<span class="sd">        sigma (float): width parameter for the Gaussians on each atom.</span>
+<span class="sd">        trans_width (float): distance over which the coefficients in the</span>
+<span class="sd">            radial functions are smoothly transitioned to zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">trans_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rcut</span> <span class="o">=</span> <span class="n">rcut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmax</span> <span class="o">=</span> <span class="n">nmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmax</span> <span class="o">=</span> <span class="n">lmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trans_width</span> <span class="o">=</span> <span class="n">trans_width</span>
+
+<div class="viewcode-block" id="SOAPCalculator.calc"><a class="viewcode-back" href="../../Modules/gblearn.soap.html#gblearn.soap.SOAPCalculator.calc">[docs]</a>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">central</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates a SOAP vector for the specified species and atomic</span>
+<span class="sd">        positions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atoms (quippy.Atoms): list of atoms to calculate the vector for.</span>
+<span class="sd">            central (int): integer element number to set as the central atom type</span>
+<span class="sd">              for the SOAP calculation.</span>
+<span class="sd">            basis (list): of `int` defining which of the atoms in the *conventional*</span>
+<span class="sd">              unit cell should be retained as a unique part of the basis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">quippy</span>
+        <span class="kn">import</span> <span class="nn">quippy.descriptors</span> <span class="k">as</span> <span class="nn">descriptor</span>
+        <span class="n">descstr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;soap cutoff=</span><span class="si">{0:.1f}</span><span class="s2"> n_max=</span><span class="si">{1:d}</span><span class="s2"> l_max=</span><span class="si">{2:d}</span><span class="s2"> &quot;</span>
+                   <span class="s2">&quot;atom_sigma=</span><span class="si">{3:.2f}</span><span class="s2"> n_species=1 species_Z={{</span><span class="si">{4:d}</span><span class="s2">}} &quot;</span>
+                   <span class="s2">&quot;Z=</span><span class="si">{4:d}</span><span class="s2"> trans_width=</span><span class="si">{5:.2f}</span><span class="s2"> normalise=F&quot;</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">Descriptor</span>
+        <span class="n">descZ</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">descstr</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rcut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span>
+                                 <span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans_width</span><span class="p">))</span>
+                
+        <span class="n">atoms</span><span class="o">.</span><span class="n">set_cutoff</span><span class="p">(</span><span class="n">descZ</span><span class="o">.</span><span class="n">cutoff</span><span class="p">())</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">calc_connect</span><span class="p">()</span>
+        <span class="n">PZ</span> <span class="o">=</span> <span class="n">descZ</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dZ</span> <span class="o">=</span> <span class="p">[</span><span class="n">PZ</span><span class="p">[</span><span class="s2">&quot;descriptor&quot;</span><span class="p">][</span><span class="n">b</span><span class="p">,:]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">dZ</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PZ</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

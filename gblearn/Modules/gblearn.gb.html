@@ -1,0 +1,552 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.gb &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gblearn.soap" href="gblearn.soap.html" />
+    <link rel="prev" title="gblearn.selection" href="gblearn.selection.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.soap.html" title="gblearn.soap"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.selection.html" title="gblearn.selection"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">gblearn.gb</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gblearn.selection.html"
+                        title="previous chapter">gblearn.selection</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gblearn.soap.html"
+                        title="next chapter">gblearn.soap</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Modules/gblearn.gb.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gblearn.gb">
+<span id="gblearn-gb"></span><h1>gblearn.gb<a class="headerlink" href="#module-gblearn.gb" title="Permalink to this headline">¶</a></h1>
+<p>Functions and classes for interacting with grain boundaries.</p>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">GrainBoundary</span></code>(xyz,&nbsp;types,&nbsp;box,&nbsp;Z[,&nbsp;extras,&nbsp;…])</td>
+<td>Represents a grain boundary that is defined by a list of atomic positions.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">GrainBoundaryCollection</span></code>(name,&nbsp;root[,&nbsp;store,&nbsp;…])</td>
+<td>Represents a collection of grain boundaries and the unique environments between them.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Functions and classes for interacting with grain boundaries.</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.gb.</code><code class="descname">GrainBoundary</code><span class="sig-paren">(</span><em>xyz</em>, <em>types</em>, <em>box</em>, <em>Z</em>, <em>extras=None</em>, <em>selectargs=None</em>, <em>**soapargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundary"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a grain boundary that is defined by a list of atomic
+positions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xyz</strong> (<em>numpy.ndarray</em>) – cartesian position of the atoms at the
+boundary. Shape is <cite>(N, 3)</cite>.</li>
+<li><strong>types</strong> (<em>numpy.ndarray</em>) – of <cite>int</cite> atom types for each atom in the
+<cite>xyz</cite> list.</li>
+<li><strong>box</strong> (<em>numpy.ndarray</em>) – box dimensions in cartesian directions in
+format <cite>lo</cite> <cite>hi</cite>. Shape <cite>(3, 2)</cite>. Also supports tricilinic boxes when
+shape <cite>(3, 3)</cite> is specified.</li>
+<li><strong>Z</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em> or </em><em>list</em>) – element code(s) for the atomic species.</li>
+<li><strong>extras</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – keys are additional atomic attributes; values are lists
+of attribute values. Value arrays must have same length as <cite>xyz</cite>.</li>
+<li><strong>selectargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – keyword arguments passed to the selection routine
+that sliced the GB atoms in the first place. Needed to ensure
+consistency when SOAP matrix is constructed.</li>
+<li><strong>soapargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – keyword arguments to pass to the constructor of the
+<code class="xref py py-class docutils literal"><span class="pre">SOAPCalculator</span></code> that will be used to calculate
+the <cite>P</cite> matrix for this GB.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundary.lattice">
+<code class="descname">lattice</code><a class="headerlink" href="#gblearn.gb.GrainBoundary.lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – array of lattice vector for the grain boundary
+box; this includes padding in the x-direction to allow a “surface” for
+the outermost atoms of the GB slice.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundary.calculator">
+<code class="descname">calculator</code><a class="headerlink" href="#gblearn.gb.GrainBoundary.calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>~gblearn.soap.SOAPCalculator</em> – calculator for getting the
+SOAP vector matrix for this GB.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundary.Z">
+<code class="descname">Z</code><a class="headerlink" href="#gblearn.gb.GrainBoundary.Z" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int or list</em> – element code(s) for the atomic species.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundary.P">
+<code class="descname">P</code><a class="headerlink" href="#gblearn.gb.GrainBoundary.P" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – SOAP vector matrix; shape <cite>(N, S)</cite>, where <cite>N</cite> is the
+number of atoms at the boundary and <cite>S</cite> is the dimensionality of the
+SOAP vector space (which varies with SOAP parameters).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundary.LAEs">
+<code class="descname">LAEs</code><a class="headerlink" href="#gblearn.gb.GrainBoundary.LAEs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of tuple with <cite>(PID, VID)</cite> corresponding to the unique LAE
+number in the collection’s global unique set.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">K</code></dt>
+<dd><p>Returns the kernel similarity matrix between for the P matrix of this
+grain boundary.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">NP</code></dt>
+<dd><p>Returns the <em>normalized</em> P matrix where each row is normalized by its
+norm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">atoms</code></dt>
+<dd><p>Returns an atoms object for the boundary that can be used for
+calculating the SOAP vectors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Z</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – element code for the atomic species.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">gbids</code></dt>
+<dd><p>Calculates the set of atom ids that fall within the padding/cutoff
+parameters used for initial atom selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">of ids in this GBs atoms list that fall within the
+padding constraints of the selection.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">load</code><span class="sig-paren">(</span><em>attr</em>, <em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundary.load"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Loads a SOAP matrix <cite>P</cite> for this GB from serialized file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>attr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – attribute to load from file; one of [‘P’, ‘R’].</li>
+<li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – full path to the file to load.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">save_xyz</code><span class="sig-paren">(</span><em>filename</em>, <em>species=None</em>, <em>vacuum=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundary.save_xyz"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Writes the grain boundary atoms to extended XYZ file format
+that can be used with QUIP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name/path to the file to save to.</li>
+<li><strong>species</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – element name.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">soap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundary.soap"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the SOAP vector matrix for the atomic environments at the
+grain boundary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subsel</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – method for subselection of atoms to include
+in the SOAP descriptor. One of [“median”, “cna”].</li>
+<li><strong>subpar</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of the parameter to pass to the selection
+routine.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – additional arguments to pass to the selection
+routine.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">trim</code><span class="sig-paren">(</span><em>ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundary.trim"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Trims the atoms list, types list and any extras in this GB object so
+that it only includes atoms that fall within the cutoff constraints of
+the selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ids</strong> (<em>numpy.ndarray</em>) – of atom ids in the list that should be kept. If
+not provided, it will be calculated from <code class="xref py py-attr docutils literal"><span class="pre">gbids</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.gb.</code><code class="descname">GrainBoundaryCollection</code><span class="sig-paren">(</span><em>name</em>, <em>root</em>, <em>store=None</em>, <em>rxgbid=None</em>, <em>sortkey=None</em>, <em>reverse=False</em>, <em>seed=None</em>, <em>**soapargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a collection of grain boundaries and the unique environments
+between them.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you don’t specify a path for <cite>store</cite>, any results (such as
+SOAP matrices, ASR, LER, etc. will <em>not</em> be saved to disk. Also, they
+won’t be loaded from disk if they already exist.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – identifier for this collection.</li>
+<li><strong>root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the directory where the raw GB atomic descriptions
+are located.</li>
+<li><strong>store</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the <code class="xref py py-class docutils literal"><span class="pre">ResultStore</span></code> root
+directory that this collection’s results are stored in. To use a
+memory-only store, leave this as <cite>None</cite>.</li>
+<li><strong>rxgbid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – regex pattern for extracting the <cite>gbid</cite> for each GB. Any
+files that don’t match the regex are automatically excluded. The regex
+should include a named group <cite>(?P&lt;gbid&gt;…)</cite> so that the GB id can be
+extracted correctly. If not specified, the file name is used as the
+<cite>gbid</cite>.</li>
+<li><strong>sortkey</strong> (<em>function</em>) – when <cite>root</cite> is investigated to load GBs, the file
+names are first sorted; here you can specify a custom sorting
+function.</li>
+<li><strong>reverse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – for GB file name sorting (see <cite>sortkey</cite>), whether to
+reverse the order.</li>
+<li><strong>seed</strong> (<em>numpy.ndarray</em>) – seed SOAP vector for calculating unique LAEs. This
+is usually the SOAP vector of the perfect bulk crystal in the GB.</li>
+<li><strong>soapargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – key-value pairs for constructing the SOAP descriptor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.name">
+<code class="descname">name</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – identifier for this collection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.root">
+<code class="descname">root</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.root" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – path to the directory where the raw GB atomic descriptions
+are located.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.store">
+<code class="descname">store</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.store" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>gblearn.io.ResultStore</em> – storage manager for all the
+intermediate results generated by this collection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.unique">
+<code class="descname">unique</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.unique" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>float</cite> values of <cite>epsilon</cite> for comparing
+environments; values are themselves dictionaries that have keys as
+<cite>tuple</cite> of <cite>(gbid, aid)</cite> with <cite>aid</cite> the id of the atom (row id) in the
+SOAP vector for the GB; value is the SOAP vector already found to be
+unique for that value of <cite>epsilon</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.equivalent">
+<code class="descname">equivalent</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.equivalent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>float</cite> values of <cite>epsilon</cite> for comparing
+environments; values are themselves dictionaries that have <cite>gbid</cite> keys
+values are a <cite>dict</cite> having linked keys with <a class="reference internal" href="#gblearn.gb.GrainBoundaryCollection.unique" title="gblearn.gb.GrainBoundaryCollection.unique"><code class="xref py py-attr docutils literal"><span class="pre">unique</span></code></a> and values
+a list of <cite>aid</cite> in the GB whose LAEs that are equivalent to the unique
+LAE represented by the key.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.gb.GrainBoundaryCollection.soapargs">
+<code class="descname">soapargs</code><a class="headerlink" href="#gblearn.gb.GrainBoundaryCollection.soapargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – key-value pairs for constructing the SOAP descriptor.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">ASR</code></dt>
+<dd><p>Returns the ASR for the GB collection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">LER</code><span class="sig-paren">(</span><em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection.LER"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Produces the LAE fingerprint for each GB in the system. The LAE
+figerprint is the percentage of the GBs local environments that belong to
+each unique LAE type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – cutoff value for deciding whether two vectors are
+unique.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>rows represent GBs; columns are the percentage of unique</dt>
+<dd>local environments of each type in each GB.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">P</code></dt>
+<dd><p>Returns the computed SOAP matrices for each GB in the collection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">U</code><span class="sig-paren">(</span><em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection.U"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the uniquified set of environments for the GB collection and
+current <cite>soapargs</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – similarity threshlod parameter.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">load</code><span class="sig-paren">(</span><em>parser=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection.load"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Loads the GBs from their files to create <code class="xref py py-class docutils literal"><span class="pre">GrainBoundary</span></code>
+objects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="xref py py-class docutils literal"><span class="pre">GrainBoundary</span></code> objects are stored in this objects
+dictionary (it inherits from <a class="reference external" href="https://docs.python.org/2/library/collections.html#collections.OrderedDict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></code></a>). Thus
+<code class="xref py py-attr docutils literal"><span class="pre">keys</span></code> are the <cite>gbid</cite> and <code class="xref py py-attr docutils literal"><span class="pre">values</span></code> are the
+<code class="xref py py-class docutils literal"><span class="pre">GrainBoundary</span></code> instances, in the sorted order that they were
+discovered.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parser</strong> – object used to parse the raw GB file. Defaults to
+<code class="xref py py-class docutils literal"><span class="pre">gblearn.lammps.Timestep</span></code>. Class should have a method <cite>gb</cite>
+that constructs a <code class="xref py py-class docutils literal"><span class="pre">GrainBoundary</span></code> instance.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – keyword arguments passed to the <cite>gb</cite> method of
+<cite>parser</cite>. For example, see <code class="xref py py-meth docutils literal"><span class="pre">gblearn.lammps.Timestep.gb()</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">soap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection.soap"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the SOAP vector matrix for the atomic environments at
+each grain boundary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">uniquify</code><span class="sig-paren">(</span><em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/gb.html#GrainBoundaryCollection.uniquify"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Extracts all the unique LAEs in the entire GB system using the
+specified <cite>epsilon</cite> similarity value.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This method does not verify the completion status of any
+previous <code class="xref py py-meth docutils literal"><span class="pre">uniquify()</span></code> attempts. It just re-runs everything and
+clobbers any existing results for the specified value of <cite>epsilon</cite>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – similarity scores below this value are considered
+identical. Two actually identical GBs will have a similarity score
+of <cite>0</cite> by this metric, so smaller is more similar.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">with keys <cite>U</cite> and <cite>GBs</cite>. The <cite>U</cite> key has a dictionary of
+<cite>(PID, VID)</cite> identifiers for the unique LAEs in the GB collection. The
+values are the corresponding SOAP vectors. <cite>GBs</cite> is a dictionary with
+<cite>gbid</cite> keys and values being a <cite>dict</cite> keyed by unique LAEs with values a
+list of <cite>(PID, VID)</cite> identifiers from the global GB collection.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.soap.html" title="gblearn.soap"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.selection.html" title="gblearn.selection"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

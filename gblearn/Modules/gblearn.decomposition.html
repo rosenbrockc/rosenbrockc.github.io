@@ -1,0 +1,1508 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.decomposition &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gblearn.io" href="gblearn.io.html" />
+    <link rel="prev" title="gblearn.soap" href="gblearn.soap.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.io.html" title="gblearn.io"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.soap.html" title="gblearn.soap"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">gblearn.decomposition</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gblearn.soap.html"
+                        title="previous chapter">gblearn.soap</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gblearn.io.html"
+                        title="next chapter">gblearn.io</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Modules/gblearn.decomposition.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gblearn.decomposition">
+<span id="gblearn-decomposition"></span><h1>gblearn.decomposition<a class="headerlink" href="#module-gblearn.decomposition" title="Permalink to this headline">¶</a></h1>
+<p>Methods for decomposing the SOAP vectors into radial and angular
+components for analysis.</p>
+<p class="rubric">Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fcut</span></code>(r,&nbsp;rcut,&nbsp;trans_width)</td>
+<td>Applies the cutoff function to the coefficients so that the function will go smoothly to zero at the cutoff.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">pissnnl</span></code>(pissnnl,&nbsp;nspecies,&nbsp;vcutoff[,&nbsp;nmax,&nbsp;lmax])</td>
+<td>Returns the geometric information for any entries of a pissnnl vector higher than the specified cutoff.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">ADFCollection</span></code>([dfs,&nbsp;counts])</td>
+<td>Represents a collection of Angular Distrubition Functions.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">DF</span></code>(dP,&nbsp;catom,&nbsp;x,&nbsp;decomposer[,&nbsp;radial,&nbsp;calculate])</td>
+<td>Represents the Radial or Angluar Distribution Function of a SOAP vector.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">DFCollection</span></code>([dfs,&nbsp;counts])</td>
+<td>Represents a collection of Distrubition Functions.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">RDFCollection</span></code>([dfs,&nbsp;counts])</td>
+<td>Represents a radial distribution function collection.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">SOAPDecomposer</span></code>([nspecies,&nbsp;lmax,&nbsp;nmax,&nbsp;rcut,&nbsp;…])</td>
+<td>Implements decompsition of vectors in the SOAP space allowing for differing <cite>lmax</cite> and <cite>nmax</cite> values in a single session.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">SOAPVector</span></code>(P,&nbsp;decomposer)</td>
+<td>Wrapper for a SOAP vector that facilitates decomposition, plotting and analysis in the SOAP space.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">SOAPVectorCollection</span></code>([Pij,&nbsp;decomposer,&nbsp;…])</td>
+<td>Represents a collection of SOAP vectors that are logically combined (for example the local environments at a grain boundary are all part of the grain boundary).</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Methods for decomposing the SOAP vectors into radial and angular
+components for analysis.</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">ADFCollection</code><span class="sig-paren">(</span><em>dfs=None</em>, <em>counts=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#ADFCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a collection of Angular Distrubition Functions.  See also the
+comments for <code class="xref py py-class docutils literal"><span class="pre">DFCollection</span></code>.</p>
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_soap</code><span class="sig-paren">(</span><em>collection</em>, <em>resolution=75</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#ADFCollection.from_soap"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Creates an ADF collection from the specified SOAPVector collection
+using the <span class="math">\(l&gt;0\)</span> components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>collection</strong> (<em>SOAPVectorCollection</em>) – collection of SOAP vectors to
+initialize from.</li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of points to sample in the angular domain.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the DFs are constructed using the density of
+the central atom.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">DF</code><span class="sig-paren">(</span><em>dP</em>, <em>catom</em>, <em>x</em>, <em>decomposer</em>, <em>radial=True</em>, <em>calculate=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents the Radial or Angluar Distribution Function of a SOAP vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dP</strong> (<em>list</em>) – of tuples; result of calling
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code> on the SOAP vector with
+<span class="math">\(l=0\)</span> or <span class="math">\(l&gt;0\)</span> components set to zero.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, this DF is for the <em>central</em> atom only (i.e.,
+<span class="math">\(l=0\)</span> components only).</li>
+<li><strong>x</strong> (<em>numpy.ndarray</em>) – domain in radial/angular space on which to sample
+the function.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – instance used to decompose the SOAP vector; has
+configuration information for SOAP parameters and caches for rapid
+evaluation of the basis functions.</li>
+<li><strong>calculate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the distribution function will be calculated
+upon initialization.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.decomposition.DF.df">
+<code class="descname">df</code><a class="headerlink" href="#gblearn.decomposition.DF.df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – distribution function values corresponding to
+<code class="xref py py-attr docutils literal"><span class="pre">x</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">dtype</code><em class="property"> = None</em></dt>
+<dd><p><em>str</em> – since this could be a radial <em>or</em> and angular DF, the type of
+the distribution function.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>data</em>, <em>decomposer=None</em>, <em>x=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.from_dict"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a DF from a serialized dict (i.e., one returned by
+<code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – result of calling <code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – instance used to decompose the SOAP vector; has
+configuration information for SOAP parameters and caches for rapid
+evaluation of the basis functions.</li>
+<li><strong>x</strong> (<em>numpy.ndarray</em>) – if this DF is constructed from a parent collection,
+the common domain sample vector to use.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>filename</em>, <em>decomposer=None</em>, <em>x=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.from_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a DF from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the file that was created by
+<code class="xref py py-meth docutils literal"><span class="pre">DF.save()</span></code>.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – instance used to decompose the SOAP vector; has
+configuration information for SOAP parameters and caches for rapid
+evaluation of the basis functions.</li>
+<li><strong>x</strong> (<em>numpy.ndarray</em>) – common domain values shared by a collection; used if
+the file doesn’t explicitly specify the domain values.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">norm</code></dt>
+<dd><p>Calculates the L2 norm of the distribution function values as if they
+were a vector in some space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>savefile=None</em>, <em>shells=None</em>, <em>opacity=1.0</em>, <em>color=’b’</em>, <em>title=None</em>, <em>xlabel=None</em>, <em>ylabel=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.plot"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Plots the DF.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot on. If not specified, a new
+figure and new axes will be created. If axes are specifed, <em>no</em> <cite>x</cite>
+or <cite>y</cite> labels or plot titles will be added.</li>
+<li><strong>savefile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to a file if the figure should be saved.</li>
+<li><strong>shells</strong> (<em>list</em>) – of <cite>float</cite> values for neighbor shells to be added as
+vertical lines to the plot.</li>
+<li><strong>opacity</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – transparency to use for the DF plot.</li>
+<li><strong>color</strong> – any color option received by <code class="xref py py-func docutils literal"><span class="pre">matplotlib.pyplot.plot()</span></code>.</li>
+<li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default title of the plot.</li>
+<li><strong>xlabel</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default (generic, not very helpful) label for
+the x-axis.</li>
+<li><strong>ylabel</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default label for the y-axis.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">same</code><span class="sig-paren">(</span><em>other</em>, <em>epsilon_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.same"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Tests whether the specifed DF is similar to this one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> (<em>DF</em>) – DF to compare similarity to.</li>
+<li><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – override the global (default) value
+<code class="xref py py-data docutils literal"><span class="pre">epsilon</span></code> for determining if the DFs
+are similar.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True when both of the DFs are identical within tolerance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">save</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.save"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Saves the DF to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to save the vector to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>withdecomp=True</em>, <em>commonx=None</em>, <em>withdP=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DF.serialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a serializable dictionary that represents this DF.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>withdecomp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, include the parameters of the SOAP
+decomposer in the dict.</li>
+<li><strong>commonx</strong> (<em>numpy.ndarray</em>) – xf this DF is part of a collection, the domain
+values will be the same for every DF; in that case we don’t need to
+include the domain in the serialization. This is the parent
+collections common radial vector. If the DFs is the same, it won’t
+be serialized. If unspecified, the domain values are serialized.</li>
+<li><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, decomposed SOAP vector values are
+serialized. Necessary to completely reconstruct the representation,
+but not necessary for most analysis.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">DFCollection</code><span class="sig-paren">(</span><em>dfs=None</em>, <em>counts=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a collection of Distrubition Functions. A DF can only
+be added once to a collection (object instance comparison). Two identical
+DFs (in the physical sense) can belong to the same collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dfs</strong> (<em>list</em>) – of <code class="xref py py-class docutils literal"><span class="pre">DF</span></code> to intialize the collection with.</li>
+<li><strong>counts</strong> (<em>list</em>) – of <cite>int</cite> specifying how many DFs of each type are in the
+collection. For example, <cite>self.counts[3]</cite> says that we have three DFs
+in the collection that are identical to the DF in <cite>self.dfs[3]</cite>,
+though we only keep one of them.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.decomposition.DFCollection.dfs">
+<code class="descname">dfs</code><a class="headerlink" href="#gblearn.decomposition.DFCollection.dfs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <code class="xref py py-class docutils literal"><span class="pre">DF</span></code> to intialize the collection with.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.DFCollection.counts">
+<code class="descname">counts</code><a class="headerlink" href="#gblearn.decomposition.DFCollection.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>int</cite> specifying how many DFs of each type are in the
+collection. For example, <cite>self.counts[3]</cite> says that we have three DFs
+in the collection that are identical to the DF in <cite>self.dfs[3]</cite>,
+though we only keep one of them.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.DFCollection.label">
+<code class="descname">label</code><a class="headerlink" href="#gblearn.decomposition.DFCollection.label" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – user-defined label for the collection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.DFCollection.tags">
+<code class="descname">tags</code><a class="headerlink" href="#gblearn.decomposition.DFCollection.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – user-defined tags to identify this collection in a larger
+analysis.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">add</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.add"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Add a new DF to the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>DF</em>) – instance to add; if it is already in the collection, nothing
+will happen.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">average</code></dt>
+<dd><p>Returns the averaged radial distribution function for the collection.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">dfs_from_soap</code><span class="sig-paren">(</span><em>collection</em>, <em>ctype</em>, <em>resolution=75</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.dfs_from_soap"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Creates a DF collection from the specified SOAPVector collection
+using the <span class="math">\(l&gt;0\)</span> components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>collection</strong> (<em>SOAPVectorCollection</em>) – collection of SOAP vectors to
+initialize from.</li>
+<li><strong>ctype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of [‘RDF’, ‘ADF’], specifies the kind of collection
+to initialize.</li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of points to sample in the radial domain.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the DFs are constructed using the density of
+the central atom.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.from_dict"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a DFCollection from a serialized dict (i.e., one returned by
+<code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – result of calling <code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.from_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a DFCollection from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the file that was created by
+<code class="xref py py-meth docutils literal"><span class="pre">DF.save()</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">histogram</code><span class="sig-paren">(</span><em>epsilon_=None</em>, <em>savefile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.histogram"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Determines how many of each kind of DF are in this collection (using
+the default comparison). Plots the histogram of unique values. This is
+equivalent to calling <code class="xref py py-meth docutils literal"><span class="pre">DFCollection.unique.histogram()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – override the global (default) value
+<code class="xref py py-data docutils literal"><span class="pre">epsilon</span></code> for determining if the DFs
+are similar.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – arguments will be passed directly to
+<code class="xref py py-func docutils literal"><span class="pre">matplotlib.pyplot.bar()</span></code> for the plotting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>of the unique values; same result as</dt>
+<dd><p class="first last"><code class="xref py py-meth docutils literal"><span class="pre">DFCollection.unique()</span></code>.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DFCollection</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>savefile=None</em>, <em>shells=None</em>, <em>color=’b’</em>, <em>title=None</em>, <em>xlabel=None</em>, <em>ylabel=None</em>, <em>withavg=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.plot"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Plots the collection of DFs on the same axes. Opacity of the line is
+chosen based on how many DFs in the collection are identical to that
+one (within tolerance). This is accomplished by calling
+<code class="xref py py-meth docutils literal"><span class="pre">DFCollection.histogram()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – axes to plot on. If not specified, a new
+figure and new axes will be created.</li>
+<li><strong>savefile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to a file if the figure should be saved.</li>
+<li><strong>shells</strong> (<em>list</em>) – of <cite>float</cite> values for neighbor shells to be added as
+vertical lines to the plot.</li>
+<li><strong>color</strong> – any color option received by <code class="xref py py-func docutils literal"><span class="pre">matplotlib.pyplot.plot()</span></code>.</li>
+<li><strong>title</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default title of the plot.</li>
+<li><strong>xlabel</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default (generic, not very helpful) label for
+the x-axis.</li>
+<li><strong>ylabel</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – override the default label for the y-axis.</li>
+<li><strong>withavg</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the average DF for the whole collection is also
+plotted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">project</code><span class="sig-paren">(</span><em>other</em>, <em>epsilon_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.project"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Projects the RDFs in self into the unique RDFs of other.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(<code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> projection, <cite>list</cite>
+exceptions); <cite>projection</cite> is the number of each kind of
+RDF in other with <cite>sum(result) == len(self)</cite>; <cite>exceptions</cite>
+are indices in <cite>self</cite> for which there was no similar <code class="xref py py-class docutils literal"><span class="pre">DF</span></code> in
+other.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)">tuple</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">refine</code><span class="sig-paren">(</span><em>other</em>, <em>epsilon_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.refine"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Refines this DFCollection to include all DFs in <cite>other</cite> that are not
+already in <cite>self</cite>. Also reduces existing DFs in <cite>self</cite> to be unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<em>DFCollection</em>) – another collection to augment this one with.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.remove"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Remove an DF from the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rdf</strong> (<em>DF</em>) – instance to remove; if it isn’t already in the
+collection, nothing will happen.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">save</code><span class="sig-paren">(</span><em>target</em>, <em>withdP=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.save"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Saves the DF to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to save the vector to.</li>
+<li><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, SOAP decomposition from which the
+DF was constructed is also included. Wasteful, but necessary to
+completely represent the DF.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>withdP=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.serialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a serializable dictionary that represents this DFCollection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, SOAP decomposition from which the
+DF was constructed is also included. Wasteful, but necessary to
+completely represent the DF.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">unique</code><span class="sig-paren">(</span><em>epsilon_=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#DFCollection.unique"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns only the unique DFs in this collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – override the global (default) value
+<code class="xref py py-data docutils literal"><span class="pre">epsilon</span></code> for determining if the DFs
+are similar.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">of unique DFs within the specified tolerance.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DFCollection</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">RDFCollection</code><span class="sig-paren">(</span><em>dfs=None</em>, <em>counts=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#RDFCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a radial distribution function collection. See also the
+comments for <code class="xref py py-class docutils literal"><span class="pre">DFCollection</span></code>.</p>
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_soap</code><span class="sig-paren">(</span><em>collection</em>, <em>resolution=75</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#RDFCollection.from_soap"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Creates an RDF collection from the specified SOAPVector collection
+using the <span class="math">\(l&gt;0\)</span> components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>collection</strong> (<em>SOAPVectorCollection</em>) – collection of SOAP vectors to
+initialize from.</li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of points to sample in the radial domain.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the DFs are constructed using the density of
+the central atom.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">SOAPDecomposer</code><span class="sig-paren">(</span><em>nspecies=1</em>, <em>lmax=12</em>, <em>nmax=12</em>, <em>rcut=6.0</em>, <em>sigma=0.5</em>, <em>trans_width=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Implements decompsition of vectors in the SOAP space allowing
+for differing <cite>lmax</cite> and <cite>nmax</cite> values in a single session. Uses
+caching to optimize the decomposition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nspecies</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of species for the SOAP descriptor.</li>
+<li><strong>nmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor radial basis
+functions.</li>
+<li><strong>lmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor spherical
+harmonics.</li>
+<li><strong>rcut</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – local environment finite cutoff parameter.</li>
+<li><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – width parameter for the Gaussians on each atom.</li>
+<li><strong>trans_width</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – distance over which the coefficients in the
+radial functions are smoothly transitioned to zero.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.alpha">
+<code class="descname">alpha</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – constant affecting the width of the Gaussians. Inversely
+proportional to <code class="xref py py-attr docutils literal"><span class="pre">sigma</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.rb">
+<code class="descname">rb</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.rb" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – positions of radial basis functions in the
+radial space.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.partitions">
+<code class="descname">partitions</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.partitions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>tuple</cite> of (<cite>l</cite> values, inverse); values are the
+corresponding indices that form the partition.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.fcrs">
+<code class="descname">fcrs</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.fcrs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>float</cite> values for radius <cite>r</cite>; values are <code class="xref py py-func docutils literal"><span class="pre">fcut()</span></code>
+evaluated at <cite>r</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.rbexp">
+<code class="descname">rbexp</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.rbexp" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>float</cite> values; the <cite>n</cite>-dependent exponential
+damping factor for radial basis function values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.rbsph">
+<code class="descname">rbsph</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.rbsph" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>tuple</cite> (n,l,r) where <cite>n</cite> and <cite>l</cite> are the integer
+radial and spherical basis function indices and <cite>r</cite> is the <cite>float</cite> value
+at which the spherical bessel function was evaluated.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.cRs">
+<code class="descname">cRs</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.cRs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>float</cite> values of radius <cite>r</cite>; values are the
+corresponding coefficient matrices returned by
+<code class="xref py py-meth docutils literal"><span class="pre">_c_numeric()</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.aRs">
+<code class="descname">aRs</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.aRs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>tuple</cite> (n,l,r) where <cite>n</cite> and <cite>l</cite> are the integer
+radial and spherical basis function indices and <cite>r</cite> is the <cite>float</cite>
+value that the radial functions were evaluated at; values are the
+corresponding coefficients of the radial basis functions.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPDecomposer.transformbasis">
+<code class="descname">transformbasis</code><a class="headerlink" href="#gblearn.decomposition.SOAPDecomposer.transformbasis" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – transformation matrix needed to account for
+radial basis function positions when calculating the radial function
+coefficients using linear algebra.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">ADF</code><span class="sig-paren">(</span><em>dP</em>, <em>ax</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.ADF"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the angular distribution function for the given SOAP
+vector decomposition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) – (<cite>int</cite> index in <cite>P</cite>, <cite>float</cite> cnlm,
+(<cite>int</cite> ni, <cite>int</cite> si), (<cite>int</cite> nj, <cite>int</cite> sj), <cite>int</cite> l). These tuples
+are calculated in bulk for a <cite>P</cite> vector using
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code>.</li>
+<li><strong>ax</strong> (<em>numpy.ndarray</em>) – linear space of polar angle values to evaluate
+at.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">RDF</code><span class="sig-paren">(</span><em>dP</em>, <em>rx</em>, <em>fast=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.RDF"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes the summed radial distribution function for the specified
+decomposed <cite>P</cite> vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) – (<cite>int</cite> index in <cite>P</cite>, <cite>float</cite> cnlm,
+(<cite>int</cite> ni, <cite>int</cite> si), (<cite>int</cite> nj, <cite>int</cite> sj), <cite>int</cite> l). These tuples
+are calculated in bulk for a <cite>P</cite> vector using
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code>.</li>
+<li><strong>rx</strong> (<em>numpy.ndarray</em>) – linear space of values to evaluate at.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">apnl</code><span class="sig-paren">(</span><em>dp</em>, <em>rx</em>, <em>cnum=False</em>, <em>fast=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.apnl"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the analytically/numerically derived coefficient for the
+specified, decomposed pissnnl.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) – (<cite>int</cite> index in <cite>P</cite>, <cite>float</cite> cnlm,
+(<cite>int</cite> ni, <cite>int</cite> si), (<cite>int</cite> nj, <cite>int</cite> sj), <cite>int</cite> l). These tuples
+are calculated in bulk for a <cite>pissnnl</cite> vector using
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code>.</li>
+<li><strong>rx</strong> (<em>numpy.ndarray</em>) – linear space of values to evaluate at.</li>
+<li><strong>cnum</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the function is evaluated numerically
+using linear algebra instead of the built-in <cite>numpy</cite>
+functions. See also <code class="xref py py-meth docutils literal"><span class="pre">cnl()</span></code>.</li>
+<li><strong>fast</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, caching is used to speed up evaluation
+of the basis functions between multiple <cite>pissnnl</cite> vectors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">cnl</code><span class="sig-paren">(</span><em>n</em>, <em>l</em>, <em>r</em>, <em>cnum=False</em>, <em>fast=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.cnl"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the coefficient of the radial basis function
+<span class="math">\(g_n(r)\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – index of the radial basis function.</li>
+<li><strong>l</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – index of the spherical harmonic associated with the
+radial function.</li>
+<li><strong>r</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – value at which to evaluate the basis function
+<span class="math">\(g_n(r)\)</span>.</li>
+<li><strong>cnum</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the function is evaluated numerically
+using linear algebra instead of the built-in <cite>numpy</cite>
+functions; can be faster, but the results can have numerical
+noise issues.</li>
+<li><strong>fast</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, caching is used to speed up evaluation
+of the basis functions between multiple <cite>pissnnl</cite> vectors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">decompose</code><span class="sig-paren">(</span><em>P</em>, <em>vcutoff=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.decompose"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Decomposes the specified SOAP vector into its radial and angular
+contributions using <code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>P</strong> (<em>numpy.ndarray</em>) – vector representing the projection of a local
+atomic environment into the SOAP space.</li>
+<li><strong>vcutoff</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – values higher than this will be included in the
+RDF.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.get_params"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a dictionary of the constructor parameters needed to
+re-initialize this decomposer instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">partition</code><span class="sig-paren">(</span><em>lfilter</em>, <em>inverse=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPDecomposer.partition"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a list of indices for a <cite>P</cite> vector that correspond to the
+specified <cite>l</cite> values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lfilter</strong> (<em>list</em>) – of <cite>l</cite> values to include in the resulting indices.</li>
+<li><strong>inverse</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, then any <cite>l</cite> values <em>not</em> in <cite>lfilter</cite> are
+included instead of the inverse.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">of <cite>int</cite> indices that have the specified <cite>l</cite> values.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(numpy.ndarray)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">SOAPVector</code><span class="sig-paren">(</span><em>P</em>, <em>decomposer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Wrapper for a SOAP vector that facilitates decomposition, plotting and
+analysis in the SOAP space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>P</strong> (<em>numpy.ndarray</em>) – vector representing the projection of a local atomic
+environment into the SOAP space.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – instance used to decompose the SOAP vector; has
+configuration information for SOAP parameters and caches for rapid
+evaluation of the basis functions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.dnP">
+<code class="descname">dnP</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.dnP" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of tuples; result of calling
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code> on the SOAP vector with <cite>l=0</cite>
+components set to zero.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.dcP">
+<code class="descname">dcP</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.dcP" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of tuples; result of calling
+<code class="xref py py-func docutils literal"><span class="pre">gblearn.decomposition.pissnnl()</span></code> on the SOAP vector with <cite>l&gt;0</cite>
+components set to zero.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.nP">
+<code class="descname">nP</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.nP" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – a copy of <cite>P</cite> with <cite>l=0</cite> components set to zero.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.cP">
+<code class="descname">cP</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.cP" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – a copy of <cite>P</cite> with <cite>l&gt;0</cite> components set to zero.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.rx">
+<code class="descname">rx</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.rx" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – sample points in the radial domain at which <a class="reference internal" href="#gblearn.decomposition.SOAPVector.cRDF" title="gblearn.decomposition.SOAPVector.cRDF"><code class="xref py py-attr docutils literal"><span class="pre">cRDF</span></code></a>
+and <a class="reference internal" href="#gblearn.decomposition.SOAPVector.nRDF" title="gblearn.decomposition.SOAPVector.nRDF"><code class="xref py py-attr docutils literal"><span class="pre">nRDF</span></code></a> were sampled.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.cRDF">
+<code class="descname">cRDF</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.cRDF" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DF</em> – radial distribution function for the central atom.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.nRDF">
+<code class="descname">nRDF</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.nRDF" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DF</em> – radial distribution function for all the neighbors of the
+central atom.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">rx</code></dt>
+<dd><p><em>numpy.ndarray</em> – sample points in the angular domain at which
+<a class="reference internal" href="#gblearn.decomposition.SOAPVector.cADF" title="gblearn.decomposition.SOAPVector.cADF"><code class="xref py py-attr docutils literal"><span class="pre">cADF</span></code></a> and <a class="reference internal" href="#gblearn.decomposition.SOAPVector.nADF" title="gblearn.decomposition.SOAPVector.nADF"><code class="xref py py-attr docutils literal"><span class="pre">nADF</span></code></a> were sampled.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.cADF">
+<code class="descname">cADF</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.cADF" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DF</em> – angular distribution function for the central atom.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.decomposition.SOAPVector.nADF">
+<code class="descname">nADF</code><a class="headerlink" href="#gblearn.decomposition.SOAPVector.nADF" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DF</em> – angular distribution function for all the neighbors of the
+central atom.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">ADF</code><span class="sig-paren">(</span><em>ax</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.ADF"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the angular distribution function for the SOAP vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ax</strong> (<em>numpy.ndarray</em>) – domain in the angular space to evaluate the ADF
+at.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the ADF of the central atom is returned;
+otherwise, the central atom is ignored and the neighbor ADF is
+returned.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">RDF</code><span class="sig-paren">(</span><em>rx</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.RDF"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the <em>total</em> radial distribution function for the SOAP vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rx</strong> (<em>numpy.ndarray</em>) – domain in the radial space to evaluate the RDF
+at.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the RDF of the central atom is returned;
+otherwise, the central atom is ignored and the neighbor RDF is
+returned.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">ax</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached value of the angular values that we evaluated
+the ADF at; useful if the ADF is requested repeatedly for the same
+<cite>theta</cite> values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">cADF</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached values of the ADF for the cached
+value in <code class="xref py py-attr docutils literal"><span class="pre">ax</span></code> with <span class="math">\(l=0\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">cRDF</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached values of the RDF for the cached
+value in <a class="reference internal" href="#gblearn.decomposition.SOAPVector.rx" title="gblearn.decomposition.SOAPVector.rx"><code class="xref py py-attr docutils literal"><span class="pre">rx</span></code></a> with <span class="math">\(l=0\)</span>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">equal</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.equal"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Performs a more thorough equality check by also comparing
+the SOAP decomposers and RDFs.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>data</em>, <em>decomposer_=None</em>, <em>rx=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.from_dict"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a SOAP vector from a serialized dict (i.e., one returned by
+<code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – result of calling <code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – if this serialization was part of a
+higher level collection, then the decomposer would not have been
+included at the item level. For reconstruction, it is passed in by
+the collection.</li>
+<li><strong>rx</strong> (<em>numpy.ndarray</em>) – as for <cite>decomposer</cite>, but with the values in the
+domain.</li>
+<li><strong>ax</strong> (<em>numpy.ndarray</em>) – as for <cite>decomposer</cite>, but with the angular values
+in the domain.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_element</code><span class="sig-paren">(</span><em>element</em>, <em>index=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.from_element"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the SOAP vector for a pure element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – element name. Must be one of
+[“Ni”, “Cr”, “Mg”].</li>
+<li><strong>index</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – for multi-atom bases, which atom to represent
+in the elemental crystal.</li>
+<li><strong>nmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor radial basis
+functions.</li>
+<li><strong>lmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor spherical
+harmonics.</li>
+<li><strong>rcut</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – local environment finite cutoff parameter.</li>
+<li><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – width parameter for the Gaussians on each atom.</li>
+<li><strong>trans_width</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – distance over which the coefficients in the
+radial functions are smoothly transitioned to zero.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>filename</em>, <em>decomposer=None</em>, <em>rx=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.from_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a SOAP vector from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the file that was created by
+<code class="xref py py-meth docutils literal"><span class="pre">SOAPVector.save()</span></code>.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – if this serialization was part of a
+higher level collection, then the decomposer would not have been
+included at the item level. For reconstruction, it is passed in by
+the collection.</li>
+<li><strong>rx</strong> (<em>numpy.ndarray</em>) – as for <cite>decomposer</cite>, but with the values in the
+domain.</li>
+<li><strong>ax</strong> (<em>numpy.ndarray</em>) – as for <cite>decomposer</cite>, but with the angular values
+in the domain.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">nADF</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached values of the ADF for the cached
+value in <code class="xref py py-attr docutils literal"><span class="pre">ax</span></code> with <span class="math">\(l&gt;0\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">nRDF</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached values of the RDF for the cached
+value in <a class="reference internal" href="#gblearn.decomposition.SOAPVector.rx" title="gblearn.decomposition.SOAPVector.rx"><code class="xref py py-attr docutils literal"><span class="pre">rx</span></code></a> with <span class="math">\(l&gt;0\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">rx</code><em class="property"> = None</em></dt>
+<dd><p><em>numpy.ndarray</em> – cached value of the radial values that we evaluated
+the RDF at; useful if the RDF is requested repeatedly for the same <cite>r</cite>
+values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">save</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.save"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Saves the SOAP vector to disk so that RDF and decomposition
+operations don’t have to be re-executed later.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to save the vector to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>withdecomp=True</em>, <em>commonrx=None</em>, <em>withdP=True</em>, <em>commonax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVector.serialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a serializable dictionary that represents this SOAP Vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>withdecomp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, include the parameters of the SOAP
+decomposer in the dict.</li>
+<li><strong>commonrx</strong> (<em>numpy.ndarray</em>) – xf this DF is part of a collection, the radial
+values will be the same for every DF; in that case we don’t need to
+include the domain in the serialization. This is the parent
+collections common radial vector. If the DFs is the same, it won’t
+be serialized. If unspecified, the domain values are serialized.</li>
+<li><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, decomposed SOAP vector values are
+serialized. Necessary to completely reconstruct the representation,
+but not necessary for most analysis.</li>
+<li><strong>commonax</strong> (<em>numpy.ndarray</em>) – same as for <cite>commonrx</cite> but for the angular
+domain.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.decomposition.</code><code class="descname">SOAPVectorCollection</code><span class="sig-paren">(</span><em>Pij=None</em>, <em>decomposer=None</em>, <em>calculate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a collection of SOAP vectors that are logically combined (for
+example the local environments at a grain boundary are all part of the grain
+boundary). The collection allows aggregate quantities to be calculated more
+easily.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Pij</strong> (<em>numpy.ndarray</em>) – a matrix of SOAP vectors, where each <em>row</em> is a
+vector.</li>
+<li><strong>decomposer</strong> (<em>SOAPDecomposer</em>) – instance used to decompose the SOAP
+vectors; has configuration information for SOAP parameters and caches
+for rapid evaluation of the basis functions.</li>
+<li><strong>calculate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the SOAPVectors are calculated based on <cite>P</cite>;
+otherwise, they are left as an empty list.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – arguments that can be passed to <code class="xref py py-class docutils literal"><span class="pre">SOAPDecomposer</span></code>
+constuctor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Create a collection of SOAP vectors and then collapse them into a set of
+unique ones (an instance of <code class="xref py py-class docutils literal"><span class="pre">RDFCollection</span></code>).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gblearn.decomposition</span> <span class="k">import</span> <span class="n">SOAPVectorCollection</span> <span class="k">as</span> <span class="n">SVC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">load</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">P</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;pissnnl.npy&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">svc</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urdfs</span> <span class="o">=</span> <span class="n">svc</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">rdf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt>
+<code class="descname">ADFs</code><span class="sig-paren">(</span><em>resolution=100</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.ADFs"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the set of <em>unique</em> angular distribution functions for this
+collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of points to sample in the angular domain.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the DFs are constructed using the density of
+the central atom.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">RDFs</code><span class="sig-paren">(</span><em>resolution=75</em>, <em>catom=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.RDFs"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the set of <em>unique</em> radial distribution functions for this
+collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of points to sample in the radial domain.</li>
+<li><strong>catom</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the DFs are constructed using the density of
+the central atom.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">equal</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.equal"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Performs a more rigorous equality test for two collections by <em>also</em>
+comparing the radial and angular distribution functions.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.from_dict"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a SOAPVectorCollection from a serialized dict (i.e., one
+returned by <code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – result of calling <code class="xref py py-meth docutils literal"><span class="pre">serialize()</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt>
+<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.from_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Restores a SOAPVectorCollection from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to the file that was created by
+<code class="xref py py-meth docutils literal"><span class="pre">SOAPVectorCollection.save()</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">save</code><span class="sig-paren">(</span><em>target</em>, <em>withdP=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.save"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Saves the DF to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – path to save the vector to.</li>
+<li><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, SOAP decomposition from which the
+DF was constructed is also included. Wasteful, but necessary to
+completely represent the DF.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>withdP=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#SOAPVectorCollection.serialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a serializable dictionary that represents this
+<code class="xref py py-class docutils literal"><span class="pre">SOAPVectorCollection</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>withdP</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the large, SOAP decomposition from which the
+DFs are constructed is also included. Wasteful, but necessary to
+completely represent the DFs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descclassname">gblearn.decomposition.</code><code class="descname">epsilon</code><em class="property"> = 5e-05</em></dt>
+<dd><p><em>float</em> – finite precision comparison value for RDF norms.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.decomposition.</code><code class="descname">fcut</code><span class="sig-paren">(</span><em>r</em>, <em>rcut</em>, <em>trans_width</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#fcut"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Applies the cutoff function to the coefficients so that the
+function will go smoothly to zero at the cutoff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – radial distance parameter.</li>
+<li><strong>rcut</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – values greater than this are identically zero.</li>
+<li><strong>trans_width</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – the transition to zero at the cutoff happens
+smoothly across this width.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>value in [0., 1.] to multiply the coefficient by so</dt>
+<dd><p class="first last">that all values fall within the specified cutoff.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.decomposition.</code><code class="descname">pissnnl</code><span class="sig-paren">(</span><em>pissnnl</em>, <em>nspecies</em>, <em>vcutoff</em>, <em>nmax=12</em>, <em>lmax=12</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/decomposition.html#pissnnl"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the geometric information for any entries of a pissnnl
+vector higher than the specified cutoff.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pissnnl</strong> (<em>numpy.ndarray</em>) – vector to examine.</li>
+<li><strong>nspecies</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – number of species for the SOAP descriptor.</li>
+<li><strong>vcutoff</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – values higher than this will be returned with
+geometry information.</li>
+<li><strong>nmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor radial basis
+functions.</li>
+<li><strong>lmax</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – bandwidth limits for the SOAP descriptor spherical harmonics.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>of tuples with (index, value, (n_i, s_i), (n_j, s_j), l), where <cite>n_i</cite></dt>
+<dd><p class="first last">is the <cite>n</cite> value of the radial basis function for species <cite>i</cite>, and <cite>s_i</cite>
+is the value of the species index.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.io.html" title="gblearn.io"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.soap.html" title="gblearn.soap"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,392 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.lammps &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gblearn.reduce" href="gblearn.reduce.html" />
+    <link rel="prev" title="gblearn.io" href="gblearn.io.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.reduce.html" title="gblearn.reduce"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.io.html" title="gblearn.io"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">gblearn.lammps</a><ul>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gblearn.io.html"
+                        title="previous chapter">gblearn.io</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gblearn.reduce.html"
+                        title="next chapter">gblearn.reduce</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Modules/gblearn.lammps.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gblearn.lammps">
+<span id="gblearn-lammps"></span><h1>gblearn.lammps<a class="headerlink" href="#module-gblearn.lammps" title="Permalink to this headline">¶</a></h1>
+<p>Functions for interacting with LAMMPS dump files.</p>
+<p class="rubric">Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">make_lattice</span></code>(box)</td>
+<td>Constructs a lattice array compatible with ASE using the box dimensions specified in a lammps format.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">Dump</span></code>(filepath[,&nbsp;stepfilter])</td>
+<td>Represents a dump file that could potentially have more than one timestep.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">Timestep</span></code>(filepath[,&nbsp;index,&nbsp;openf,&nbsp;stepfilter])</td>
+<td>Represents a single time step in a LAMMPS dump file.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Functions for interacting with LAMMPS dump files.</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.lammps.</code><code class="descname">Dump</code><span class="sig-paren">(</span><em>filepath</em>, <em>stepfilter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Dump"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a dump file that could potentially have more than one
+timestep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – full path to the LAMMPS dump file to extract the
+time step from.</li>
+<li><strong>stepfilter</strong> (<em>list</em>) – of <cite>int</cite> timestep values that <em>should</em> be parsed. If the
+next timestep encountered is not in this list, it will be ignored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.lammps.Dump.steps">
+<code class="descname">steps</code><a class="headerlink" href="#gblearn.lammps.Dump.steps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – keys are <cite>int</cite> timestep ids; values are <code class="xref py py-class docutils literal"><span class="pre">Timestep</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">dump</code><span class="sig-paren">(</span><em>filename</em>, <em>mode=’w’</em>, <em>rebox=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Dump.dump"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Dumps the specified structure to file in the LAMMPS format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – target path for saving the timestep.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – file read/write mode; defaults to new file.</li>
+<li><strong>rebox</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the box is recalculated from the current
+set of atomic positions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">gblearn.lammps.</code><code class="descname">Timestep</code><span class="sig-paren">(</span><em>filepath</em>, <em>index=0</em>, <em>openf=None</em>, <em>stepfilter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Timestep"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Represents a single time step in a LAMMPS dump file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – full path to the LAMMPS dump file to extract the
+time step from.</li>
+<li><strong>index</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – index of the time step in the dump file.</li>
+<li><strong>openf</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#file" title="(in Python v2.7)"><em>file</em></a>) – open file object for sequential instantiation of multiple time
+steps.</li>
+<li><strong>stepfilter</strong> (<em>list</em>) – of <cite>int</cite> timestep values that <em>should</em> be parsed. If the
+next timestep encountered is not in this list, it will be ignored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.types">
+<code class="descname">types</code><a class="headerlink" href="#gblearn.lammps.Timestep.types" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – integer types of the atoms in the list.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.ids">
+<code class="descname">ids</code><a class="headerlink" href="#gblearn.lammps.Timestep.ids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – integer atom ids; has same length as <cite>len(self)</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.xyz">
+<code class="descname">xyz</code><a class="headerlink" href="#gblearn.lammps.Timestep.xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – with shape (len(self), 3); float positions of the
+atoms in the time step.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.periodic">
+<code class="descname">periodic</code><a class="headerlink" href="#gblearn.lammps.Timestep.periodic" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>bool</cite> specifying whether the <cite>x</cite>, <cite>y</cite>, or <cite>z</cite>
+directions are periodic (for the box).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.box">
+<code class="descname">box</code><a class="headerlink" href="#gblearn.lammps.Timestep.box" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> – with shape (3, 2) specifying the <cite>lo</cite> and <cite>hi</cite> bounds
+of the box in each direction. The box can also have shape
+(3, 3) to support non-orthogonal box vectors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gblearn.lammps.Timestep.extras">
+<code class="descname">extras</code><a class="headerlink" href="#gblearn.lammps.Timestep.extras" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – of <cite>str</cite> indicating extra atomic parameters that are
+available in this time step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">dump</code><span class="sig-paren">(</span><em>filename</em>, <em>mode=’a’</em>, <em>rebox=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Timestep.dump"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Dumps the specified structure to file in the LAMMPS format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – target path for saving the timestep.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – file read/write mode; defaults to append.</li>
+<li><strong>rebox</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, the box is recalculated from the current
+set of atomic positions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">gb</code><span class="sig-paren">(</span><em>Z=None</em>, <em>method=’median’</em>, <em>pattr=’c_csd’</em>, <em>extras=True</em>, <em>soapargs={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Timestep.gb"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the grain boundary for this time step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Z</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em> or </em><em>list</em>) – element code(s) for the atomic species.</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of [‘median’].</li>
+<li><strong>pattr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of an attribute in <a class="reference internal" href="#gblearn.lammps.Timestep.extras" title="gblearn.lammps.Timestep.extras"><code class="xref py py-attr docutils literal"><span class="pre">extras</span></code></a> to pass as the
+selection parameter of the routine.</li>
+<li><strong>extras</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, include extra attributes in the new GB
+structure.</li>
+<li><strong>soapargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – initialization parameters for the
+<code class="xref py py-class docutils literal"><span class="pre">gblearn.soap.SOAPCalculator</span></code> instance for the GB.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – additional arguments passed to the atom selection
+function. For <cite>median</cite>, see <code class="xref py py-func docutils literal"><span class="pre">gblearn.selection.median()</span></code> for the
+arguments. For <cite>cna*</cite> see <code class="xref py py-func docutils literal"><span class="pre">gblearn.selection.cna_max()</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>instance with only those atoms that appear</dt>
+<dd><p class="first last">to be at the boundary.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">gblearn.gb.GrainBoundary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">gbids</code><span class="sig-paren">(</span><em>method=’median’</em>, <em>pattr=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#Timestep.gbids"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns the <em>indices</em> of the atoms that lie at the grain
+boundary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – one of [‘median’, ‘cna’, ‘cna_z’].</li>
+<li><strong>pattr</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – name of an attribute in <a class="reference internal" href="#gblearn.lammps.Timestep.extras" title="gblearn.lammps.Timestep.extras"><code class="xref py py-attr docutils literal"><span class="pre">extras</span></code></a> to pass as the
+selection parameter of the routine.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – additional arguments passed to the atom selection
+function. For <cite>median</cite>, see <code class="xref py py-func docutils literal"><span class="pre">gblearn.selection.median()</span></code> for the
+arguments.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>of integer indices of atoms in this timestep that are</dt>
+<dd><p class="first last">considered to lie on the boundary.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Retrieve the positions of the atoms that lie at the boundary using the
+median centro-symmetry parameter values.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gblearn.lammps</span> <span class="k">import</span> <span class="n">Timestep</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t0</span> <span class="o">=</span> <span class="n">Timestep</span><span class="p">(</span><span class="s2">&quot;lammps.dump&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ids</span> <span class="o">=</span> <span class="n">t0</span><span class="o">.</span><span class="n">gbids</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xyz</span> <span class="o">=</span> <span class="n">t0</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="n">ids</span><span class="p">,:]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">gblearn.lammps.</code><code class="descname">make_lattice</code><span class="sig-paren">(</span><em>box</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gblearn/lammps.html#make_lattice"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Constructs a lattice array compatible with ASE using the box dimensions
+specified in a lammps format. This was contributed by Jonathan Priedeman.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>box</strong> (<em>numpy.ndarray</em>) – box dimensions in cartesian directions in
+format <cite>lo</cite> <cite>hi</cite>. Shape <cite>(3, 2)</cite>. Also supports tricilinic boxes when
+shape <cite>(3, 3)</cite> is specified.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gblearn.reduce.html" title="gblearn.reduce"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gblearn.io.html" title="gblearn.io"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

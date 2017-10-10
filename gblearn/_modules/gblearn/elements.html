@@ -1,0 +1,175 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.elements &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gblearn.elements</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Crystal definitions and SOAP vector calculations for simple</span>
+<span class="sd">elements.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">gblearn</span> <span class="k">import</span> <span class="n">msg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">_shells</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are element names, values are lists of shells (in Ang.).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">elements</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Ni&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;fcc&quot;</span><span class="p">,</span> <span class="mf">3.52</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+    <span class="s2">&quot;Cr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;bcc&quot;</span><span class="p">,</span> <span class="mf">2.91</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+    <span class="s2">&quot;Mg&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;hcp&quot;</span><span class="p">,</span> <span class="mf">3.21</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;dict: keys are element names, values are a tuple of (`str` lattice,</span>
+<span class="sd">`float` lattice parameter, `int` element number, `list` basis indices).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="atoms"><a class="viewcode-back" href="../../Modules/gblearn.elements.html#gblearn.elements.atoms">[docs]</a><span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a :class:`quippy.Atoms` structure for the given</span>
+<span class="sd">    element, using the tabulated lattice parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        element (str): name of the element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lattice</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">quippy.structures</span> <span class="k">as</span> <span class="nn">structures</span>
+        <span class="n">lattice</span><span class="p">,</span> <span class="n">latpar</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="n">lattice</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="n">lattice</span><span class="p">)(</span><span class="n">latpar</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+
+    <span class="n">emsg</span> <span class="o">=</span> <span class="s2">&quot;Element </span><span class="si">{}</span><span class="s2"> with structure </span><span class="si">{}</span><span class="s2"> is not auto-configurable.&quot;</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">err</span><span class="p">(</span><span class="n">emsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">lattice</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="shells"><a class="viewcode-back" href="../../Modules/gblearn.elements.html#gblearn.elements.shells">[docs]</a><span class="k">def</span> <span class="nf">shells</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="mf">6.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the neighbor shells for the specified element.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        element (str): name of the element.</span>
+<span class="sd">        n (int): maximum number of shells to return.</span>
+<span class="sd">        rcut (float): maximum cutoff to consider in looking for unique shells.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_shells</span>
+    <span class="k">if</span> <span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_shells</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">set_cutoff</span><span class="p">(</span><span class="n">rcut</span><span class="p">)</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">calc_connect</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">neighb</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">connect</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="n">neighb</span><span class="o">.</span><span class="n">distance</span>
+                <span class="n">deltain</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">dist</span><span class="o">-</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-5</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">deltain</span><span class="p">):</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+
+        <span class="n">_shells</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_shells</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="nb">min</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">_shells</span><span class="p">[</span><span class="n">element</span><span class="p">])))]</span></div>
+
+<div class="viewcode-block" id="pissnnl"><a class="viewcode-back" href="../../Modules/gblearn.elements.html#gblearn.elements.pissnnl">[docs]</a><span class="k">def</span> <span class="nf">pissnnl</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">trans_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the :math:`P` matrix for the given element.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        element (str): name of the element.</span>
+<span class="sd">        nmax (int): bandwidth limits for the SOAP descriptor radial basis</span>
+<span class="sd">          functions.</span>
+<span class="sd">        lmax (int): bandwidth limits for the SOAP descriptor spherical</span>
+<span class="sd">          harmonics.</span>
+<span class="sd">        rcut (float): local environment finite cutoff parameter.</span>
+<span class="sd">        sigma (float): width parameter for the Gaussians on each atom.</span>
+<span class="sd">        trans_width (float): distance over which the coefficients in the</span>
+<span class="sd">            radial functions are smoothly transitioned to zero.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lattice</span><span class="p">,</span> <span class="n">latpar</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+    <span class="kn">from</span> <span class="nn">gblearn.soap</span> <span class="k">import</span> <span class="n">SOAPCalculator</span>
+    <span class="n">SC</span> <span class="o">=</span> <span class="n">SOAPCalculator</span><span class="p">(</span><span class="n">rcut</span><span class="p">,</span> <span class="n">nmax</span><span class="p">,</span> <span class="n">lmax</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">trans_width</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SC</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

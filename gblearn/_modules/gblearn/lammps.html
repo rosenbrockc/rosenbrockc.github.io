@@ -1,0 +1,539 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn.lammps &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gblearn.lammps</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for interacting with LAMMPS dump files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">gblearn</span> <span class="k">import</span> <span class="n">msg</span>
+
+<div class="viewcode-block" id="make_lattice"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.make_lattice">[docs]</a><span class="k">def</span> <span class="nf">make_lattice</span><span class="p">(</span><span class="n">box</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs a lattice array compatible with ASE using the box dimensions</span>
+<span class="sd">    specified in a lammps format. This was contributed by Jonathan Priedeman.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        box (numpy.ndarray): box dimensions in cartesian directions in</span>
+<span class="sd">          format `lo` `hi`. Shape `(3, 2)`. Also supports tricilinic boxes when</span>
+<span class="sd">          shape `(3, 3)` is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">quippy.atoms</span> <span class="k">import</span> <span class="n">make_lattice</span>
+    <span class="k">if</span> <span class="n">box</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+	<span class="c1"># http://lammps.sandia.gov/doc/Section_howto.html#howto-12 Describes the</span>
+	<span class="c1"># methodology (look for the section entitled &quot;6.12. Triclinic</span>
+	<span class="c1"># (non-orthogonal) simulation boxes&quot;) The [a, b, c, alpha, beta, gamma]</span>
+	<span class="c1"># vector can be passed to the ase.Atoms object as a definition for the</span>
+	<span class="c1"># triclinic box (note that the quippy.Atoms class inherits from</span>
+	<span class="c1"># ase.Atoms) Make sure that you note that the data is provided:</span>
+	<span class="c1"># </span>
+	<span class="c1"># ITEM: BOX BOUNDS xy xz yz ....</span>
+	<span class="c1"># xlo_bound xhi_bound xy</span>
+	<span class="c1"># ylo_bound yhi_bound xz</span>
+	<span class="c1"># zlo_bound zhi_bound yz</span>
+	<span class="c1"># </span>
+	<span class="c1"># whereas we need xlo, xhi, etc. not xlo_bound, xhi_bound, etc.</span>
+	<span class="n">xlo</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+	<span class="n">xhi</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+	<span class="n">ylo</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+	<span class="n">yhi</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+	<span class="n">zlo</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">zhi</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+	<span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">xhi</span> <span class="o">-</span> <span class="n">xlo</span><span class="p">)</span>
+	<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">yhi</span> <span class="o">-</span> <span class="n">ylo</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+	<span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">zhi</span> <span class="o">-</span> <span class="n">zlo</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+	<span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">((</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">yhi</span> <span class="o">-</span> <span class="n">ylo</span><span class="p">)</span> <span class="o">*</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">c</span><span class="p">))</span>
+	<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span>
+	<span class="n">gamma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">make_lattice</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+    
+    <span class="k">elif</span> <span class="n">box</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">make_lattice</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected box size/parameters: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">box</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Dump"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Dump">[docs]</a><span class="k">class</span> <span class="nc">Dump</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a dump file that could potentially have more than one</span>
+<span class="sd">    timestep.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): full path to the LAMMPS dump file to extract the</span>
+<span class="sd">          time step from.</span>
+<span class="sd">        stepfilter (list): of `int` timestep values that *should* be parsed. If the</span>
+<span class="sd">          next timestep encountered is not in this list, it will be ignored.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        steps (dict): keys are `int` timestep ids; values are :class:`Timestep`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">stepfilter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Timestep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">stepfilter</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">Timestep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">stepfilter</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ts</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">ts</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dump</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+    
+<div class="viewcode-block" id="Dump.dump"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Dump.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">rebox</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dumps the specified structure to file in the LAMMPS format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): target path for saving the timestep.</span>
+<span class="sd">            mode (str): file read/write mode; defaults to new file.</span>
+<span class="sd">            rebox (bool): when True, the box is recalculated from the current</span>
+<span class="sd">              set of atomic positions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>            
+        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">ts</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">rebox</span><span class="o">=</span><span class="n">rebox</span><span class="p">)</span></div></div>
+    
+<div class="viewcode-block" id="Timestep"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Timestep">[docs]</a><span class="k">class</span> <span class="nc">Timestep</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a single time step in a LAMMPS dump file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): full path to the LAMMPS dump file to extract the</span>
+<span class="sd">          time step from.</span>
+<span class="sd">        index (int): index of the time step in the dump file.</span>
+<span class="sd">        openf (file): open file object for sequential instantiation of multiple time</span>
+<span class="sd">          steps.</span>
+<span class="sd">        stepfilter (list): of `int` timestep values that *should* be parsed. If the</span>
+<span class="sd">          next timestep encountered is not in this list, it will be ignored.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        types (numpy.ndarray): integer types of the atoms in the list.</span>
+<span class="sd">        ids (numpy.ndarray): integer atom ids; has same length as `len(self)`.</span>
+<span class="sd">        xyz (numpy.ndarray): with shape (len(self), 3); float positions of the</span>
+<span class="sd">          atoms in the time step.</span>
+<span class="sd">        periodic (list): of `bool` specifying whether the `x`, `y`, or `z`</span>
+<span class="sd">          directions are periodic (for the box).</span>
+<span class="sd">        box (numpy.ndarray): with shape (3, 2) specifying the `lo` and `hi` bounds</span>
+<span class="sd">          of the box in each direction. The box can also have shape</span>
+<span class="sd">          (3, 3) to support non-orthogonal box vectors.</span>
+<span class="sd">	extras (list): of `str` indicating extra atomic parameters that are</span>
+<span class="sd">          available in this time step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">openf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stepfilter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        
+        <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">openf</span><span class="p">,</span> <span class="n">stepfilter</span><span class="p">)</span>
+        <span class="c1">#We should at least have time, type, id, xyz, box, periodic; otherwise</span>
+        <span class="c1">#this is an incomplete dump file.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extras</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extras</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ids&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;atom:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">quant</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">quant</span> <span class="o">==</span> <span class="s2">&quot;ids&quot;</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quant</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quant</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quant</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span> <span class="o">==</span> <span class="s2">&quot;pp&quot;</span><span class="p">,</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span> <span class="o">!=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;natoms&quot;</span><span class="p">]:</span><span class="c1"># pragma: no cover</span>
+            <span class="n">wmsg</span> <span class="o">=</span> <span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> did not have as many atoms (</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">) as specified.&quot;</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">wmsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">),</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;natoms&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Timestep</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">ids</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">types</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">extras</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">extras</span> <span class="ow">and</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">box</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Timestep.gb"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Timestep.gb">[docs]</a>    <span class="k">def</span> <span class="nf">gb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">pattr</span><span class="o">=</span><span class="s2">&quot;c_csd&quot;</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">soapargs</span><span class="o">=</span><span class="p">{},</span>
+           <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the grain boundary for this time step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Z (int or list): element code(s) for the atomic species.</span>
+<span class="sd">            method (str): one of [&#39;median&#39;].</span>
+<span class="sd">            pattr (str): name of an attribute in :attr:`extras` to pass as the</span>
+<span class="sd">              selection parameter of the routine.</span>
+<span class="sd">            extras (bool): when True, include extra attributes in the new GB</span>
+<span class="sd">              structure.</span>
+<span class="sd">            soapargs (dict): initialization parameters for the</span>
+<span class="sd">              :class:`gblearn.soap.SOAPCalculator` instance for the GB.</span>
+<span class="sd">            kwargs (dict): additional arguments passed to the atom selection</span>
+<span class="sd">              function. For `median`, see :func:`gblearn.selection.median` for the</span>
+<span class="sd">              arguments. For `cna*` see :func:`gblearn.selection.cna_max`.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            gblearn.gb.GrainBoundary: instance with only those atoms that appear</span>
+<span class="sd">              to be at the boundary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`Z` is a required parameter for constructing a &quot;</span>
+                             <span class="s2">&quot;:class:`GrainBoundary` instance.&quot;</span><span class="p">)</span>
+        
+        <span class="kn">from</span> <span class="nn">gblearn.gb</span> <span class="k">import</span> <span class="n">GrainBoundary</span>
+        <span class="n">selectargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span>
+            <span class="s2">&quot;pattr&quot;</span><span class="p">:</span> <span class="n">pattr</span>
+        <span class="p">}</span>
+        <span class="n">selectargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gbids</span><span class="p">(</span><span class="o">**</span><span class="n">selectargs</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">extras</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)[</span><span class="n">ids</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">GrainBoundary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="n">ids</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">ids</span><span class="p">],</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">extras</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                               <span class="n">selectargs</span><span class="o">=</span><span class="n">selectargs</span><span class="p">,</span> <span class="o">**</span><span class="n">soapargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+        
+<div class="viewcode-block" id="Timestep.gbids"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Timestep.gbids">[docs]</a>    <span class="k">def</span> <span class="nf">gbids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">pattr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the *indices* of the atoms that lie at the grain</span>
+<span class="sd">        boundary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            method (str): one of [&#39;median&#39;, &#39;cna&#39;, &#39;cna_z&#39;].</span>
+<span class="sd">            pattr (str): name of an attribute in :attr:`extras` to pass as the</span>
+<span class="sd">              selection parameter of the routine.</span>
+<span class="sd">            kwargs (dict): additional arguments passed to the atom selection</span>
+<span class="sd">              function. For `median`, see :func:`gblearn.selection.median` for the</span>
+<span class="sd">              arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: of integer indices of atoms in this timestep that are</span>
+<span class="sd">              considered to lie on the boundary.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Retrieve the positions of the atoms that lie at the boundary using the</span>
+<span class="sd">            median centro-symmetry parameter values.</span>
+
+<span class="sd">            &gt;&gt;&gt; from gblearn.lammps import Timestep</span>
+<span class="sd">            &gt;&gt;&gt; t0 = Timestep(&quot;lammps.dump&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; ids = t0.gbids()</span>
+<span class="sd">            &gt;&gt;&gt; xyz = t0.xyz[ids,:]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">gblearn.selection</span> <span class="k">as</span> <span class="nn">sel</span>
+        <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+        <span class="n">methmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">sel</span><span class="o">.</span><span class="n">median</span><span class="p">,</span>
+            <span class="s2">&quot;cna&quot;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">cna_max</span><span class="p">,</span> <span class="n">coord</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+	    <span class="s2">&quot;cna_z&quot;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">cna_max</span><span class="p">,</span> <span class="n">coord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methmap</span><span class="p">:</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattr</span><span class="p">)</span> <span class="k">if</span> <span class="n">pattr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">methmap</span><span class="p">[</span><span class="n">method</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="n">extra</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Timestep.dump"><a class="viewcode-back" href="../../Modules/gblearn.lammps.html#gblearn.lammps.Timestep.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">rebox</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dumps the specified structure to file in the LAMMPS format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): target path for saving the timestep.</span>
+<span class="sd">            mode (str): file read/write mode; defaults to append.</span>
+<span class="sd">            rebox (bool): when True, the box is recalculated from the current</span>
+<span class="sd">              set of atomic positions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: TIMESTEP</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: NUMBER OF ATOMS</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+            <span class="n">speriod</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([(</span><span class="s2">&quot;pp&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="k">else</span> <span class="s2">&quot;ss&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: BOX BOUNDS </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">speriod</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">rebox</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">gblearn.selection</span> <span class="k">import</span> <span class="n">extent</span>
+                <span class="n">minmax</span> <span class="o">=</span> <span class="p">[</span><span class="n">extent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">minmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span>
+                
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">minmax</span><span class="p">)):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:.4f}</span><span class="s2"> </span><span class="si">{1:.4f}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">minmax</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+            <span class="n">xheads</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: ATOMS id type x y z </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xheads</span><span class="p">))</span>
+
+            <span class="c1">#We need to generate a format string for all the extra quantities.</span>
+            <span class="n">xfmtstr</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+            <span class="n">xfmt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="p">):</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">:</span>
+                    <span class="n">xfmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{{</span><span class="si">{0:d}</span><span class="s2">:d}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ix</span><span class="o">+</span><span class="mi">5</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                    <span class="n">xfmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;{{</span><span class="si">{0:d}</span><span class="s2">:.5e}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ix</span><span class="o">+</span><span class="mi">5</span><span class="p">))</span>
+            <span class="n">xfmtstr</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xfmt</span><span class="p">)</span>
+
+            <span class="n">atomfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2"> </span><span class="si">{1:d}</span><span class="s2"> </span><span class="si">{2:.5f}</span><span class="s2"> </span><span class="si">{3:.5f}</span><span class="s2"> </span><span class="si">{4:.5f}</span><span class="s2">&quot;</span>
+            <span class="n">atomfmt</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xfmtstr</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iatom</span><span class="p">,</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">):</span>
+                <span class="c1">#1 4 -65.9625 1.54915 1.46824 5 30.976</span>
+                <span class="n">sid</span><span class="p">,</span> <span class="n">atype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="n">iatom</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">iatom</span><span class="p">]</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">xyz</span>
+                <span class="n">xvals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xname</span><span class="p">)[</span><span class="n">iatom</span><span class="p">]</span> <span class="k">for</span> <span class="n">xname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extras</span><span class="p">]</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">atype</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">*</span><span class="n">xvals</span><span class="p">))</span></div>
+    
+    <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">openf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stepfilter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads the defining items from the dump file for the timestep</span>
+<span class="sd">        configured in this object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            openf (file): if this timestep is being read in from a higher-level</span>
+<span class="sd">              routine, an open file object to read from. This allows sequential time</span>
+<span class="sd">              steps to be read without re-seeking over parts of the file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: with keys [&#39;type&#39;, &#39;id&#39;, &#39;xyz&#39;, &#39;atom:{}&#39;...], where the &#39;atom:{}&#39;</span>
+<span class="sd">              keys are for extra labelled quantities in the dump file that are</span>
+<span class="sd">              applicable to each atom.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itemstack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">xkeys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">laststep</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">openf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">openf</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;start&#39;</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">lastpos</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            
+            <span class="k">if</span> <span class="n">itemstack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">itemstack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>                    
+                <span class="n">cast</span> <span class="o">=</span> <span class="n">itemstack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cast</span><span class="p">,</span> <span class="n">raw</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">current</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">stepfilter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">values</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stepfilter</span><span class="p">:</span>
+                        <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">values</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">values</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">openf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="k">return</span> <span class="p">{}</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">True</span>
+                                <span class="n">laststep</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">values</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">False</span>
+                
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itemstack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">current</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">current</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">itemstack</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">current</span> <span class="o">==</span> <span class="s2">&quot;atoms&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;ITEM&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">openf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">lastpos</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#E.g. line: 1 4 -65.9625 1.54915 1.46824 5 30.976 </span>
+                    <span class="n">vals</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">sid</span><span class="p">,</span> <span class="n">atype</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]))</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atype</span><span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]))</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">xkeys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">ikey</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">5</span><span class="p">:]):</span>
+                            <span class="n">result</span><span class="p">[</span><span class="n">xkeys</span><span class="p">[</span><span class="n">ikey</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                    <span class="k">continue</span> <span class="c1"># pragma: no cover</span>
+                
+            <span class="k">if</span> <span class="s2">&quot;ITEM: TIMESTEP&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">laststep</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">lastpos</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="n">itemstack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">,))</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span>
+                <span class="n">timeskip</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">timeskip</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;ITEM: NUMBER OF ATOMS&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">itemstack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">,))</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;natoms&quot;</span>
+                <span class="k">elif</span> <span class="s2">&quot;ITEM: BOX BOUNDS&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">period</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;BOX BOUNDS&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">period</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">period</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">period</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ss&quot;</span><span class="p">,</span> <span class="s2">&quot;ss&quot;</span> <span class="p">,</span><span class="s2">&quot;ss&quot;</span><span class="p">)</span>
+                    
+		    <span class="c1"># Changes by JPRIEDS to accommodate triclinic boxes</span>
+		    <span class="c1"># Written 170719</span>
+		    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="n">itemstack</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;box&quot;</span>
+			<span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">][</span><span class="mi">3</span><span class="p">:]</span>
+		    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+			<span class="n">itemstack</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;box&quot;</span>
+		    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">emsg</span> <span class="o">=</span> <span class="s2">&quot;Could not classify periodic bounds: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">emsg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;periodic&quot;</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="s2">&quot;ITEM: ATOMS&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">itemstack</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;atoms&quot;</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    
+                    <span class="c1">#The first two headings in the line have &quot;ITEM: ATOMS&quot;, the</span>
+                    <span class="c1">#rest are usuall id, type, x, y, z, rest...</span>
+                    <span class="n">headings</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">extras</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">headings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span>
+                    <span class="k">if</span> <span class="n">extras</span><span class="p">:</span>
+                        <span class="n">xkeys</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">xheadings</span> <span class="o">=</span> <span class="n">headings</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+                        <span class="k">for</span> <span class="n">xhead</span> <span class="ow">in</span> <span class="n">xheadings</span><span class="p">:</span>
+                            <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;atom:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xhead</span><span class="p">)</span>
+                            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="n">xkeys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">openf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#Close the file since we opened it.</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            
+        <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">gblearn 0.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

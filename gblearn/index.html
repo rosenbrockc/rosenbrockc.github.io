@@ -1,0 +1,199 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gblearn: Machine Learning for Grain Boundaries &#8212; gblearn 0.2.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples for using gblearn" href="examples.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples for using gblearn"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><cite>gblearn</cite>: Machine Learning for Grain Boundaries</a><ul>
+<li><a class="reference internal" href="#workflow-and-examples">Workflow and Examples</a></li>
+<li><a class="reference internal" href="#modules-in-the-package">Modules in the Package</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Examples for using <cite>gblearn</cite></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gblearn-machine-learning-for-grain-boundaries">
+<h1><cite>gblearn</cite>: Machine Learning for Grain Boundaries<a class="headerlink" href="#gblearn-machine-learning-for-grain-boundaries" title="Permalink to this headline">¶</a></h1>
+<p>Recently, we proposed a universal descriptor for grain boundaries that
+has desirable mathematical properties, and which can be applied to
+arbitrary grain boundaries. Using this descriptor, we were able to
+create a feature matrix for machine learning based on the local atomic
+environments present at the grain boundary. In addition to being
+useful for predicting grain boundary energy and mobility, the method
+also allows important atomic environments to be discovered for each of
+the properties.</p>
+<p>If you use this package, please cite the paper:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Rosenbrock</span><span class="p">:</span><span class="mi">2017</span><span class="n">vd</span><span class="p">,</span>
+<span class="n">author</span> <span class="o">=</span> <span class="p">{</span><span class="n">Rosenbrock</span><span class="p">,</span> <span class="n">Conrad</span> <span class="n">W</span> <span class="ow">and</span> <span class="n">Homer</span><span class="p">,</span> <span class="n">Eric</span> <span class="n">R</span> <span class="ow">and</span> <span class="n">Csanyi</span><span class="p">,</span> <span class="n">G</span><span class="p">{</span>\<span class="s1">&#39;a}bor and Hart, Gus L W},</span>
+<span class="n">title</span> <span class="o">=</span> <span class="p">{{</span><span class="n">Discovering</span> <span class="n">the</span> <span class="n">building</span> <span class="n">blocks</span> <span class="n">of</span> <span class="n">atomic</span> <span class="n">systems</span> <span class="n">using</span> <span class="n">machine</span> <span class="n">learning</span><span class="p">:</span> <span class="n">application</span> <span class="n">to</span> <span class="n">grain</span> <span class="n">boundaries</span><span class="p">}},</span>
+<span class="n">journal</span> <span class="o">=</span> <span class="p">{</span><span class="n">npj</span> <span class="n">Computational</span> <span class="n">Materials</span><span class="p">},</span>
+<span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2017</span><span class="p">},</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="p">{</span><span class="mi">3</span><span class="p">},</span>
+<span class="n">number</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">},</span>
+<span class="n">pages</span> <span class="o">=</span> <span class="p">{</span><span class="mi">29</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To get started quickly, take a look at the <a class="reference internal" href="examples.html"><span class="doc">Examples for using gblearn</span></a>, which show
+how to generate the plots and model from the paper.</p>
+<div class="section" id="workflow-and-examples">
+<h2>Workflow and Examples<a class="headerlink" href="#workflow-and-examples" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples for using <cite>gblearn</cite></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="modules-in-the-package">
+<h2>Modules in the Package<a class="headerlink" href="#modules-in-the-package" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="Modules/gblearn.elements.html#module-gblearn.elements" title="gblearn.elements"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.elements</span></code></a></td>
+<td>Crystal definitions and SOAP vector calculations for simple elements.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="Modules/gblearn.selection.html#module-gblearn.selection" title="gblearn.selection"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.selection</span></code></a></td>
+<td>Functions for selecting the atoms that allegedly contribute to the grain boundary properties.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="Modules/gblearn.gb.html#module-gblearn.gb" title="gblearn.gb"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.gb</span></code></a></td>
+<td>Functions and classes for interacting with grain boundaries.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="Modules/gblearn.soap.html#module-gblearn.soap" title="gblearn.soap"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.soap</span></code></a></td>
+<td>Functions for generating the SOAP representation of a grain boundary.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="Modules/gblearn.decomposition.html#module-gblearn.decomposition" title="gblearn.decomposition"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.decomposition</span></code></a></td>
+<td>Methods for decomposing the SOAP vectors into radial and angular components for analysis.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="Modules/gblearn.io.html#module-gblearn.io" title="gblearn.io"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.io</span></code></a></td>
+<td>Functions for I/O interaction of <code class="xref py py-class docutils literal"><span class="pre">gblearn.gb.GrainBoundaryCollection</span></code> objects and the many results they produce with disk storage.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="Modules/gblearn.lammps.html#module-gblearn.lammps" title="gblearn.lammps"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.lammps</span></code></a></td>
+<td>Functions for interacting with LAMMPS dump files.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="Modules/gblearn.reduce.html#module-gblearn.reduce" title="gblearn.reduce"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.reduce</span></code></a></td>
+<td>Once the unique LAEs for a grain boundary collection have been calculated using SOAP and the similarity metric, we can generate the local environment representation by accumulating the fraction of each unique LAE within a given GB.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="Modules/gblearn.utility.html#module-gblearn.utility" title="gblearn.utility"><code class="xref py py-obj docutils literal"><span class="pre">gblearn.utility</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples for using gblearn"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">gblearn 0.2.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Conrad W. Rosenbrock.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>
