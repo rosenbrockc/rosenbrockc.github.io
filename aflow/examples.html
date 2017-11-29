@@ -1,12 +1,12 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Example Queries with aflow &#8212; aflow 0.0.3 documentation</title>
+    <title>Example Queries with aflow &#8212; aflow 0.0.7 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.3',
+        VERSION:     '0.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +30,7 @@
     <link rel="next" title="Query Constructor" href="control.html" />
     <link rel="prev" title="AFLOW Python API" href="index.html" /> 
   </head>
-  <body>
+  <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="index.html" title="AFLOW Python API"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -60,6 +60,56 @@
 <p>Although the API is well-documented, we choose to demonstrate how to
 use <cite>aflow</cite> with some examples. The homepage of the github repo also
 has some short examples.</p>
+<div class="section" id="downloading-the-cif-files">
+<h2>Downloading the CIF Files<a class="headerlink" href="#downloading-the-cif-files" title="Permalink to this headline">¶</a></h2>
+<p>Suppose I am looking for <cite>Si</cite> structures and I want to get the <cite>.cif</cite>
+files.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span>
+     <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">species</span> <span class="o">==</span> <span class="s2">&quot;Si&quot;</span>
+     <span class="p">)</span><span class="o">.</span><span class="n">orderby</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">energy_atom</span><span class="p">)</span>
+<span class="n">a0</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># &lt;aflow.entries.Entry at 0x1132b0c50&gt;</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">files</span>
+<span class="c1"># [u&#39;CONTCAR.relax&#39;, u&#39;CONTCAR.relax.abinit&#39;, ...]</span>
+
+<span class="c1">#The files object accepts a pattern for selecting a single file</span>
+<span class="c1">#from the list. It will raise an error if more than one (or no)</span>
+<span class="c1">#file matches the pattern.</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;\*.312.cif&quot;</span><span class="p">]</span>
+<span class="c1"># AflowFile(aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/SiW_pv/312/SiW_pv.312.cif)</span>
+
+<span class="c1">#The AflowFile object can be called to get the file contents as a</span>
+<span class="c1">#string</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;\*.312.cif&quot;</span><span class="p">]()</span>
+<span class="c1">#u&quot;data_SiW_pv/312 - (312) - NbNi8 [AB8] (312)...</span>
+
+<span class="c1">#Or, you can specify the path to where you want the file saved.</span>
+<span class="n">a0</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">&quot;\*.312.cif&quot;</span><span class="p">](</span><span class="s2">&quot;/temp/si0.cif&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;/temp/si0.cif&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filtering-by-multiple-space-groups">
+<h2>Filtering by Multiple Space Groups<a class="headerlink" href="#filtering-by-multiple-space-groups" title="Permalink to this headline">¶</a></h2>
+<p>Suppose I want to find Heusler alloys in <cite>aflowlib</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">heus_result</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span> <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">spacegroup_relax</span><span class="o">==</span><span class="mi">216</span><span class="p">)</span> <span class="o">|</span>
+              <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">spacegroup_relax</span><span class="o">==</span><span class="mi">225</span><span class="p">)</span> <span class="o">|</span>
+              <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">spacegroup_relax</span><span class="o">==</span><span class="mi">139</span><span class="p">)</span> <span class="o">|</span>
+              <span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">spacegroup_relax</span><span class="o">==</span><span class="mi">119</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+        <span class="n">K</span><span class="o">.</span><span class="n">enthalpy_formation_atom</span><span class="p">,</span>
+        <span class="n">K</span><span class="o">.</span><span class="n">aurl</span><span class="p">,</span>
+        <span class="n">K</span><span class="o">.</span><span class="n">species</span><span class="p">,</span>
+        <span class="n">K</span><span class="o">.</span><span class="n">species_pp</span>
+    <span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">heus_result</span><span class="p">)</span>
+<span class="c1"># 541244</span>
+</pre></div>
+</div>
+<p>This selects multiple keywords and grabs any of the structures that
+have space group numbers of 216, 225, 139 or 119.</p>
+</div>
 </div>
 
 
@@ -68,6 +118,15 @@ has some short examples.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Example Queries with <cite>aflow</cite></a><ul>
+<li><a class="reference internal" href="#downloading-the-cif-files">Downloading the CIF Files</a></li>
+<li><a class="reference internal" href="#filtering-by-multiple-space-groups">Filtering by Multiple Space Groups</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter"><cite>AFLOW</cite> Python API</a></p>
@@ -110,12 +169,12 @@ has some short examples.</p>
         <li class="right" >
           <a href="index.html" title="AFLOW Python API"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
     </div>
   </body>
 </html>

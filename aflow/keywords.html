@@ -1,12 +1,12 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>AFLOW Database Keywords &#8212; aflow 0.0.3 documentation</title>
+    <title>AFLOW Database Keywords &#8212; aflow 0.0.7 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.3',
+        VERSION:     '0.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +30,7 @@
     <link rel="next" title="AFLOW Database Entries" href="entries.html" />
     <link rel="prev" title="Query Constructor" href="control.html" /> 
   </head>
-  <body>
+  <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="control.html" title="Query Constructor"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -73,10 +73,10 @@ operators:</p>
 <ol class="arabic simple">
 <li><cite>&gt;</cite> and <cite>&lt;</cite> behave as expected. However, these are overloaded for
 string comparisons in the spirit of the AFLUX endpoint. For example
-<cite>author &lt; “curtarolo”</cite> will match <cite>*curtarolo</cite> and <cite>author &gt;
-“curtarolo” will match `curtarolo*</cite>.</li>
+<cite>author &lt; &#8220;curtarolo&#8221;</cite> will match <cite>*curtarolo</cite> and <cite>author &gt;
+&#8220;curtarolo&#8221; will match `curtarolo*</cite>.</li>
 <li><cite>==</cite> behaves as expected for all keywords.</li>
-<li><cite>%</cite> allows for string searches. <cite>author % “curtarolo”</cite> matches
+<li><cite>%</cite> allows for string searches. <cite>author % &#8220;curtarolo&#8221;</cite> matches
 <cite>*curtarolo*</cite>.</li>
 <li><cite>~</cite> inverts the filter (equivalent to a boolean <cite>not</cite>).</li>
 <li><cite>&amp;</cite> is the logical <cite>and</cite> between two conditions.</li>
@@ -98,38 +98,38 @@ which has its <a class="reference internal" href="#aflow.keywords.Keyword.state"
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – current query state of this keyword (combination).</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; current query state of this keyword (combination).</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="aflow.keywords.Keyword.state">
 <code class="descname">state</code><a class="headerlink" href="#aflow.keywords.Keyword.state" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – of <cite>str</cite> <em>composite</em> queries for this keyword (combination).</p>
+<dd><p><em>list</em> &#8211; of <cite>str</cite> <em>composite</em> queries for this keyword (combination).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.keywords.Keyword.ptype">
 <code class="descname">ptype</code><a class="headerlink" href="#aflow.keywords.Keyword.ptype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>type</em> – python type that values for this keyword will have.</p>
+<dd><p><em>type</em> &#8211; python type that values for this keyword will have.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.keywords.Keyword.name">
 <code class="descname">name</code><a class="headerlink" href="#aflow.keywords.Keyword.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – keyword name to use in the AFLUX request.</p>
+<dd><p><em>str</em> &#8211; keyword name to use in the AFLUX request.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.keywords.Keyword.cache">
 <code class="descname">cache</code><a class="headerlink" href="#aflow.keywords.Keyword.cache" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – of <cite>str</cite> <em>simple</em> operator comparisons.</p>
+<dd><p><em>list</em> &#8211; of <cite>str</cite> <em>simple</em> operator comparisons.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.keywords.Keyword.classes">
 <code class="descname">classes</code><a class="headerlink" href="#aflow.keywords.Keyword.classes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>set</em> – of <cite>str</cite> keyword names that have been combined into the
+<dd><p><em>set</em> &#8211; of <cite>str</cite> keyword names that have been combined into the
 current keyword.</p>
 </dd></dl>
 
@@ -207,12 +207,12 @@ can be re-used for a new query.</p>
         <li class="right" >
           <a href="control.html" title="Query Constructor"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
     </div>
   </body>
 </html>

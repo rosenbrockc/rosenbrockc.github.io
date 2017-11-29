@@ -1,12 +1,12 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>AFLOW Database Entries &#8212; aflow 0.0.3 documentation</title>
+    <title>AFLOW Database Entries &#8212; aflow 0.0.7 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.3',
+        VERSION:     '0.0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +30,7 @@
     <link rel="next" title="AFLOW Custom Deserializers" href="caster.html" />
     <link rel="prev" title="AFLOW Database Keywords" href="keywords.html" /> 
   </head>
-  <body>
+  <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="keywords.html" title="AFLOW Database Keywords"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,6 +65,41 @@ other properties that are available for the given material entry.</p>
 <span class="target" id="module-aflow.entries"></span><p>Provides class and methods for abstracting the data from AFLOW into
 python.</p>
 <dl class="class">
+<dt id="aflow.entries.AflowFile">
+<em class="property">class </em><code class="descclassname">aflow.entries.</code><code class="descname">AflowFile</code><span class="sig-paren">(</span><em>aurl</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#AflowFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.AflowFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a single file for an entry in AFLOW and allows easy
+access to download it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>aurl</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the entry in AFLOW.</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="aflow.entries.AflowFiles">
+<em class="property">class </em><code class="descclassname">aflow.entries.</code><code class="descname">AflowFiles</code><span class="sig-paren">(</span><em>entry</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#AflowFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.AflowFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a collection of files for an entry in AFLOW and allows easy
+access to download them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>entry</strong> (<a class="reference internal" href="#aflow.entries.Entry" title="aflow.entries.Entry"><em>Entry</em></a>) &#8211; database entry object that has a list of the files and
+remote URL for accessing them.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
 <dt id="aflow.entries.Entry">
 <em class="property">class </em><code class="descclassname">aflow.entries.</code><code class="descname">Entry</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#Entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.Entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encapsulates the result of a single material entry in the AFLOW
@@ -79,7 +114,7 @@ is recommended to request <em>all</em> known keywords up front.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – of key-value pairs obtained from the initial
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; of key-value pairs obtained from the initial
 AFLUX request.</td>
 </tr>
 </tbody>
@@ -87,7 +122,7 @@ AFLUX request.</td>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.attributes">
 <code class="descname">attributes</code><a class="headerlink" href="#aflow.entries.Entry.attributes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – of key-value pairs requested for the given
+<dd><p><em>dict</em> &#8211; of key-value pairs requested for the given
 material. This will only be identical to the passed in the
 keyword arguments if no additional property requests have been
 made.</p>
@@ -96,14 +131,14 @@ made.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.raw">
 <code class="descname">raw</code><a class="headerlink" href="#aflow.entries.Entry.raw" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – original response dictionary (without any cast
+<dd><p><em>dict</em> &#8211; original response dictionary (without any cast
 values).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Bravais_lattice_orig">
 <code class="descname">Bravais_lattice_orig</code><a class="headerlink" href="#aflow.entries.Entry.Bravais_lattice_orig" title="Permalink to this definition">¶</a></dt>
-<dd><p>original bravais lattice (<cite>optional</cite>). Units – <a href="#id1"><span class="problematic" id="id2">``</span></a>.</p>
+<dd><p>original bravais lattice (<cite>optional</cite>). Units &#8211; <a href="#id1"><span class="problematic" id="id2">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -122,7 +157,7 @@ values).</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Bravais_lattice_relax">
 <code class="descname">Bravais_lattice_relax</code><a class="headerlink" href="#aflow.entries.Entry.Bravais_lattice_relax" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed bravais lattice (<cite>optional</cite>). Units – <a href="#id3"><span class="problematic" id="id4">``</span></a>.</p>
+<dd><p>relaxed bravais lattice (<cite>optional</cite>). Units &#8211; <a href="#id3"><span class="problematic" id="id4">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -152,7 +187,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Egap">
 <code class="descname">Egap</code><a class="headerlink" href="#aflow.entries.Entry.Egap" title="Permalink to this definition">¶</a></dt>
-<dd><p>electronic energy band gap (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>electronic energy band gap (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -180,7 +215,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Egap_fit">
 <code class="descname">Egap_fit</code><a class="headerlink" href="#aflow.entries.Entry.Egap_fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>fitted band gap (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>fitted band gap (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -208,7 +243,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Egap_type">
 <code class="descname">Egap_type</code><a class="headerlink" href="#aflow.entries.Entry.Egap_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>band gap type (<cite>mandatory</cite>). Units – <a href="#id5"><span class="problematic" id="id6">``</span></a>.</p>
+<dd><p>band gap type (<cite>mandatory</cite>). Units &#8211; <a href="#id5"><span class="problematic" id="id6">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -236,7 +271,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.PV_atom">
 <code class="descname">PV_atom</code><a class="headerlink" href="#aflow.entries.Entry.PV_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic pressure*volume (<cite>mandatory</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>atomic pressure*volume (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -264,7 +299,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.PV_cell">
 <code class="descname">PV_cell</code><a class="headerlink" href="#aflow.entries.Entry.PV_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell pressure*volume (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>unit cell pressure*volume (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -292,7 +327,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Pearson_symbol_orig">
 <code class="descname">Pearson_symbol_orig</code><a class="headerlink" href="#aflow.entries.Entry.Pearson_symbol_orig" title="Permalink to this definition">¶</a></dt>
-<dd><p>original Pearson symbol (<cite>mandatory</cite>). Units – <a href="#id7"><span class="problematic" id="id8">``</span></a>.</p>
+<dd><p>original Pearson symbol (<cite>mandatory</cite>). Units &#8211; <a href="#id7"><span class="problematic" id="id8">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -311,7 +346,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Pearson_symbol_relax">
 <code class="descname">Pearson_symbol_relax</code><a class="headerlink" href="#aflow.entries.Entry.Pearson_symbol_relax" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed Pearson symbol (<cite>mandatory</cite>). Units – <a href="#id9"><span class="problematic" id="id10">``</span></a>.</p>
+<dd><p>relaxed Pearson symbol (<cite>mandatory</cite>). Units &#8211; <a href="#id9"><span class="problematic" id="id10">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -338,7 +373,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Pulay_stress">
 <code class="descname">Pulay_stress</code><a class="headerlink" href="#aflow.entries.Entry.Pulay_stress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pulay Stress (<cite>mandatory</cite>). Units – <cite>kbar</cite>.</p>
+<dd><p>Pulay Stress (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -362,7 +397,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.Pullay_stress">
 <code class="descname">Pullay_stress</code><a class="headerlink" href="#aflow.entries.Entry.Pullay_stress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pulay Stress (<cite>mandatory</cite>). Units – <cite>kbar</cite>.</p>
+<dd><p>Pulay Stress (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -386,7 +421,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_bulk_modulus_reuss">
 <code class="descname">ael_bulk_modulus_reuss</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_reuss" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL Reuss bulk modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL Reuss bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -414,7 +449,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_bulk_modulus_voigt">
 <code class="descname">ael_bulk_modulus_voigt</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_voigt" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL Voigt bulk modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL Voigt bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -442,7 +477,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_bulk_modulus_vrh">
 <code class="descname">ael_bulk_modulus_vrh</code><a class="headerlink" href="#aflow.entries.Entry.ael_bulk_modulus_vrh" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL VRH bulk modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL VRH bulk modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -470,7 +505,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_elastic_anistropy">
 <code class="descname">ael_elastic_anistropy</code><a class="headerlink" href="#aflow.entries.Entry.ael_elastic_anistropy" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL elastic anistropy (<cite>optional</cite>). Units – <a href="#id11"><span class="problematic" id="id12">``</span></a>.</p>
+<dd><p>AEL elastic anistropy (<cite>optional</cite>). Units &#8211; <a href="#id11"><span class="problematic" id="id12">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -498,7 +533,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_poisson_ratio">
 <code class="descname">ael_poisson_ratio</code><a class="headerlink" href="#aflow.entries.Entry.ael_poisson_ratio" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL Poisson ratio (<cite>optional</cite>). Units – <a href="#id13"><span class="problematic" id="id14">``</span></a>.</p>
+<dd><p>AEL Poisson ratio (<cite>optional</cite>). Units &#8211; <a href="#id13"><span class="problematic" id="id14">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -526,7 +561,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_shear_modulus_reuss">
 <code class="descname">ael_shear_modulus_reuss</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_reuss" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL Reuss shear modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL Reuss shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -554,7 +589,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_shear_modulus_voigt">
 <code class="descname">ael_shear_modulus_voigt</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_voigt" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL Voigt shear modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL Voigt shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -582,7 +617,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ael_shear_modulus_vrh">
 <code class="descname">ael_shear_modulus_vrh</code><a class="headerlink" href="#aflow.entries.Entry.ael_shear_modulus_vrh" title="Permalink to this definition">¶</a></dt>
-<dd><p>AEL VRH shear modulus (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AEL VRH shear modulus (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -610,7 +645,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aflow_version">
 <code class="descname">aflow_version</code><a class="headerlink" href="#aflow.entries.Entry.aflow_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>aflow version (<cite>optional</cite>). Units – <a href="#id15"><span class="problematic" id="id16">``</span></a>.</p>
+<dd><p>aflow version (<cite>optional</cite>). Units &#8211; <a href="#id15"><span class="problematic" id="id16">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -629,7 +664,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aflowlib_date">
 <code class="descname">aflowlib_date</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_date" title="Permalink to this definition">¶</a></dt>
-<dd><p>material generation date (<cite>optional</cite>). Units – <a href="#id17"><span class="problematic" id="id18">``</span></a>.</p>
+<dd><p>material generation date (<cite>optional</cite>). Units &#8211; <a href="#id17"><span class="problematic" id="id18">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -648,7 +683,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aflowlib_entries">
 <code class="descname">aflowlib_entries</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_entries" title="Permalink to this definition">¶</a></dt>
-<dd><p>aflowlib entries (<cite>conditional</cite>). Units – <a href="#id19"><span class="problematic" id="id20">``</span></a>.</p>
+<dd><p>aflowlib entries (<cite>conditional</cite>). Units &#8211; <a href="#id19"><span class="problematic" id="id20">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -661,13 +696,13 @@ keyword. They are exposed as additional methods on this object.</p>
 </table>
 <p class="rubric">Examples</p>
 <p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>aflowlib_entries=AgAl,AgAs,AgAu,AgB_h,AgBa_sv,AgBe_sv,AgBi_d,AgBr,AgCa_sv,…</cite></p>
+<p><cite>aflowlib_entries=AgAl,AgAs,AgAu,AgB_h,AgBa_sv,AgBe_sv,AgBi_d,AgBr,AgCa_sv,...</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aflowlib_entries_number">
 <code class="descname">aflowlib_entries_number</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_entries_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>aflowlib entry count (<cite>conditional</cite>). Units – <a href="#id21"><span class="problematic" id="id22">``</span></a>.</p>
+<dd><p>aflowlib entry count (<cite>conditional</cite>). Units &#8211; <a href="#id21"><span class="problematic" id="id22">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -686,7 +721,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aflowlib_version">
 <code class="descname">aflowlib_version</code><a class="headerlink" href="#aflow.entries.Entry.aflowlib_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>aflowlib version (<cite>optional</cite>). Units – <a href="#id23"><span class="problematic" id="id24">``</span></a>.</p>
+<dd><p>aflowlib version (<cite>optional</cite>). Units &#8211; <a href="#id23"><span class="problematic" id="id24">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -705,7 +740,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_acoustic_debye">
 <code class="descname">agl_acoustic_debye</code><a class="headerlink" href="#aflow.entries.Entry.agl_acoustic_debye" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL acoustic Debye temperature (<cite>optional</cite>). Units – <cite>K</cite>.</p>
+<dd><p>AGL acoustic Debye temperature (<cite>optional</cite>). Units &#8211; <cite>K</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -733,7 +768,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_bulk_modulus_isothermal_300K">
 <code class="descname">agl_bulk_modulus_isothermal_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_bulk_modulus_isothermal_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL isothermal bulk modulus 300K (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AGL isothermal bulk modulus 300K (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -761,7 +796,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_bulk_modulus_static_300K">
 <code class="descname">agl_bulk_modulus_static_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_bulk_modulus_static_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL static bulk modulus 300K (<cite>optional</cite>). Units – <cite>GPa</cite>.</p>
+<dd><p>AGL static bulk modulus 300K (<cite>optional</cite>). Units &#8211; <cite>GPa</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -789,7 +824,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_debye">
 <code class="descname">agl_debye</code><a class="headerlink" href="#aflow.entries.Entry.agl_debye" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL Debye temperature (<cite>optional</cite>). Units – <cite>K</cite>.</p>
+<dd><p>AGL Debye temperature (<cite>optional</cite>). Units &#8211; <cite>K</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -817,7 +852,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_gruneisen">
 <code class="descname">agl_gruneisen</code><a class="headerlink" href="#aflow.entries.Entry.agl_gruneisen" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL Gruneisen parameter (<cite>optional</cite>). Units – <a href="#id25"><span class="problematic" id="id26">``</span></a>.</p>
+<dd><p>AGL Gruneisen parameter (<cite>optional</cite>). Units &#8211; <a href="#id25"><span class="problematic" id="id26">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -845,7 +880,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_heat_capacity_Cp_300K">
 <code class="descname">agl_heat_capacity_Cp_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_heat_capacity_Cp_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL heat capacity Cp (<cite>optional</cite>). Units – <cite>kB/cell</cite>.</p>
+<dd><p>AGL heat capacity Cp (<cite>optional</cite>). Units &#8211; <cite>kB/cell</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -873,7 +908,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_heat_capacity_Cv_300K">
 <code class="descname">agl_heat_capacity_Cv_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_heat_capacity_Cv_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL heat capacity Cv (<cite>optional</cite>). Units – <cite>kB/cell</cite>.</p>
+<dd><p>AGL heat capacity Cv (<cite>optional</cite>). Units &#8211; <cite>kB/cell</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -901,7 +936,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_thermal_conductivity_300K">
 <code class="descname">agl_thermal_conductivity_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_thermal_conductivity_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL thermal conductivity (<cite>optional</cite>). Units – <cite>W/m*K</cite>.</p>
+<dd><p>AGL thermal conductivity (<cite>optional</cite>). Units &#8211; <cite>W/m*K</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -929,7 +964,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.agl_thermal_expansion_300K">
 <code class="descname">agl_thermal_expansion_300K</code><a class="headerlink" href="#aflow.entries.Entry.agl_thermal_expansion_300K" title="Permalink to this definition">¶</a></dt>
-<dd><p>AGL thermal expansion (<cite>optional</cite>). Units – <cite>1/K</cite>.</p>
+<dd><p>AGL thermal expansion (<cite>optional</cite>). Units &#8211; <cite>1/K</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -956,7 +991,7 @@ keyword. They are exposed as additional methods on this object.</p>
 
 <dl class="method">
 <dt id="aflow.entries.Entry.atoms">
-<code class="descname">atoms</code><span class="sig-paren">(</span><em>pattern=’CONTCAR.relax*’</em>, <em>quippy=False</em>, <em>keywords=None</em>, <em>calculator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#Entry.atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.Entry.atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atoms</code><span class="sig-paren">(</span><em>pattern='CONTCAR.relax*'</em>, <em>quippy=False</em>, <em>keywords=None</em>, <em>calculator=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aflow/entries.html#Entry.atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aflow.entries.Entry.atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a <code class="xref py py-class docutils literal"><span class="pre">ase.atoms.Atoms</span></code> or a <code class="xref py py-class docutils literal"><span class="pre">quippy.atoms.Atoms</span></code>
 object for this database entry.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -964,17 +999,17 @@ object for this database entry.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pattern</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – pattern for choosing the file to generate the atomic
+<li><strong>pattern</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; pattern for choosing the file to generate the atomic
 lattice and positions from. The pattern is passed to
 <a class="reference external" href="https://docs.python.org/2/library/fnmatch.html#fnmatch.fnmatch" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">fnmatch()</span></code></a> and the <em>last</em> entry in the list is
 returned (so that <cite>CONTCAR.relax2</cite> would be returned
 preferentially over <cite>CONTCAR.relax1</cite> or <cite>CONTCAR.relax</cite>).</li>
-<li><strong>quippy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – when True, return a <code class="xref py py-class docutils literal"><span class="pre">quippy.atoms.Atoms</span></code>
+<li><strong>quippy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; when True, return a <code class="xref py py-class docutils literal"><span class="pre">quippy.atoms.Atoms</span></code>
 object.</li>
-<li><strong>keywords</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – keys are keyword obects accessible from <cite>aflow.K</cite>;
+<li><strong>keywords</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keys are keyword obects accessible from <cite>aflow.K</cite>;
 values are desired <cite>str</cite> names in the parameters dictionary of the
 atoms object.</li>
-<li><strong>calculator</strong> (<em>ase.calculators.Calculator</em>) – calculator to set for the
+<li><strong>calculator</strong> (<em>ase.calculators.Calculator</em>) &#8211; calculator to set for the
 newly created atoms object.</li>
 </ul>
 </td>
@@ -995,7 +1030,7 @@ energy and forces. Assume that <cite>result</cite> is a valid
 <dl class="attribute">
 <dt id="aflow.entries.Entry.auid">
 <code class="descname">auid</code><a class="headerlink" href="#aflow.entries.Entry.auid" title="Permalink to this definition">¶</a></dt>
-<dd><p>AFLOWLIB Unique Identifier (<cite>mandatory</cite>). Units – <a href="#id27"><span class="problematic" id="id28">``</span></a>.</p>
+<dd><p>AFLOWLIB Unique Identifier (<cite>mandatory</cite>). Units &#8211; <a href="#id27"><span class="problematic" id="id28">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1014,7 +1049,7 @@ energy and forces. Assume that <cite>result</cite> is a valid
 <dl class="attribute">
 <dt id="aflow.entries.Entry.aurl">
 <code class="descname">aurl</code><a class="headerlink" href="#aflow.entries.Entry.aurl" title="Permalink to this definition">¶</a></dt>
-<dd><p>AFLOWLIB Uniform Resource Locator (<cite>mandatory</cite>). Units – <a href="#id29"><span class="problematic" id="id30">``</span></a>.</p>
+<dd><p>AFLOWLIB Uniform Resource Locator (<cite>mandatory</cite>). Units &#8211; <a href="#id29"><span class="problematic" id="id30">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1033,7 +1068,7 @@ energy and forces. Assume that <cite>result</cite> is a valid
 <dl class="attribute">
 <dt id="aflow.entries.Entry.author">
 <code class="descname">author</code><a class="headerlink" href="#aflow.entries.Entry.author" title="Permalink to this definition">¶</a></dt>
-<dd><p>author (<cite>optional</cite>). Units – <a href="#id31"><span class="problematic" id="id32">``</span></a>.</p>
+<dd><p>author (<cite>optional</cite>). Units &#8211; <a href="#id31"><span class="problematic" id="id32">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1057,7 +1092,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.bader_atomic_volumes">
 <code class="descname">bader_atomic_volumes</code><a class="headerlink" href="#aflow.entries.Entry.bader_atomic_volumes" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic volume per atom (<cite>optional</cite>). Units – <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<dd><p>atomic volume per atom (<cite>optional</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1085,7 +1120,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.bader_net_charges">
 <code class="descname">bader_net_charges</code><a class="headerlink" href="#aflow.entries.Entry.bader_net_charges" title="Permalink to this definition">¶</a></dt>
-<dd><p>partial charge per atom (<cite>optional</cite>). Units – <cite>electrons</cite>.</p>
+<dd><p>partial charge per atom (<cite>optional</cite>). Units &#8211; <cite>electrons</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1113,7 +1148,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.calculation_cores">
 <code class="descname">calculation_cores</code><a class="headerlink" href="#aflow.entries.Entry.calculation_cores" title="Permalink to this definition">¶</a></dt>
-<dd><p>used CPU cores (<cite>optional</cite>). Units – <a href="#id33"><span class="problematic" id="id34">``</span></a>.</p>
+<dd><p>used CPU cores (<cite>optional</cite>). Units &#8211; <a href="#id33"><span class="problematic" id="id34">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1141,7 +1176,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.calculation_memory">
 <code class="descname">calculation_memory</code><a class="headerlink" href="#aflow.entries.Entry.calculation_memory" title="Permalink to this definition">¶</a></dt>
-<dd><p>used RAM (<cite>optional</cite>). Units – <cite>Megabytes</cite>.</p>
+<dd><p>used RAM (<cite>optional</cite>). Units &#8211; <cite>Megabytes</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1169,7 +1204,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.calculation_time">
 <code class="descname">calculation_time</code><a class="headerlink" href="#aflow.entries.Entry.calculation_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>used time (<cite>optional</cite>). Units – <cite>seconds</cite>.</p>
+<dd><p>used time (<cite>optional</cite>). Units &#8211; <cite>seconds</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1197,7 +1232,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.catalog">
 <code class="descname">catalog</code><a class="headerlink" href="#aflow.entries.Entry.catalog" title="Permalink to this definition">¶</a></dt>
-<dd><p>catalog (<cite>optional</cite>). Units – <a href="#id35"><span class="problematic" id="id36">``</span></a>.</p>
+<dd><p>catalog (<cite>optional</cite>). Units &#8211; <a href="#id35"><span class="problematic" id="id36">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1216,7 +1251,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.code">
 <code class="descname">code</code><a class="headerlink" href="#aflow.entries.Entry.code" title="Permalink to this definition">¶</a></dt>
-<dd><p>ab initio code (<cite>optional</cite>). Units – <a href="#id37"><span class="problematic" id="id38">``</span></a>.</p>
+<dd><p>ab initio code (<cite>optional</cite>). Units &#8211; <a href="#id37"><span class="problematic" id="id38">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1235,7 +1270,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.composition">
 <code class="descname">composition</code><a class="headerlink" href="#aflow.entries.Entry.composition" title="Permalink to this definition">¶</a></dt>
-<dd><p>composition (<cite>optional</cite>). Units – <a href="#id39"><span class="problematic" id="id40">``</span></a>.</p>
+<dd><p>composition (<cite>optional</cite>). Units &#8211; <a href="#id39"><span class="problematic" id="id40">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1254,7 +1289,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.compound">
 <code class="descname">compound</code><a class="headerlink" href="#aflow.entries.Entry.compound" title="Permalink to this definition">¶</a></dt>
-<dd><p>chemical formula (<cite>mandatory</cite>). Units – <a href="#id41"><span class="problematic" id="id42">``</span></a>.</p>
+<dd><p>chemical formula (<cite>mandatory</cite>). Units &#8211; <a href="#id41"><span class="problematic" id="id42">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1273,7 +1308,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.corresponding">
 <code class="descname">corresponding</code><a class="headerlink" href="#aflow.entries.Entry.corresponding" title="Permalink to this definition">¶</a></dt>
-<dd><p>coresponding (<cite>optional</cite>). Units – <a href="#id43"><span class="problematic" id="id44">``</span></a>.</p>
+<dd><p>coresponding (<cite>optional</cite>). Units &#8211; <a href="#id43"><span class="problematic" id="id44">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1297,7 +1332,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.data_api">
 <code class="descname">data_api</code><a class="headerlink" href="#aflow.entries.Entry.data_api" title="Permalink to this definition">¶</a></dt>
-<dd><p>REST API version (<cite>mandatory</cite>). Units – <a href="#id45"><span class="problematic" id="id46">``</span></a>.</p>
+<dd><p>REST API version (<cite>mandatory</cite>). Units &#8211; <a href="#id45"><span class="problematic" id="id46">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1316,7 +1351,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.data_language">
 <code class="descname">data_language</code><a class="headerlink" href="#aflow.entries.Entry.data_language" title="Permalink to this definition">¶</a></dt>
-<dd><p>data language (<cite>optional</cite>). Units – <a href="#id47"><span class="problematic" id="id48">``</span></a>.</p>
+<dd><p>data language (<cite>optional</cite>). Units &#8211; <a href="#id47"><span class="problematic" id="id48">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1335,7 +1370,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.data_source">
 <code class="descname">data_source</code><a class="headerlink" href="#aflow.entries.Entry.data_source" title="Permalink to this definition">¶</a></dt>
-<dd><p>data source (<cite>optional</cite>). Units – <a href="#id49"><span class="problematic" id="id50">``</span></a>.</p>
+<dd><p>data source (<cite>optional</cite>). Units &#8211; <a href="#id49"><span class="problematic" id="id50">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1354,7 +1389,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.delta_electronic_energy_convergence">
 <code class="descname">delta_electronic_energy_convergence</code><a class="headerlink" href="#aflow.entries.Entry.delta_electronic_energy_convergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Electronic Energy of Convergence Step (<cite>optional</cite>). Units – <a href="#id51"><span class="problematic" id="id52">``</span></a>.</p>
+<dd><p>Electronic Energy of Convergence Step (<cite>optional</cite>). Units &#8211; <a href="#id51"><span class="problematic" id="id52">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1378,7 +1413,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.delta_electronic_energy_threshold">
 <code class="descname">delta_electronic_energy_threshold</code><a class="headerlink" href="#aflow.entries.Entry.delta_electronic_energy_threshold" title="Permalink to this definition">¶</a></dt>
-<dd><p>Electronic Energy of Convergence Threshold (<cite>optional</cite>). Units – <a href="#id53"><span class="problematic" id="id54">``</span></a>.</p>
+<dd><p>Electronic Energy of Convergence Threshold (<cite>optional</cite>). Units &#8211; <a href="#id53"><span class="problematic" id="id54">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1402,7 +1437,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.density">
 <code class="descname">density</code><a class="headerlink" href="#aflow.entries.Entry.density" title="Permalink to this definition">¶</a></dt>
-<dd><p>mass density (<cite>optional</cite>). Units – <cite>grams/cm&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<dd><p>mass density (<cite>optional</cite>). Units &#8211; <cite>grams/cm&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1432,7 +1467,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.dft_type">
 <code class="descname">dft_type</code><a class="headerlink" href="#aflow.entries.Entry.dft_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>DFT type (<cite>optional</cite>). Units – <a href="#id55"><span class="problematic" id="id56">``</span></a>.</p>
+<dd><p>DFT type (<cite>optional</cite>). Units &#8211; <a href="#id55"><span class="problematic" id="id56">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1451,7 +1486,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.eentropy_atom">
 <code class="descname">eentropy_atom</code><a class="headerlink" href="#aflow.entries.Entry.eentropy_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomistic electronic entropy (<cite>optional</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>atomistic electronic entropy (<cite>optional</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1479,7 +1514,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.eentropy_cell">
 <code class="descname">eentropy_cell</code><a class="headerlink" href="#aflow.entries.Entry.eentropy_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell electronic entropy (<cite>optional</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>unit cell electronic entropy (<cite>optional</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1507,7 +1542,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.energy_atom">
 <code class="descname">energy_atom</code><a class="headerlink" href="#aflow.entries.Entry.energy_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic energy (<cite>mandatory</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>atomic energy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1537,7 +1572,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.energy_cell">
 <code class="descname">energy_cell</code><a class="headerlink" href="#aflow.entries.Entry.energy_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell energy (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>unit cell energy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1567,7 +1602,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.energy_cutoff">
 <code class="descname">energy_cutoff</code><a class="headerlink" href="#aflow.entries.Entry.energy_cutoff" title="Permalink to this definition">¶</a></dt>
-<dd><p>energy cutoff (<cite>optional</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>energy cutoff (<cite>optional</cite>). Units &#8211; <cite>eV</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1586,7 +1621,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.enthalpy_atom">
 <code class="descname">enthalpy_atom</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic enthalpy (<cite>mandatory</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>atomic enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1616,7 +1651,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.enthalpy_cell">
 <code class="descname">enthalpy_cell</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell enthalpy (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>unit cell enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1646,7 +1681,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.enthalpy_formation_atom">
 <code class="descname">enthalpy_formation_atom</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_formation_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic formation enthalpy (<cite>mandatory</cite>). Units – <cite>eV/atom</cite>.</p>
+<dd><p>atomic formation enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1674,7 +1709,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.enthalpy_formation_cell">
 <code class="descname">enthalpy_formation_cell</code><a class="headerlink" href="#aflow.entries.Entry.enthalpy_formation_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell formation enthalpy (<cite>mandatory</cite>). Units – <cite>eV</cite>.</p>
+<dd><p>unit cell formation enthalpy (<cite>mandatory</cite>). Units &#8211; <cite>eV</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1702,7 +1737,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.entropic_temperature">
 <code class="descname">entropic_temperature</code><a class="headerlink" href="#aflow.entries.Entry.entropic_temperature" title="Permalink to this definition">¶</a></dt>
-<dd><p>entropic temperature (<cite>mandatory</cite>). Units – <cite>Kelvin</cite>.</p>
+<dd><p>entropic temperature (<cite>mandatory</cite>). Units &#8211; <cite>Kelvin</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1728,28 +1763,9 @@ keyword. They are exposed as additional methods on this object.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="aflow.entries.Entry.files">
-<code class="descname">files</code><a class="headerlink" href="#aflow.entries.Entry.files" title="Permalink to this definition">¶</a></dt>
-<dd><p>I/O files (<cite>conditional</cite>). Units – <a href="#id57"><span class="problematic" id="id58">``</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Provides access to the input and output files used in the simulation (provenance data).</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Examples</p>
-<p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>files=Bi_dRh_pv.33.cif,Bi_dRh_pv.33.png,CONTCAR.relax,CONTCAR.relax1,</cite></p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="aflow.entries.Entry.forces">
 <code class="descname">forces</code><a class="headerlink" href="#aflow.entries.Entry.forces" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quantum Forces (<cite>optional</cite>). Units – <cite>eV/&amp;Aring;</cite>.</p>
+<dd><p>Quantum Forces (<cite>optional</cite>). Units &#8211; <cite>eV/&amp;Aring;</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1776,13 +1792,13 @@ keyword. They are exposed as additional methods on this object.</p>
 </table>
 <p class="rubric">Examples</p>
 <p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>forces=0,-0.023928,0.000197;0,0.023928,-0.000197;…</cite></p>
+<p><cite>forces=0,-0.023928,0.000197;0,0.023928,-0.000197;...</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.geometry">
 <code class="descname">geometry</code><a class="headerlink" href="#aflow.entries.Entry.geometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell basis (<cite>mandatory</cite>). Units – <cite>&amp;Aring;</cite>.</p>
+<dd><p>unit cell basis (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1812,7 +1828,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.keywords">
 <code class="descname">keywords</code><a class="headerlink" href="#aflow.entries.Entry.keywords" title="Permalink to this definition">¶</a></dt>
-<dd><p>Title (<cite>mandatory</cite>). Units – <a href="#id59"><span class="problematic" id="id60">``</span></a>.</p>
+<dd><p>Title (<cite>mandatory</cite>). Units &#8211; <a href="#id57"><span class="problematic" id="id58">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1830,13 +1846,13 @@ knowing that it is subject to change or removal.</p>
 </table>
 <p class="rubric">Examples</p>
 <p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>keywords=aurl,auid,loop,code,compound,prototype,nspecies,natoms,…</cite></p>
+<p><cite>keywords=aurl,auid,loop,code,compound,prototype,nspecies,natoms,...</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.kpoints">
 <code class="descname">kpoints</code><a class="headerlink" href="#aflow.entries.Entry.kpoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>K-point mesh (<cite>optional</cite>). Units – <a href="#id61"><span class="problematic" id="id62">``</span></a>.</p>
+<dd><p>K-point mesh (<cite>optional</cite>). Units &#8211; <a href="#id59"><span class="problematic" id="id60">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1855,7 +1871,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.lattice_system_orig">
 <code class="descname">lattice_system_orig</code><a class="headerlink" href="#aflow.entries.Entry.lattice_system_orig" title="Permalink to this definition">¶</a></dt>
-<dd><p>original lattice system (<cite>mandatory</cite>). Units – <a href="#id63"><span class="problematic" id="id64">``</span></a>.</p>
+<dd><p>original lattice system (<cite>mandatory</cite>). Units &#8211; <a href="#id61"><span class="problematic" id="id62">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1874,7 +1890,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.lattice_system_relax">
 <code class="descname">lattice_system_relax</code><a class="headerlink" href="#aflow.entries.Entry.lattice_system_relax" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed lattice system (<cite>mandatory</cite>). Units – <a href="#id65"><span class="problematic" id="id66">``</span></a>.</p>
+<dd><p>relaxed lattice system (<cite>mandatory</cite>). Units &#8211; <a href="#id63"><span class="problematic" id="id64">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1904,7 +1920,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.lattice_variation_orig">
 <code class="descname">lattice_variation_orig</code><a class="headerlink" href="#aflow.entries.Entry.lattice_variation_orig" title="Permalink to this definition">¶</a></dt>
-<dd><p>original lattice variation (<cite>mandatory</cite>). Units – <a href="#id67"><span class="problematic" id="id68">``</span></a>.</p>
+<dd><p>original lattice variation (<cite>mandatory</cite>). Units &#8211; <a href="#id65"><span class="problematic" id="id66">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1923,7 +1939,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.lattice_variation_relax">
 <code class="descname">lattice_variation_relax</code><a class="headerlink" href="#aflow.entries.Entry.lattice_variation_relax" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed lattice variation (<cite>mandatory</cite>). Units – <a href="#id69"><span class="problematic" id="id70">``</span></a>.</p>
+<dd><p>relaxed lattice variation (<cite>mandatory</cite>). Units &#8211; <a href="#id67"><span class="problematic" id="id68">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -1953,7 +1969,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.ldau_TLUJ">
 <code class="descname">ldau_TLUJ</code><a class="headerlink" href="#aflow.entries.Entry.ldau_TLUJ" title="Permalink to this definition">¶</a></dt>
-<dd><p>on site coulomb interaction (<cite>mandatory</cite>). Units – <a href="#id71"><span class="problematic" id="id72">``</span></a>.</p>
+<dd><p>on site coulomb interaction (<cite>mandatory</cite>). Units &#8211; <a href="#id69"><span class="problematic" id="id70">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -1977,7 +1993,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.loop">
 <code class="descname">loop</code><a class="headerlink" href="#aflow.entries.Entry.loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>process category (<cite>optional</cite>). Units – <a href="#id73"><span class="problematic" id="id74">``</span></a>.</p>
+<dd><p>process category (<cite>optional</cite>). Units &#8211; <a href="#id71"><span class="problematic" id="id72">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1996,7 +2012,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.natoms">
 <code class="descname">natoms</code><a class="headerlink" href="#aflow.entries.Entry.natoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>number of atoms in unit cell (<cite>mandatory</cite>). Units – <a href="#id75"><span class="problematic" id="id76">``</span></a>.</p>
+<dd><p>number of atoms in unit cell (<cite>mandatory</cite>). Units &#8211; <a href="#id73"><span class="problematic" id="id74">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2015,7 +2031,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.nbondxx">
 <code class="descname">nbondxx</code><a class="headerlink" href="#aflow.entries.Entry.nbondxx" title="Permalink to this definition">¶</a></dt>
-<dd><p>nearest neighbor bond lengths (<cite>optional</cite>). Units – <cite>&amp;Aring;</cite>.</p>
+<dd><p>nearest neighbor bond lengths (<cite>optional</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2046,7 +2062,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.node_CPU_Cores">
 <code class="descname">node_CPU_Cores</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_Cores" title="Permalink to this definition">¶</a></dt>
-<dd><p>available CPU cores (<cite>optional</cite>). Units – <a href="#id77"><span class="problematic" id="id78">``</span></a>.</p>
+<dd><p>available CPU cores (<cite>optional</cite>). Units &#8211; <a href="#id75"><span class="problematic" id="id76">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2065,7 +2081,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.node_CPU_MHz">
 <code class="descname">node_CPU_MHz</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_MHz" title="Permalink to this definition">¶</a></dt>
-<dd><p>CPU rate (<cite>optional</cite>). Units – <cite>Megahertz</cite>.</p>
+<dd><p>CPU rate (<cite>optional</cite>). Units &#8211; <cite>Megahertz</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2084,7 +2100,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.node_CPU_Model">
 <code class="descname">node_CPU_Model</code><a class="headerlink" href="#aflow.entries.Entry.node_CPU_Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>CPU model (<cite>optional</cite>). Units – <a href="#id79"><span class="problematic" id="id80">``</span></a>.</p>
+<dd><p>CPU model (<cite>optional</cite>). Units &#8211; <a href="#id77"><span class="problematic" id="id78">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2103,7 +2119,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.node_RAM_GB">
 <code class="descname">node_RAM_GB</code><a class="headerlink" href="#aflow.entries.Entry.node_RAM_GB" title="Permalink to this definition">¶</a></dt>
-<dd><p>available RAM (<cite>optional</cite>). Units – <cite>Gigabytes</cite>.</p>
+<dd><p>available RAM (<cite>optional</cite>). Units &#8211; <cite>Gigabytes</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2122,7 +2138,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.nspecies">
 <code class="descname">nspecies</code><a class="headerlink" href="#aflow.entries.Entry.nspecies" title="Permalink to this definition">¶</a></dt>
-<dd><p>species count (<cite>mandatory</cite>). Units – <a href="#id81"><span class="problematic" id="id82">``</span></a>.</p>
+<dd><p>species count (<cite>mandatory</cite>). Units &#8211; <a href="#id79"><span class="problematic" id="id80">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2141,7 +2157,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.positions_cartesian">
 <code class="descname">positions_cartesian</code><a class="headerlink" href="#aflow.entries.Entry.positions_cartesian" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed absolute positions (<cite>mandatory</cite>). Units – <cite>&amp;Aring;</cite>.</p>
+<dd><p>relaxed absolute positions (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2171,13 +2187,13 @@ keyword. They are exposed as additional methods on this object.</p>
 </table>
 <p class="rubric">Examples</p>
 <p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>positions_cartesian=0,0,0;18.18438,0,2.85027;…</cite></p>
+<p><cite>positions_cartesian=0,0,0;18.18438,0,2.85027;...</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.positions_fractional">
 <code class="descname">positions_fractional</code><a class="headerlink" href="#aflow.entries.Entry.positions_fractional" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed relative positions (<cite>mandatory</cite>). Units – <a href="#id83"><span class="problematic" id="id84">``</span></a>.</p>
+<dd><p>relaxed relative positions (<cite>mandatory</cite>). Units &#8211; <a href="#id81"><span class="problematic" id="id82">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2207,13 +2223,13 @@ keyword. They are exposed as additional methods on this object.</p>
 </table>
 <p class="rubric">Examples</p>
 <p>You can expect the <em>content</em> of the result to be something like:</p>
-<p><cite>positions_fractional=0,0,0;0.25,0.25,0.25;…</cite></p>
+<p><cite>positions_fractional=0,0,0;0.25,0.25,0.25;...</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="aflow.entries.Entry.pressure">
 <code class="descname">pressure</code><a class="headerlink" href="#aflow.entries.Entry.pressure" title="Permalink to this definition">¶</a></dt>
-<dd><p>external pressure (<cite>mandatory</cite>). Units – <cite>kbar</cite>.</p>
+<dd><p>external pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2232,7 +2248,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.pressure_final">
 <code class="descname">pressure_final</code><a class="headerlink" href="#aflow.entries.Entry.pressure_final" title="Permalink to this definition">¶</a></dt>
-<dd><p>resulting pressure (<cite>mandatory</cite>). Units – <cite>kbar</cite>.</p>
+<dd><p>resulting pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2256,7 +2272,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.pressure_residual">
 <code class="descname">pressure_residual</code><a class="headerlink" href="#aflow.entries.Entry.pressure_residual" title="Permalink to this definition">¶</a></dt>
-<dd><p>residual pressure (<cite>mandatory</cite>). Units – <cite>kbar</cite>.</p>
+<dd><p>residual pressure (<cite>mandatory</cite>). Units &#8211; <cite>kbar</cite>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2280,7 +2296,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.prototype">
 <code class="descname">prototype</code><a class="headerlink" href="#aflow.entries.Entry.prototype" title="Permalink to this definition">¶</a></dt>
-<dd><p>original prototype (<cite>mandatory</cite>). Units – <a href="#id85"><span class="problematic" id="id86">``</span></a>.</p>
+<dd><p>original prototype (<cite>mandatory</cite>). Units &#8211; <a href="#id83"><span class="problematic" id="id84">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2299,7 +2315,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.scintillation_attenuation_length">
 <code class="descname">scintillation_attenuation_length</code><a class="headerlink" href="#aflow.entries.Entry.scintillation_attenuation_length" title="Permalink to this definition">¶</a></dt>
-<dd><p>attenuation length (<cite>mandatory</cite>). Units – <cite>cm</cite>.</p>
+<dd><p>attenuation length (<cite>mandatory</cite>). Units &#8211; <cite>cm</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2327,7 +2343,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.sg">
 <code class="descname">sg</code><a class="headerlink" href="#aflow.entries.Entry.sg" title="Permalink to this definition">¶</a></dt>
-<dd><p>space group of compound (<cite>mandatory</cite>). Units – <a href="#id87"><span class="problematic" id="id88">``</span></a>.</p>
+<dd><p>space group of compound (<cite>mandatory</cite>). Units &#8211; <a href="#id85"><span class="problematic" id="id86">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2357,7 +2373,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.sg2">
 <code class="descname">sg2</code><a class="headerlink" href="#aflow.entries.Entry.sg2" title="Permalink to this definition">¶</a></dt>
-<dd><p>refined space group of compound  (<cite>mandatory</cite>). Units – <a href="#id89"><span class="problematic" id="id90">``</span></a>.</p>
+<dd><p>refined space group of compound  (<cite>mandatory</cite>). Units &#8211; <a href="#id87"><span class="problematic" id="id88">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2387,7 +2403,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spacegroup_orig">
 <code class="descname">spacegroup_orig</code><a class="headerlink" href="#aflow.entries.Entry.spacegroup_orig" title="Permalink to this definition">¶</a></dt>
-<dd><p>original space group number (<cite>mandatory</cite>). Units – <a href="#id91"><span class="problematic" id="id92">``</span></a>.</p>
+<dd><p>original space group number (<cite>mandatory</cite>). Units &#8211; <a href="#id89"><span class="problematic" id="id90">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2406,7 +2422,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spacegroup_relax">
 <code class="descname">spacegroup_relax</code><a class="headerlink" href="#aflow.entries.Entry.spacegroup_relax" title="Permalink to this definition">¶</a></dt>
-<dd><p>relaxed space group number (<cite>mandatory</cite>). Units – <a href="#id93"><span class="problematic" id="id94">``</span></a>.</p>
+<dd><p>relaxed space group number (<cite>mandatory</cite>). Units &#8211; <a href="#id91"><span class="problematic" id="id92">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2436,7 +2452,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.species">
 <code class="descname">species</code><a class="headerlink" href="#aflow.entries.Entry.species" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic species (<cite>mandatory</cite>). Units – <a href="#id95"><span class="problematic" id="id96">``</span></a>.</p>
+<dd><p>atomic species (<cite>mandatory</cite>). Units &#8211; <a href="#id93"><span class="problematic" id="id94">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2455,7 +2471,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.species_pp">
 <code class="descname">species_pp</code><a class="headerlink" href="#aflow.entries.Entry.species_pp" title="Permalink to this definition">¶</a></dt>
-<dd><p>pseudopotential of chemical speciess (<cite>mandatory</cite>). Units – <a href="#id97"><span class="problematic" id="id98">``</span></a>.</p>
+<dd><p>pseudopotential of chemical speciess (<cite>mandatory</cite>). Units &#8211; <a href="#id95"><span class="problematic" id="id96">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2474,7 +2490,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.species_pp_ZVAL">
 <code class="descname">species_pp_ZVAL</code><a class="headerlink" href="#aflow.entries.Entry.species_pp_ZVAL" title="Permalink to this definition">¶</a></dt>
-<dd><p>valence atoms per species (<cite>optional</cite>). Units – <cite>electrons</cite>.</p>
+<dd><p>valence atoms per species (<cite>optional</cite>). Units &#8211; <cite>electrons</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2493,7 +2509,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.species_pp_version">
 <code class="descname">species_pp_version</code><a class="headerlink" href="#aflow.entries.Entry.species_pp_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>pseudopotential version and species (<cite>mandatory</cite>). Units – <a href="#id99"><span class="problematic" id="id100">``</span></a>.</p>
+<dd><p>pseudopotential version and species (<cite>mandatory</cite>). Units &#8211; <a href="#id97"><span class="problematic" id="id98">``</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2512,7 +2528,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spinD">
 <code class="descname">spinD</code><a class="headerlink" href="#aflow.entries.Entry.spinD" title="Permalink to this definition">¶</a></dt>
-<dd><p>spin decomposition over unit cell (<cite>mandatory</cite>). Units – <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<dd><p>spin decomposition over unit cell (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2540,7 +2556,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spinF">
 <code class="descname">spinF</code><a class="headerlink" href="#aflow.entries.Entry.spinF" title="Permalink to this definition">¶</a></dt>
-<dd><p>magnetization of unit cell at Fermi level (<cite>mandatory</cite>). Units – <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<dd><p>magnetization of unit cell at Fermi level (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2568,7 +2584,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spin_atom">
 <code class="descname">spin_atom</code><a class="headerlink" href="#aflow.entries.Entry.spin_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic spin polarization (<cite>mandatory</cite>). Units – <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;/atom</cite>.</p>
+<dd><p>atomic spin polarization (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2596,7 +2612,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.spin_cell">
 <code class="descname">spin_cell</code><a class="headerlink" href="#aflow.entries.Entry.spin_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell spin polarization (<cite>mandatory</cite>). Units – <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
+<dd><p>unit cell spin polarization (<cite>mandatory</cite>). Units &#8211; <cite>&amp;mu;&lt;sub&gt;B&lt;/sub&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2624,7 +2640,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.sponsor">
 <code class="descname">sponsor</code><a class="headerlink" href="#aflow.entries.Entry.sponsor" title="Permalink to this definition">¶</a></dt>
-<dd><p>sponsor (<cite>optional</cite>). Units – <a href="#id101"><span class="problematic" id="id102">``</span></a>.</p>
+<dd><p>sponsor (<cite>optional</cite>). Units &#8211; <a href="#id99"><span class="problematic" id="id100">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2648,7 +2664,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.stoich">
 <code class="descname">stoich</code><a class="headerlink" href="#aflow.entries.Entry.stoich" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell stoichiometry (<cite>optional</cite>). Units – <a href="#id103"><span class="problematic" id="id104">``</span></a>.</p>
+<dd><p>unit cell stoichiometry (<cite>optional</cite>). Units &#8211; <a href="#id101"><span class="problematic" id="id102">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2681,7 +2697,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.stoichiometry">
 <code class="descname">stoichiometry</code><a class="headerlink" href="#aflow.entries.Entry.stoichiometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell stoichiometry (<cite>mandatory</cite>). Units – <a href="#id105"><span class="problematic" id="id106">``</span></a>.</p>
+<dd><p>unit cell stoichiometry (<cite>mandatory</cite>). Units &#8211; <a href="#id103"><span class="problematic" id="id104">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2709,7 +2725,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.stress_tensor">
 <code class="descname">stress_tensor</code><a class="headerlink" href="#aflow.entries.Entry.stress_tensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stress Tensor (<cite>mandatory</cite>). Units – <a href="#id107"><span class="problematic" id="id108">``</span></a>.</p>
+<dd><p>Stress Tensor (<cite>mandatory</cite>). Units &#8211; <a href="#id105"><span class="problematic" id="id106">``</span></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This keyword is still listed as development level. Use it
@@ -2733,7 +2749,7 @@ knowing that it is subject to change or removal.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.valence_cell_iupac">
 <code class="descname">valence_cell_iupac</code><a class="headerlink" href="#aflow.entries.Entry.valence_cell_iupac" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell IUPAC valence (<cite>mandatory</cite>). Units – <a href="#id109"><span class="problematic" id="id110">``</span></a>.</p>
+<dd><p>unit cell IUPAC valence (<cite>mandatory</cite>). Units &#8211; <a href="#id107"><span class="problematic" id="id108">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2761,7 +2777,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.valence_cell_std">
 <code class="descname">valence_cell_std</code><a class="headerlink" href="#aflow.entries.Entry.valence_cell_std" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell standard valence (<cite>mandatory</cite>). Units – <a href="#id111"><span class="problematic" id="id112">``</span></a>.</p>
+<dd><p>unit cell standard valence (<cite>mandatory</cite>). Units &#8211; <a href="#id109"><span class="problematic" id="id110">``</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2789,7 +2805,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.volume_atom">
 <code class="descname">volume_atom</code><a class="headerlink" href="#aflow.entries.Entry.volume_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>atomic volume (<cite>mandatory</cite>). Units – <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;/atom</cite>.</p>
+<dd><p>atomic volume (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;/atom</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2820,7 +2836,7 @@ keyword. They are exposed as additional methods on this object.</p>
 <dl class="attribute">
 <dt id="aflow.entries.Entry.volume_cell">
 <code class="descname">volume_cell</code><a class="headerlink" href="#aflow.entries.Entry.volume_cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>unit cell volume (<cite>mandatory</cite>). Units – <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
+<dd><p>unit cell volume (<cite>mandatory</cite>). Units &#8211; <cite>&amp;Aring;&lt;sup&gt;3&lt;/sup&gt;</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>The following verifications are available for this
@@ -2900,12 +2916,12 @@ keyword. They are exposed as additional methods on this object.</p>
         <li class="right" >
           <a href="keywords.html" title="AFLOW Database Keywords"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">aflow 0.0.7 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Conrad W. Rosenbrock.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
     </div>
   </body>
 </html>
